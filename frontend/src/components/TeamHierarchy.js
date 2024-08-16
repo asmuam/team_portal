@@ -4,19 +4,39 @@ import './TeamHierarchy.css';
 function TeamHierarchy() {
     const [teams, setTeams] = useState([
         {
-            id: 1, name: 'Tim Kerja A', activities: [
+            id: 1,
+            name: 'Tim Kerja A',
+            activities: [
                 {
-                    name: 'Kegiatan 1', subActivities: [
-                        { name: 'Sub-Kegiatan 1.1', tasks: ['Tugas 1', 'Tugas 2'] },
-                        { name: 'Sub-Kegiatan 1.2', tasks: [] }
+                    name: 'Kegiatan 1',
+                    subActivities: [
+                        {
+                            name: 'Sub-Kegiatan 1.1',
+                            tasks: [
+                                { name: 'Tugas abcdefg', dateCreated: '2024-05-01', dueDate: '2024-08-10', dateUpload: '', link: '', completed: false, status: '' },
+                                { name: 'Tugas 2', dateCreated: '2024-07-02', dueDate: '2024-08-22', dateUpload: '', link: '', completed: true, status: '' }
+                            ]
+                        },
+                        {
+                            name: 'Sub-Kegiatan 1.2',
+                            tasks: []
+                        }
                     ]
                 },
-                { name: 'Kegiatan 2', subActivities: [] }
+                {
+                    name: 'Kegiatan 2',
+                    subActivities: [
+                        {
+                            name: 'Sub-Kegiatan 2.1',
+                            tasks: [
+                            ]
+                        }
+                    ]
+                }
             ]
-        },
-        { id: 2, name: 'Tim Kerja B', activities: [] },
-        { id: 3, name: 'Tim Kerja C', activities: [] },
+        }
     ]);
+
 
     const [activeTeams, setActiveTeams] = useState([]);
     const [activeActivities, setActiveActivities] = useState([]);
@@ -180,8 +200,18 @@ function TeamHierarchy() {
     };
 
     const addTask = (teamId, activityIndex, subActivityIndex) => {
-        const newTask = prompt('Masukkan nama tugas baru:');
-        if (newTask) {
+        const newTaskName = prompt('Masukkan nama tugas baru:');
+        const dueDate = prompt('Masukkan deadline tugas (YYYY-MM-DD):');
+        const driveLink = prompt('Masukkan link drive (bukti dukung):');
+
+        if (newTaskName) {
+            const newTask = {
+                name: newTaskName,
+                dateCreated: new Date().toISOString().split('T')[0],
+                dueDate: dueDate || 'Tidak ada',
+                driveLink: driveLink || '#',
+                completed: false
+            };
             setTeams(teams.map(team =>
                 team.id === teamId
                     ? {
@@ -202,8 +232,8 @@ function TeamHierarchy() {
         }
     };
 
-    const renameTask = (teamId, activityIndex, subActivityIndex, taskIndex) => {
-        const newName = prompt('Masukkan nama tugas baru:');
+    const renameTask = (teamId, activityIndex, subActivityIndex, taskIndex, currentName) => {
+        const newName = prompt('Masukkan nama tugas baru:', currentName);
         if (newName) {
             setTeams(teams.map(team =>
                 team.id === teamId
@@ -215,7 +245,7 @@ function TeamHierarchy() {
                                 subActivities: activity.subActivities.map((subActivity, j) => j === subActivityIndex
                                     ? {
                                         ...subActivity,
-                                        tasks: subActivity.tasks.map((task, k) => k === taskIndex ? newName : task)
+                                        tasks: subActivity.tasks.map((task, k) => k === taskIndex ? { ...task, name: newName } : task)
                                     }
                                     : subActivity
                                 )
@@ -227,6 +257,7 @@ function TeamHierarchy() {
             ));
         }
     };
+
 
     const deleteTask = (teamId, activityIndex, subActivityIndex, taskIndex) => {
         setTeams(teams.map(team =>
@@ -255,6 +286,97 @@ function TeamHierarchy() {
         alert(`Tugas ${teams.find(team => team.id === teamId).activities[activityIndex].subActivities[subActivityIndex].tasks[taskIndex]} telah diarsipkan.`);
     };
 
+    const toggleTaskCompletion = (teamId, activityIndex, subActivityIndex, taskIndex) => {
+        setTeams(teams.map(team =>
+            team.id === teamId
+                ? {
+                    ...team,
+                    activities: team.activities.map((activity, i) => i === activityIndex
+                        ? {
+                            ...activity,
+                            subActivities: activity.subActivities.map((subActivity, j) => j === subActivityIndex
+                                ? {
+                                    ...subActivity,
+                                    tasks: subActivity.tasks.map((task, k) => k === taskIndex ? { ...task, completed: !task.completed } : task)
+                                }
+                                : subActivity
+                            )
+                        }
+                        : activity
+                    )
+                }
+                : team
+        ));
+    };
+
+    const handleDeadlineChange = (teamId, activityIndex, subActivityIndex, taskIndex) => {
+        const newDeadline = prompt('Masukkan deadline baru (YYYY-MM-DD):');
+
+        if (newDeadline) {
+            setTeams(teams.map(team =>
+                team.id === teamId
+                    ? {
+                        ...team,
+                        activities: team.activities.map((activity, i) => i === activityIndex
+                            ? {
+                                ...activity,
+                                subActivities: activity.subActivities.map((subActivity, j) => j === subActivityIndex
+                                    ? {
+                                        ...subActivity,
+                                        tasks: subActivity.tasks.map((task, k) => k === taskIndex ? { ...task, dueDate: newDeadline, status: calculateTaskStatus(newDeadline, task.dateUpload) } : task)
+                                    }
+                                    : subActivity
+                                )
+                            }
+                            : activity
+                        )
+                    }
+                    : team
+            ));
+        }
+    };
+
+
+    const handleLinkChange = (e, teamId, activityIndex, subActivityIndex, taskIndex) => {
+        const newLink = e.target.value;
+        const dateUpload = new Date().toISOString().split('T')[0]; // Current date as upload date
+
+        setTeams(teams.map(team =>
+            team.id === teamId
+                ? {
+                    ...team,
+                    activities: team.activities.map((activity, i) => i === activityIndex
+                        ? {
+                            ...activity,
+                            subActivities: activity.subActivities.map((subActivity, j) => j === subActivityIndex
+                                ? {
+                                    ...subActivity,
+                                    tasks: subActivity.tasks.map((task, k) => k === taskIndex ? { ...task, link: newLink, dateUpload, status: calculateTaskStatus(task.dueDate, dateUpload) } : task)
+                                }
+                                : subActivity
+                            )
+                        }
+                        : activity
+                    )
+                }
+                : team
+        ));
+    };
+
+    const calculateTaskStatus = (dueDate, dateUpload) => {
+        const due = new Date(dueDate);
+        const upload = new Date(dateUpload);
+
+        return upload > due ? 'terlambat' : 'tepat waktu';
+    };
+
+    const calculateProgress = (tasks) => {
+        const totalTasks = tasks.length;
+        const completedTasks = tasks.filter(task => task.completed).length;
+        return totalTasks > 0 ? (completedTasks / totalTasks) * 100 : 0;
+    };
+
+
     return (
         <div className="team-hierarchy">
             <div className="team-list">
@@ -282,44 +404,76 @@ function TeamHierarchy() {
                                         </div>
                                         {activeActivities.includes(activityIndex) && (
                                             <div className="sub-activities-content">
-                                                {activity.subActivities.map((subActivity, subActivityIndex) => (
-                                                    <div className='sub-activity-container' key={subActivityIndex}>
-                                                        <div className="sub-activity-box">
-                                                            <div className="sub-activity-name" onClick={() => toggleSubActivityTasks(team.id, activityIndex, subActivityIndex)}>{subActivity.name}</div>
-                                                            <div className="sub-activity-actions">
-                                                                <span onClick={() => renameSubActivity(team.id, activityIndex, subActivityIndex)}>&#9998;</span>
-                                                                <span onClick={() => deleteSubActivity(team.id, activityIndex, subActivityIndex)}>&#10006;</span>
-                                                                <span onClick={() => archiveSubActivity(team.id, activityIndex, subActivityIndex)}>&#128229;</span>
-                                                            </div>
-                                                        </div>
-                                                        {subActivityTasks[team.id]?.[activityIndex]?.[subActivityIndex] && (
-                                                            <div className="tasks-content">
-                                                                {subActivity.tasks.map((task, taskIndex) => (
-                                                                    <div className='task-container' key={taskIndex}>
-                                                                        <div className="task-box">
-                                                                            <div className="task-name">{task}</div>
-                                                                            <div className="task-actions">
-                                                                                <span onClick={() => renameTask(team.id, activityIndex, subActivityIndex, taskIndex)}>&#9998;</span>
-                                                                                <span onClick={() => deleteTask(team.id, activityIndex, subActivityIndex, taskIndex)}>&#10006;</span>
-                                                                                <span onClick={() => archiveTask(team.id, activityIndex, subActivityIndex, taskIndex)}>&#128229;</span>
-                                                                            </div>
-                                                                        </div>
-                                                                    </div>
-                                                                ))}
-                                                                <div className="add-task-box" onClick={() => addTask(team.id, activityIndex, subActivityIndex)}>
-                                                                    + Tambah Tugas
+                                                {activity.subActivities.map((subActivity, subActivityIndex) => {
+                                                    const progress = calculateProgress(subActivity.tasks);
+
+                                                    return (
+                                                        <div className='sub-activity-container' key={subActivityIndex}>
+                                                            <div className="sub-activity-box" onClick={() => toggleSubActivityTasks(team.id, activityIndex, subActivityIndex)}>
+                                                                <div className="sub-activity-name">
+                                                                    {subActivity.name}
+                                                                </div>
+                                                                <div className="progress-status">    {subActivity.tasks.length === 0 ? 'Belum ada tugas' : `Progress: ${progress.toFixed(2)}%`}
+                                                                </div>
+                                                                <div className="sub-activity-actions">
+                                                                    <span onClick={() => renameSubActivity(team.id, activityIndex, subActivityIndex)}>&#9998;</span>
+                                                                    <span onClick={() => deleteSubActivity(team.id, activityIndex, subActivityIndex)}>&#10006;</span>
+                                                                    <span onClick={() => archiveSubActivity(team.id, activityIndex, subActivityIndex)}>&#128229;</span>
                                                                 </div>
                                                             </div>
-                                                        )}
-                                                    </div>
-                                                ))}
+                                                            {subActivityTasks[team.id]?.[activityIndex]?.[subActivityIndex] && (
+                                                                <div className="tasks-content">
+                                                                    {subActivity.tasks.map((task, taskIndex) => (
+                                                                        <div className='task-container' key={taskIndex}>
+                                                                            <div className="task-details">
+                                                                                <div className="task-name">{task.name}</div>
+                                                                                <div className="task-meta">
+                                                                                    <div>Date Created: {task.dateCreated}</div>
+                                                                                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                                                                                        <span>Deadline: {task.dueDate}</span>
+                                                                                        <span
+                                                                                            onClick={() => handleDeadlineChange(team.id, activityIndex, subActivityIndex, taskIndex)}
+                                                                                            style={{ cursor: 'pointer', fontSize: '1.2em' }}
+                                                                                        >
+                                                                                            &#128197;
+                                                                                        </span>
+                                                                                    </div>
+                                                                                    <div>
+                                                                                        <input
+                                                                                            type="text"
+                                                                                            value={task.link}
+                                                                                            onChange={(e) => handleLinkChange(e, team.id, activityIndex, subActivityIndex, taskIndex)}
+                                                                                        />
+                                                                                    </div>
+                                                                                    <div>Status: {task.status}</div>
+                                                                                    <input
+                                                                                        type="checkbox"
+                                                                                        checked={task.completed}
+                                                                                        onChange={() => toggleTaskCompletion(team.id, activityIndex, subActivityIndex, taskIndex)}
+                                                                                    />
+                                                                                </div>
+                                                                                <div className="task-actions">
+                                                                                    <span onClick={() => renameTask(team.id, activityIndex, subActivityIndex, taskIndex, task.name)}>&#9998;</span>
+                                                                                    <span onClick={() => deleteTask(team.id, activityIndex, subActivityIndex, taskIndex)}>&#10006;</span>
+                                                                                    <span onClick={() => archiveTask(team.id, activityIndex, subActivityIndex, taskIndex)}>&#128229;</span>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                    ))}
+                                                                    <div className="add-task-box" onClick={() => addTask(team.id, activityIndex, subActivityIndex)}>
+                                                                        + Tambah Tugas
+                                                                    </div>
+                                                                </div>
+                                                            )}
+                                                        </div>
+                                                    );
+                                                })}
                                                 <div className="add-sub-activity-box" onClick={() => addSubActivity(team.id, activityIndex)}>
                                                     + Tambah Sub-Kegiatan
                                                 </div>
                                             </div>
                                         )}
                                     </div>
-
                                 ))}
                                 <div className="add-activity-box" onClick={() => addActivity(team.id)}>
                                     + Tambah Kegiatan
@@ -334,6 +488,7 @@ function TeamHierarchy() {
             </div>
         </div>
     );
+
 }
 
 export default TeamHierarchy;

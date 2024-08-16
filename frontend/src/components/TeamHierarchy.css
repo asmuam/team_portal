@@ -24,7 +24,7 @@
     padding: 20px;
     border: 2px solid #333;
     border-radius: 8px;
-    background-color: #f0f0f0;
+    background-color: #8d8a8a;
     cursor: pointer;
 }
 
@@ -33,8 +33,8 @@
 }
 
 .team-name {
-    font-size: 1.2em;
-    font-weight: bold;
+    font-size: 1.5em;
+    font-weight: 900;
     margin-bottom: 10px;
 }
 
@@ -79,7 +79,7 @@
 .activity-box {
     position: relative;
     padding: 10px;
-    border: 1px solid #777;
+    border: 5px solid #777;
     border-radius: 6px;
     background-color: #fff;
     cursor: pointer;
@@ -90,7 +90,8 @@
 }
 
 .activity-name {
-    font-size: 1em;
+    font-size: 1.2em;
+    font-weight: 500;
     margin-bottom: 5px;
 }
 
@@ -145,7 +146,7 @@
 .sub-activity-container {
     position: relative;
     padding: 10px;
-    border: 1px solid #aaa;
+    border: 3px outset #aaa;
     border-radius: 6px;
     background-color: #f9f9f9;
     cursor: pointer;
@@ -157,6 +158,7 @@
 
 .sub-activity-name {
     font-size: 0.9em;
+    font-weight: 900;
     margin-bottom: 5px;
 }
 
@@ -182,7 +184,7 @@
 
 /* task */
 .tasks-content {
-    margin-top: 10px;
+    margin-top: 20px;
     padding-left: 20px; /* Align with the sub-activity content */
     display: flex;
     flex-direction: column;
@@ -192,25 +194,39 @@
 .task-container {
     position: relative;
     padding: 10px;
+    padding-right: 150px; /* Add extra space on the right for task actions */
     border: 1px solid #888;
     border-radius: 6px;
     background-color: #f1f1f1;
     cursor: pointer;
+    box-sizing: border-box; /* Ensure padding and border are included in the total width */
 }
 
 .task-container:hover .task-actions {
     display: flex;
 }
 
-.task-name {
-    font-size: 0.8em;
-    margin-bottom: 5px;
+.task-details {
+    display: flex;
+    flex-direction: row;
+    align-items: center; /* Center items vertically */
+    justify-content: space-between; /* Distribute space between name and metadata */
+    width: 100%; /* Ensure it takes full width of the container */
 }
+
+.task-name {
+    margin-right: 15px; /* Space between task name and metadata */
+    flex: 1; /* Allow task name to take available space */
+    min-width: 150px; /* Set a minimum width for consistency */
+    overflow: hidden; /* Handle text overflow */
+    text-overflow: ellipsis; /* Show ellipsis for overflow text */
+    white-space: nowrap; /* Prevent wrapping of task name */
+}
+
 
 .task-actions {
     position: absolute;
-    top: 5px;
-    right: 5px;
+    right: 5px; /* Ensure actions are positioned inside container */
     display: none;
     flex-direction: row;
     gap: 5px;
@@ -239,4 +255,26 @@
     display: flex;
     justify-content: center;
     align-items: center;
+}
+
+/* Metadata */
+.task-meta {
+    display: flex;
+    flex:5;
+    flex-direction: row; /* Stack metadata vertically */
+    gap: 20px;
+    align-items: center;
+    align-content: center;
+}
+
+/* Adjusting link styling */
+.task-meta a {
+    color: #007BFF; /* Link color */
+    text-decoration: none; /* Removing underline */
+    overflow-wrap: break-word; /* Ensure long URLs or text wrap correctly */
+}
+
+/* Ensure link and other metadata fit within the task container */
+.task-meta div, .task-meta a {
+    word-break: break-word; /* Break long words/URLs */
 }
