@@ -3,38 +3,38 @@ import './TeamHierarchy.css';
 
 function TeamHierarchy() {
     const [teams, setTeams] = useState([
-        {
-            id: 1,
-            name: 'Tim Kerja A',
-            activities: [
-                {
-                    name: 'Kegiatan 1',
-                    subActivities: [
-                        {
-                            name: 'Sub-Kegiatan 1.1',
-                            tasks: [
-                                { name: 'Tugas abcdefg', dateCreated: '2024-05-01', dueDate: '2024-08-10', dateUpload: '', link: '', completed: false, status: '' },
-                                { name: 'Tugas 2', dateCreated: '2024-07-02', dueDate: '2024-08-22', dateUpload: '', link: '', completed: true, status: '' }
-                            ]
-                        },
-                        {
-                            name: 'Sub-Kegiatan 1.2',
-                            tasks: []
-                        }
-                    ]
-                },
-                {
-                    name: 'Kegiatan 2',
-                    subActivities: [
-                        {
-                            name: 'Sub-Kegiatan 2.1',
-                            tasks: [
-                            ]
-                        }
-                    ]
-                }
-            ]
-        }
+        // {
+        //     id: 1,
+        //     name: 'Tim Kerja A',
+        //     activities: [
+        //         {
+        //             name: 'Kegiatan 1',
+        //             subActivities: [
+        //                 {
+        //                     name: 'Sub-Kegiatan 1.1',
+        //                     tasks: [
+        //                         { name: 'Tugas abcdefg', dateCreated: '2024-05-01', dueDate: '2024-08-10', dateUpload: '', link: '', completed: false, status: '' },
+        //                         { name: 'Tugas 2', dateCreated: '2024-07-02', dueDate: '2024-08-22', dateUpload: '', link: '', completed: true, status: '' }
+        //                     ]
+        //                 },
+        //                 {
+        //                     name: 'Sub-Kegiatan 1.2',
+        //                     tasks: []
+        //                 }
+        //             ]
+        //         },
+        //         {
+        //             name: 'Kegiatan 2',
+        //             subActivities: [
+        //                 {
+        //                     name: 'Sub-Kegiatan 2.1',
+        //                     tasks: [
+        //                     ]
+        //                 }
+        //             ]
+        //         }
+        //     ]
+        // }
     ]);
 
 
@@ -413,7 +413,8 @@ function TeamHierarchy() {
                                                                 <div className="sub-activity-name">
                                                                     {subActivity.name}
                                                                 </div>
-                                                                <div className="progress-status">    {subActivity.tasks.length === 0 ? 'Belum ada tugas' : `Progress: ${progress.toFixed(2)}%`}
+                                                                <div className="progress-status">
+                                                                    {subActivity.tasks.length === 0 ? 'Belum ada tugas' : `Progress: ${progress.toFixed(2)}%`}
                                                                 </div>
                                                                 <div className="sub-activity-actions">
                                                                     <span onClick={() => renameSubActivity(team.id, activityIndex, subActivityIndex)}>&#9998;</span>
@@ -428,9 +429,15 @@ function TeamHierarchy() {
                                                                             <div className="task-details">
                                                                                 <div className="task-name">{task.name}</div>
                                                                                 <div className="task-meta">
-                                                                                    <div>Date Created: {task.dateCreated}</div>
-                                                                                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                                                                                        <span>Deadline: {task.dueDate}</span>
+                                                                                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexDirection: 'column' }}>
+                                                                                        <span>Date Created: </span>
+                                                                                        <span>{task.dateCreated}</span>
+                                                                                    </div>
+                                                                                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexDirection: 'row' }}>
+                                                                                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexDirection: 'column' }}>
+                                                                                            <span>Deadline:</span>
+                                                                                            <span style={{color:'red'}}>{task.dueDate}</span>
+                                                                                        </div>
                                                                                         <span
                                                                                             onClick={() => handleDeadlineChange(team.id, activityIndex, subActivityIndex, taskIndex)}
                                                                                             style={{ cursor: 'pointer', fontSize: '1.2em' }}
@@ -461,7 +468,7 @@ function TeamHierarchy() {
                                                                         </div>
                                                                     ))}
                                                                     <div className="add-task-box" onClick={() => addTask(team.id, activityIndex, subActivityIndex)}>
-                                                                        + Tambah Tugas
+                                                                        + Tambah Tugas {activity.name} - {subActivity.name}
                                                                     </div>
                                                                 </div>
                                                             )}
@@ -469,14 +476,14 @@ function TeamHierarchy() {
                                                     );
                                                 })}
                                                 <div className="add-sub-activity-box" onClick={() => addSubActivity(team.id, activityIndex)}>
-                                                    + Tambah Sub-Kegiatan
+                                                    + Tambah Sub-Kegiatan {activity.name}
                                                 </div>
                                             </div>
                                         )}
                                     </div>
                                 ))}
                                 <div className="add-activity-box" onClick={() => addActivity(team.id)}>
-                                    + Tambah Kegiatan
+                                    + Tambah Kegiatan {team.name}
                                 </div>
                             </div>
                         )}
@@ -488,6 +495,7 @@ function TeamHierarchy() {
             </div>
         </div>
     );
+
 
 }
 
