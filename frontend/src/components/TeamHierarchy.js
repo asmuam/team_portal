@@ -1,42 +1,7 @@
 import React, { useState } from 'react';
 import './TeamHierarchy.css';
 
-function TeamHierarchy() {
-    const [teams, setTeams] = useState([
-        // {
-        //     id: 1,
-        //     name: 'Tim Kerja A',
-        //     activities: [
-        //         {
-        //             name: 'Kegiatan 1',
-        //             subActivities: [
-        //                 {
-        //                     name: 'Sub-Kegiatan 1.1',
-        //                     tasks: [
-        //                         { name: 'Tugas abcdefg', dateCreated: '2024-05-01', dueDate: '2024-08-10', dateUpload: '', link: '', completed: false, status: '' },
-        //                         { name: 'Tugas 2', dateCreated: '2024-07-02', dueDate: '2024-08-22', dateUpload: '', link: '', completed: true, status: '' }
-        //                     ]
-        //                 },
-        //                 {
-        //                     name: 'Sub-Kegiatan 1.2',
-        //                     tasks: []
-        //                 }
-        //             ]
-        //         },
-        //         {
-        //             name: 'Kegiatan 2',
-        //             subActivities: [
-        //                 {
-        //                     name: 'Sub-Kegiatan 2.1',
-        //                     tasks: [
-        //                     ]
-        //                 }
-        //             ]
-        //         }
-        //     ]
-        // }
-    ]);
-
+function TeamHierarchy({ teams, setTeams }) {
 
     const [activeTeams, setActiveTeams] = useState([]);
     const [activeActivities, setActiveActivities] = useState([]);
@@ -376,7 +341,18 @@ function TeamHierarchy() {
         return totalTasks > 0 ? (completedTasks / totalTasks) * 100 : 0;
     };
 
-
+    const copyToClipboard = (text) => {
+        if (text.trim()) {
+            navigator.clipboard.writeText(text).then(() => {
+                alert('Copied to clipboard!');
+            }).catch(err => {
+                console.error('Failed to copy: ', err);
+            });
+        } else {
+            alert('No text to copy!');
+        }
+    };
+    
     return (
         <div className="team-hierarchy">
             <div className="team-list">
@@ -436,21 +412,24 @@ function TeamHierarchy() {
                                                                                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexDirection: 'row' }}>
                                                                                         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexDirection: 'column' }}>
                                                                                             <span>Deadline:</span>
-                                                                                            <span style={{color:'red'}}>{task.dueDate}</span>
+                                                                                            <span style={{ color: 'red' }}>{task.dueDate}</span>
                                                                                         </div>
                                                                                         <span
                                                                                             onClick={() => handleDeadlineChange(team.id, activityIndex, subActivityIndex, taskIndex)}
-                                                                                            style={{ cursor: 'pointer', fontSize: '1.2em' }}
+                                                                                            style={{ cursor: 'pointer', fontSize: '1.5em', margin: '15px' }}
                                                                                         >
                                                                                             &#128197;
                                                                                         </span>
                                                                                     </div>
-                                                                                    <div>
+                                                                                    <div className='task-meta-input-container'>
                                                                                         <input
                                                                                             type="text"
+                                                                                            className="task-meta-input"
                                                                                             value={task.link}
-                                                                                            onChange={(e) => handleLinkChange(e, team.id, activityIndex, subActivityIndex, taskIndex)}
-                                                                                        />
+                                                                                            onChange={(e) => handleLinkChange(e, team.id, activityIndex, subActivityIndex, taskIndex)} />
+                                                                                        <span className="copy-icon" onClick={() => copyToClipboard(task.link)}>
+                                                                                            Salin&#x1f4cb; {/* Copy icon */}
+                                                                                        </span>
                                                                                     </div>
                                                                                     <div>Status: {task.status}</div>
                                                                                     <input
@@ -483,7 +462,7 @@ function TeamHierarchy() {
                                     </div>
                                 ))}
                                 <div className="add-activity-box" onClick={() => addActivity(team.id)}>
-                                    + Tambah Kegiatan {team.name}
+                                    + Tambah Kegiatan Tim {team.name}
                                 </div>
                             </div>
                         )}
