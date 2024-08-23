@@ -10,9 +10,9 @@ app.use(express.json());
 
 app.use('/api', authRoutes);  // Add authRoutes to handle authentication
 app.use('/api', explorerRoutes);  
-app.use('/api/secure-endpoint', authenticateToken, (req, res) => {
-    res.json({ message: 'This is a secure endpoint' });
-});
+app.use('/api', tabelRoutes);  
+app.use('/api', linkPentingRoutes);  
+
 
 app.listen(5000, () => {
     console.log('Server running on port 5000');

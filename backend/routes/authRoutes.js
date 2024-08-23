@@ -1,55 +1,119 @@
-const express = require('express');
-const prisma = require('@prisma/client');
-const bcrypt = require('bcrypt');
-const jwt = require('jsonwebtoken');
+import express from 'express';
+import dotenv from 'dotenv';
+import jwt from 'jsonwebtoken';
+import bcrypt from 'bcryptjs';
+import prismaClient from '../prisma/config'; // Sesuaikan dengan path prismaClient Anda
+
+dotenv.config();
 
 const router = express.Router();
-const prismaClient = new prisma.PrismaClient();
 
-// Replace with your own secret
-const JWT_SECRET = 'your_secret_key';
+const JWT_SECRET = process.env.JWT_SECRET;
+const REFRESH_TOKEN_SECRET = process.env.REFRESH_TOKEN_SECRET;
 
 // Login route
 router.post('/login', async (req, res) => {
+  try {
     const { username, password } = req.body;
-    
-    // Find user by username
+
+    // Validasi input
+    if (!username || !password) {
+      return res.status(400).json({
+        message: "Username dan password tidak boleh kosong",
+      });
+    }
+
+    // Temukan pengguna berdasarkan username
     const user = await prismaClient.user.findUnique({
-        where: { username: username },
+      where: { username: username },
     });
 
-    if (user && bcrypt.compareSync(password, user.password)) {
-        // Generate JWT token
-        const token = jwt.sign({ userId: user.id }, JWT_SECRET, { expiresIn: '1h' });
-        res.json({ success: true, token });
-    } else {
-        res.status(401).json({ success: false, message: 'Invalid credentials' });
+    // Verifikasi pengguna dan kata sandi
+    if (!user || !bcrypt.compareSync(password, user.password)) {
+      return res.status(401).json({
+        success: false,
+        message: 'Username atau password tidak valid',
+      });
     }
+
+    // Buat access token dan refresh token
+    const accessToken = jwt.sign(
+      { userId: user.id, role: user.role },
+      JWT_SECRET,
+      { expiresIn: '1h' } // Access token berlaku selama 1 jam
+    );
+
+    const refreshToken = jwt.sign(
+      { userId: user.id, role: user.role },
+      REFRESH_TOKEN_SECRET,
+      { expiresIn: '7d' } // Refresh token berlaku selama 7 hari
+    );
+
+    // Kirim refresh token dalam cookie
+    res.cookie('refreshToken', refreshToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production', // Pastikan cookie hanya dikirim melalui HTTPS jika di produksi
+      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 hari
+    });
+
+    // Kirim access token dalam respons JSON
+    res.status(200).json({
+      success: true,
+      accessToken,
+    });
+
+  } catch (e) {
+    console.error(e.message);
+    res.status(500).json({
+      message: "Internal server error",
+      error: e.message,
+    });
+  }
 });
 
-// Sign up route (optional)
-router.post('/signup', async (req, res) => {
-    const { username, password } = req.body;
+// Refresh token route
+router.post('/refresh', async (req, res) => {
+  try {
+    const refreshToken = req.cookies.refreshToken;
+    const { id } = req.body;
 
-    // Hash the password
-    const hashedPassword = bcrypt.hashSync(password, 10);
+    // Validasi input
+    if (!refreshToken) return res.status(401).json({ message: 'Refresh token tidak ditemukan' });
 
-    try {
-        const user = await prismaClient.user.create({
-            data: { username, password: hashedPassword },
-        });
-        res.status(201).json({ success: true, user });
-    } catch (error) {
-        res.status(400).json({ success: false, message: 'User already exists' });
-    }
+    // Temukan pengguna berdasarkan id
+    const user = await prismaClient.user.findUnique({
+      where: { id: +id },
+    });
+
+    if (!user) return res.status(404).json({ message: 'Akun tidak ditemukan' });
+
+    // Verifikasi refresh token
+    jwt.verify(refreshToken, REFRESH_TOKEN_SECRET, (err, user) => {
+      if (err) return res.status(403).json({ message: 'Refresh token tidak valid' });
+
+      // Buat ulang access token
+      const accessToken = jwt.sign(
+        { userId: user.userId, role: user.role },
+        JWT_SECRET,
+        { expiresIn: '1h' } // Access token berlaku selama 1 jam
+      );
+
+      res.status(200).json({ accessToken });
+    });
+  } catch (error) {
+    console.error(error.message);
+    res.status(500).json({
+      message: "Internal server error",
+      error: error.message,
+    });
+  }
 });
-
-// Add this to your existing routes
 
 // Logout route (optional, if you need server-side token invalidation)
 router.post('/logout', (req, res) => {
     // Invalidate token on the server side if needed (e.g., add it to a blacklist)
+    res.clearCookie('refreshToken'); // Clear the refresh token cookie
     res.json({ success: true, message: 'Logged out successfully' });
 });
 
-module.exports = router;
+export default router;
