@@ -1,11 +1,26 @@
 import React, { useState } from 'react';
+import axios from 'axios'
 import './TeamHierarchy.css';
 
 function TeamHierarchy({ teams, setTeams }) {
-
     const [activeTeams, setActiveTeams] = useState([]);
     const [activeActivities, setActiveActivities] = useState([]);
     const [subActivityTasks, setSubActivityTasks] = useState({});
+
+    const URL = process.env.REACT_APP_API_URL
+
+    const refetchTeams = async () => {
+        try {
+            const response = await fetch(`${URL}/teams`);
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            const data = await response.json();
+            setTeams(data);
+        } catch (error) {
+            console.error('Failed to fetch teams:', error);
+        }
+    };
 
     const toggleTeamActivities = (id) => {
         setActiveTeams(prevState =>
@@ -13,17 +28,17 @@ function TeamHierarchy({ teams, setTeams }) {
         );
     };
 
-    const toggleActivitySubActivities = (teamId, index) => {
+    const toggleActivitySubActivities = (teamId, Id) => {
         setActiveActivities(prevState => {
             // Create a new set of active activities
             const newActiveActivities = new Set(prevState);
 
-            if (newActiveActivities.has(index)) {
+            if (newActiveActivities.has(Id)) {
                 // If the activity is already active, remove it
-                newActiveActivities.delete(index);
+                newActiveActivities.delete(Id);
             } else {
                 // Otherwise, add it to the set
-                newActiveActivities.add(index);
+                newActiveActivities.add(Id);
             }
 
             return Array.from(newActiveActivities);
@@ -31,301 +46,206 @@ function TeamHierarchy({ teams, setTeams }) {
     };
 
 
-    const toggleSubActivityTasks = (teamId, activityIndex, subActivityIndex) => {
+    const toggleSubActivityTasks = (teamId, activityId, subActivityId) => {
         setSubActivityTasks(prevState => ({
             ...prevState,
             [teamId]: {
                 ...(prevState[teamId] || {}),
-                [activityIndex]: {
-                    ...(prevState[teamId]?.[activityIndex] || {}),
-                    [subActivityIndex]: prevState[teamId]?.[activityIndex]?.[subActivityIndex] ? null : true
+                [activityId]: {
+                    ...(prevState[teamId]?.[activityId] || {}),
+                    [subActivityId]: prevState[teamId]?.[activityId]?.[subActivityId] ? null : true
                 }
             }
         }));
     };
 
-    const addTeam = () => {
+    const addTeam = async () => {
         const newTeamName = prompt('Masukkan nama tim baru:');
         if (newTeamName) {
-            setTeams([...teams, { id: teams.length + 1, name: newTeamName, activities: [] }]);
+            try {
+                await axios.post(`${URL}/teams`, { name: newTeamName });
+                refetchTeams();
+            } catch (error) {
+                console.error('Error adding team:', error);
+            }
         }
     };
 
-    const renameTeam = (id) => {
+    const renameTeam = async (id) => {
         const newName = prompt('Masukkan nama baru:');
         if (newName) {
-            setTeams(teams.map(team => team.id === id ? { ...team, name: newName } : team));
+            try {
+                await axios.put(`${URL}/teams/${id}`, { name: newName });
+                refetchTeams();
+            } catch (error) {
+                console.error('Error renaming team:', error);
+            }
         }
     };
 
-    const deleteTeam = (id) => {
-        setTeams(teams.filter(team => team.id !== id));
+    const deleteTeam = async (id) => {
+        try {
+            await axios.delete(`${URL}/teams/${id}`);
+            refetchTeams();
+        } catch (error) {
+            console.error('Error deleting team:', error);
+        }
     };
 
-    const archiveTeam = (id) => {
+    const archiveTeam = async (id) => {
+        // Implement archiving logic if applicable
         alert(`Tim Kerja ${teams.find(team => team.id === id).name} telah diarsipkan.`);
     };
 
-    const addActivity = (teamId) => {
+    const addActivity = async (teamId) => {
         const newActivity = prompt('Masukkan nama kegiatan baru:');
         if (newActivity) {
-            setTeams(teams.map(team =>
-                team.id === teamId
-                    ? { ...team, activities: [...team.activities, { name: newActivity, subActivities: [] }] }
-                    : team
-            ));
+            try {
+                await axios.post(`${URL}/teams/${teamId}/activities`, { name: newActivity });
+                refetchTeams();
+            } catch (error) {
+                console.error('Error adding activity:', error);
+            }
         }
     };
 
-    const renameActivity = (teamId, index) => {
+    const renameActivity = async (teamId, Id) => {
         const newName = prompt('Masukkan nama kegiatan baru:');
         if (newName) {
-            setTeams(teams.map(team =>
-                team.id === teamId
-                    ? {
-                        ...team,
-                        activities: team.activities.map((activity, i) => i === index ? { ...activity, name: newName } : activity),
-                    }
-                    : team
-            ));
+            try {
+                await axios.put(`${URL}/teams/${teamId}/activities/${Id}`, { name: newName });
+                refetchTeams();
+            } catch (error) {
+                console.error('Error renaming activity:', error);
+            }
         }
     };
 
-    const deleteActivity = (teamId, index) => {
-        setTeams(teams.map(team =>
-            team.id === teamId
-                ? {
-                    ...team,
-                    activities: team.activities.filter((_, i) => i !== index),
-                }
-                : team
-        ));
+    const deleteActivity = async (teamId, Id) => {
+        try {
+            await axios.delete(`${URL}/teams/${teamId}/activities/${Id}`);
+            refetchTeams();
+        } catch (error) {
+            console.error('Error deleting activity:', error);
+        }
     };
 
-    const archiveActivity = (teamId, index) => {
-        alert(`Kegiatan ${teams.find(team => team.id === teamId).activities[index].name} telah diarsipkan.`);
+    const archiveActivity = async (teamId, Id) => {
+        // Implement archiving logic if applicable
+        alert(`Kegiatan ${teams.find(team => team.id === teamId).activities[Id].name} telah diarsipkan.`);
     };
 
-    const addSubActivity = (teamId, activityIndex) => {
+    const addSubActivity = async (teamId, activityId) => {
         const newSubActivity = prompt('Masukkan nama sub-kegiatan baru:');
         if (newSubActivity) {
-            setTeams(teams.map(team =>
-                team.id === teamId
-                    ? {
-                        ...team,
-                        activities: team.activities.map((activity, i) => i === activityIndex
-                            ? { ...activity, subActivities: [...activity.subActivities, { name: newSubActivity, tasks: [] }] }
-                            : activity
-                        )
-                    }
-                    : team
-            ));
+            try {
+                await axios.post(`${URL}/teams/${teamId}/activities/${activityId}/sub-activities`, { name: newSubActivity });
+                refetchTeams();
+            } catch (error) {
+                console.error('Error adding sub-activity:', error);
+            }
         }
     };
 
-    const renameSubActivity = (teamId, activityIndex, subActivityIndex) => {
+    const renameSubActivity = async (teamId, activityId, subActivityId) => {
         const newName = prompt('Masukkan nama sub-kegiatan baru:');
         if (newName) {
-            setTeams(teams.map(team =>
-                team.id === teamId
-                    ? {
-                        ...team,
-                        activities: team.activities.map((activity, i) => i === activityIndex
-                            ? {
-                                ...activity,
-                                subActivities: activity.subActivities.map((subActivity, j) => j === subActivityIndex ? { ...subActivity, name: newName } : subActivity)
-                            }
-                            : activity
-                        )
-                    }
-                    : team
-            ));
+            try {
+                await axios.put(`${URL}/teams/${teamId}/activities/${activityId}/sub-activities/${subActivityId}`, { name: newName });
+                refetchTeams();
+            } catch (error) {
+                console.error('Error renaming sub-activity:', error);
+            }
         }
     };
 
-    const deleteSubActivity = (teamId, activityIndex, subActivityIndex) => {
-        setTeams(teams.map(team =>
-            team.id === teamId
-                ? {
-                    ...team,
-                    activities: team.activities.map((activity, i) => i === activityIndex
-                        ? {
-                            ...activity,
-                            subActivities: activity.subActivities.filter((_, j) => j !== subActivityIndex)
-                        }
-                        : activity
-                    )
-                }
-                : team
-        ));
+    const deleteSubActivity = async (teamId, activityId, subActivityId) => {
+        try {
+            await axios.delete(`${URL}/teams/${teamId}/activities/${activityId}/sub-activities/${subActivityId}`);
+            refetchTeams();
+        } catch (error) {
+            console.error('Error deleting sub-activity:', error);
+        }
     };
 
-    const archiveSubActivity = (teamId, activityIndex, subActivityIndex) => {
-        alert(`Sub-Kegiatan ${teams.find(team => team.id === teamId).activities[activityIndex].subActivities[subActivityIndex].name} telah diarsipkan.`);
+    const archiveSubActivity = async (teamId, activityId, subActivityId) => {
+        // Implement archiving logic if applicable
+        alert(`Sub-Kegiatan ${teams.find(team => team.id === teamId).activities[activityId].subActivities[subActivityId].name} telah diarsipkan.`);
     };
 
-    const addTask = (teamId, activityIndex, subActivityIndex) => {
+    const addTask = async (teamId, activityId, subActivityId) => {
         const newTaskName = prompt('Masukkan nama tugas baru:');
         const dueDate = prompt('Masukkan deadline tugas (YYYY-MM-DD):');
-        const driveLink = prompt('Masukkan link drive (bukti dukung):');
+        const link = prompt('Masukkan link (bukti dukung):');
 
         if (newTaskName) {
             const newTask = {
                 name: newTaskName,
                 dateCreated: new Date().toISOString().split('T')[0],
                 dueDate: dueDate || 'Tidak ada',
-                driveLink: driveLink || '#',
+                link: link || '#',
                 completed: false
             };
-            setTeams(teams.map(team =>
-                team.id === teamId
-                    ? {
-                        ...team,
-                        activities: team.activities.map((activity, i) => i === activityIndex
-                            ? {
-                                ...activity,
-                                subActivities: activity.subActivities.map((subActivity, j) => j === subActivityIndex
-                                    ? { ...subActivity, tasks: [...subActivity.tasks, newTask] }
-                                    : subActivity
-                                )
-                            }
-                            : activity
-                        )
-                    }
-                    : team
-            ));
+            try {
+                await axios.post(`${URL}/teams/${teamId}/activities/${activityId}/sub-activities/${subActivityId}/tasks`, newTask);
+                refetchTeams();
+            } catch (error) {
+                console.error('Error adding task:', error);
+            }
         }
     };
 
-    const renameTask = (teamId, activityIndex, subActivityIndex, taskIndex, currentName) => {
+    const renameTask = async (teamId, activityId, subActivityId, taskId, currentName) => {
         const newName = prompt('Masukkan nama tugas baru:', currentName);
         if (newName) {
-            setTeams(teams.map(team =>
-                team.id === teamId
-                    ? {
-                        ...team,
-                        activities: team.activities.map((activity, i) => i === activityIndex
-                            ? {
-                                ...activity,
-                                subActivities: activity.subActivities.map((subActivity, j) => j === subActivityIndex
-                                    ? {
-                                        ...subActivity,
-                                        tasks: subActivity.tasks.map((task, k) => k === taskIndex ? { ...task, name: newName } : task)
-                                    }
-                                    : subActivity
-                                )
-                            }
-                            : activity
-                        )
-                    }
-                    : team
-            ));
+            try {
+                await axios.put(`${URL}/teams/${teamId}/activities/${activityId}/sub-activities/${subActivityId}/tasks/${taskId}`, { name: newName });
+                refetchTeams();
+            } catch (error) {
+                console.error('Error renaming task:', error);
+            }
         }
     };
 
-
-    const deleteTask = (teamId, activityIndex, subActivityIndex, taskIndex) => {
-        setTeams(teams.map(team =>
-            team.id === teamId
-                ? {
-                    ...team,
-                    activities: team.activities.map((activity, i) => i === activityIndex
-                        ? {
-                            ...activity,
-                            subActivities: activity.subActivities.map((subActivity, j) => j === subActivityIndex
-                                ? {
-                                    ...subActivity,
-                                    tasks: subActivity.tasks.filter((_, k) => k !== taskIndex)
-                                }
-                                : subActivity
-                            )
-                        }
-                        : activity
-                    )
-                }
-                : team
-        ));
-    };
-
-    const archiveTask = (teamId, activityIndex, subActivityIndex, taskIndex) => {
-        alert(`Tugas ${teams.find(team => team.id === teamId).activities[activityIndex].subActivities[subActivityIndex].tasks[taskIndex]} telah diarsipkan.`);
-    };
-
-    const toggleTaskCompletion = (teamId, activityIndex, subActivityIndex, taskIndex) => {
-        setTeams(teams.map(team =>
-            team.id === teamId
-                ? {
-                    ...team,
-                    activities: team.activities.map((activity, i) => i === activityIndex
-                        ? {
-                            ...activity,
-                            subActivities: activity.subActivities.map((subActivity, j) => j === subActivityIndex
-                                ? {
-                                    ...subActivity,
-                                    tasks: subActivity.tasks.map((task, k) => k === taskIndex ? { ...task, completed: !task.completed } : task)
-                                }
-                                : subActivity
-                            )
-                        }
-                        : activity
-                    )
-                }
-                : team
-        ));
-    };
-
-    const handleDeadlineChange = (teamId, activityIndex, subActivityIndex, taskIndex) => {
-        const newDeadline = prompt('Masukkan deadline baru (YYYY-MM-DD):');
-
-        if (newDeadline) {
-            setTeams(teams.map(team =>
-                team.id === teamId
-                    ? {
-                        ...team,
-                        activities: team.activities.map((activity, i) => i === activityIndex
-                            ? {
-                                ...activity,
-                                subActivities: activity.subActivities.map((subActivity, j) => j === subActivityIndex
-                                    ? {
-                                        ...subActivity,
-                                        tasks: subActivity.tasks.map((task, k) => k === taskIndex ? { ...task, dueDate: newDeadline, status: calculateTaskStatus(newDeadline, task.dateUpload) } : task)
-                                    }
-                                    : subActivity
-                                )
-                            }
-                            : activity
-                        )
-                    }
-                    : team
-            ));
+    const deleteTask = async (teamId, activityId, subActivityId, taskId) => {
+        try {
+            await axios.delete(`${URL}/teams/${teamId}/activities/${activityId}/sub-activities/${subActivityId}/tasks/${taskId}`);
+            refetchTeams();
+        } catch (error) {
+            console.error('Error deleting task:', error);
         }
     };
 
+    const archiveTask = async (teamId, activityId, subActivityId, taskId) => {
+        // Implement archiving logic if applicable
+        alert(`Tugas ${teams.find(team => team.id === teamId).activities[activityId].subActivities[subActivityId].tasks[taskId].name} telah diarsipkan.`);
+    };
 
-    const handleLinkChange = (e, teamId, activityIndex, subActivityIndex, taskIndex) => {
-        const newLink = e.target.value;
-        const dateUpload = new Date().toISOString().split('T')[0]; // Current date as upload date
+    const toggleTaskCompletion = async (teamId, activityId, subActivityId, taskId) => {
+        try {
+            await axios.put(`${URL}/teams/${teamId}/activities/${activityId}/sub-activities/${subActivityId}/tasks/${taskId}/toggle`, {});
+            refetchTeams();
+        } catch (error) {
+            console.error('Error toggling task completion:', error);
+        }
+    };
 
-        setTeams(teams.map(team =>
-            team.id === teamId
-                ? {
-                    ...team,
-                    activities: team.activities.map((activity, i) => i === activityIndex
-                        ? {
-                            ...activity,
-                            subActivities: activity.subActivities.map((subActivity, j) => j === subActivityIndex
-                                ? {
-                                    ...subActivity,
-                                    tasks: subActivity.tasks.map((task, k) => k === taskIndex ? { ...task, link: newLink, dateUpload, status: calculateTaskStatus(task.dueDate, dateUpload) } : task)
-                                }
-                                : subActivity
-                            )
-                        }
-                        : activity
-                    )
-                }
-                : team
-        ));
+    const handleDeadlineChange = async (teamId, activityId, subActivityId, taskId, newDeadline) => {
+        try {
+            await axios.put(`${URL}/teams/${teamId}/activities/${activityId}/sub-activities/${subActivityId}/tasks/${taskId}/deadline`, { dueDate: newDeadline });
+            refetchTeams();
+        } catch (error) {
+            console.error('Error updating task deadline:', error);
+        }
+    };
+
+    const handleLinkChange = async (teamId, activityId, subActivityId, taskId, newLink) => {
+        try {
+            await axios.put(`${URL}/teams/${teamId}/activities/${activityId}/sub-activities/${subActivityId}/tasks/${taskId}/link`, { driveLink: newLink });
+            refetchTeams();
+        } catch (error) {
+            console.error('Error updating task drive link:', error);
+        }
     };
 
     const calculateTaskStatus = (dueDate, dateUpload) => {
@@ -352,7 +272,10 @@ function TeamHierarchy({ teams, setTeams }) {
             alert('No text to copy!');
         }
     };
-    
+
+    if (!Array.isArray(teams)) {
+        return <p>No teams available.</p>;  // Or handle the error gracefully
+    }
     return (
         <div className="team-hierarchy">
             <div className="team-list">
@@ -368,24 +291,23 @@ function TeamHierarchy({ teams, setTeams }) {
                         </div>
                         {activeTeams.includes(team.id) && (
                             <div className="activities-content">
-                                {team.activities.map((activity, activityIndex) => (
-                                    <div className='activity-container' key={activityIndex}>
-                                        <div className="activity-box" onClick={() => toggleActivitySubActivities(team.id, activityIndex)}>
+                                {(team.activities).map((activity) => (
+                                    <div className='activity-container' key={activity.Id}>
+                                        <div className="activity-box" onClick={() => toggleActivitySubActivities(team.id, activity.id)}>
                                             <div className="activity-name">{activity.name}</div>
                                             <div className="activity-actions">
-                                                <span onClick={() => renameActivity(team.id, activityIndex)}>&#9998;</span>
-                                                <span onClick={() => deleteActivity(team.id, activityIndex)}>&#10006;</span>
-                                                <span onClick={() => archiveActivity(team.id, activityIndex)}>&#128229;</span>
+                                                <span onClick={() => renameActivity(team.id, activity.id)}>&#9998;</span>
+                                                <span onClick={() => deleteActivity(team.id, activity.id)}>&#10006;</span>
+                                                <span onClick={() => archiveActivity(team.id, activity.id)}>&#128229;</span>
                                             </div>
                                         </div>
-                                        {activeActivities.includes(activityIndex) && (
+                                        {activeActivities.includes(activity.id) && (
                                             <div className="sub-activities-content">
-                                                {activity.subActivities.map((subActivity, subActivityIndex) => {
-                                                    const progress = calculateProgress(subActivity.tasks);
-
+                                                {(activity.subActivities).map((subActivity) => {
+                                                    const progress = calculateProgress(subActivity.tasks || []);
                                                     return (
-                                                        <div className='sub-activity-container' key={subActivityIndex}>
-                                                            <div className="sub-activity-box" onClick={() => toggleSubActivityTasks(team.id, activityIndex, subActivityIndex)}>
+                                                        <div className='sub-activity-container' key={subActivity.id}>
+                                                            <div className="sub-activity-box" onClick={() => toggleSubActivityTasks(team.id, activity.id, subActivity.id)}>
                                                                 <div className="sub-activity-name">
                                                                     {subActivity.name}
                                                                 </div>
@@ -393,15 +315,15 @@ function TeamHierarchy({ teams, setTeams }) {
                                                                     {subActivity.tasks.length === 0 ? 'Belum ada tugas' : `Progress: ${progress.toFixed(2)}%`}
                                                                 </div>
                                                                 <div className="sub-activity-actions">
-                                                                    <span onClick={() => renameSubActivity(team.id, activityIndex, subActivityIndex)}>&#9998;</span>
-                                                                    <span onClick={() => deleteSubActivity(team.id, activityIndex, subActivityIndex)}>&#10006;</span>
-                                                                    <span onClick={() => archiveSubActivity(team.id, activityIndex, subActivityIndex)}>&#128229;</span>
+                                                                    <span onClick={() => renameSubActivity(team.id, activity.id, subActivity.id)}>&#9998;</span>
+                                                                    <span onClick={() => deleteSubActivity(team.id, activity.id, subActivity.id)}>&#10006;</span>
+                                                                    <span onClick={() => archiveSubActivity(team.id, activity.id, subActivity.id)}>&#128229;</span>
                                                                 </div>
                                                             </div>
-                                                            {subActivityTasks[team.id]?.[activityIndex]?.[subActivityIndex] && (
+                                                            {subActivityTasks[team.id]?.[activity.id]?.[subActivity.id] && (
                                                                 <div className="tasks-content">
-                                                                    {subActivity.tasks.map((task, taskIndex) => (
-                                                                        <div className='task-container' key={taskIndex}>
+                                                                    {(subActivity.tasks).map((task, taskId) => (
+                                                                        <div className='task-container' key={taskId}>
                                                                             <div className="task-details">
                                                                                 <div className="task-name">{task.name}</div>
                                                                                 <div className="task-meta">
@@ -415,7 +337,7 @@ function TeamHierarchy({ teams, setTeams }) {
                                                                                             <span style={{ color: 'red' }}>{task.dueDate}</span>
                                                                                         </div>
                                                                                         <span
-                                                                                            onClick={() => handleDeadlineChange(team.id, activityIndex, subActivityIndex, taskIndex)}
+                                                                                            onClick={() => handleDeadlineChange(team.id, activity.id, subActivity.id, task.id)}
                                                                                             style={{ cursor: 'pointer', fontSize: '1.5em', margin: '15px' }}
                                                                                         >
                                                                                             &#128197;
@@ -426,7 +348,9 @@ function TeamHierarchy({ teams, setTeams }) {
                                                                                             type="text"
                                                                                             className="task-meta-input"
                                                                                             value={task.link}
-                                                                                            onChange={(e) => handleLinkChange(e, team.id, activityIndex, subActivityIndex, taskIndex)} />
+                                                                                            onChange={(e) => handleLinkChange(e.target.value, team.id, activity.id, subActivity.id, task.id)}
+                                                                                            disabled={task.completed} // Disable input if task is completed
+                                                                                        />
                                                                                         <span className="copy-icon" onClick={() => copyToClipboard(task.link)}>
                                                                                             Salin&#x1f4cb; {/* Copy icon */}
                                                                                         </span>
@@ -435,18 +359,18 @@ function TeamHierarchy({ teams, setTeams }) {
                                                                                     <input
                                                                                         type="checkbox"
                                                                                         checked={task.completed}
-                                                                                        onChange={() => toggleTaskCompletion(team.id, activityIndex, subActivityIndex, taskIndex)}
+                                                                                        onChange={() => toggleTaskCompletion(team.id, activity.id, subActivity.id, taskId)}
                                                                                     />
                                                                                 </div>
                                                                                 <div className="task-actions">
-                                                                                    <span onClick={() => renameTask(team.id, activityIndex, subActivityIndex, taskIndex, task.name)}>&#9998;</span>
-                                                                                    <span onClick={() => deleteTask(team.id, activityIndex, subActivityIndex, taskIndex)}>&#10006;</span>
-                                                                                    <span onClick={() => archiveTask(team.id, activityIndex, subActivityIndex, taskIndex)}>&#128229;</span>
+                                                                                    <span onClick={() => renameTask(team.id, activity.id, subActivity.id, task.id, task.name)}>&#9998;</span>
+                                                                                    <span onClick={() => deleteTask(team.id, activity.id, subActivity.id, task.id)}>&#10006;</span>
+                                                                                    <span onClick={() => archiveTask(team.id, activity.id, subActivity.id, task.id)}>&#128229;</span>
                                                                                 </div>
                                                                             </div>
                                                                         </div>
                                                                     ))}
-                                                                    <div className="add-task-box" onClick={() => addTask(team.id, activityIndex, subActivityIndex)}>
+                                                                    <div className="add-task-box" onClick={() => addTask(team.id, activity.id, subActivity.id)}>
                                                                         + Tambah Tugas {activity.name} - {subActivity.name}
                                                                     </div>
                                                                 </div>
@@ -454,7 +378,7 @@ function TeamHierarchy({ teams, setTeams }) {
                                                         </div>
                                                     );
                                                 })}
-                                                <div className="add-sub-activity-box" onClick={() => addSubActivity(team.id, activityIndex)}>
+                                                <div className="add-sub-activity-box" onClick={() => addSubActivity(team.id, activity.id)}>
                                                     + Tambah Sub-Kegiatan {activity.name}
                                                 </div>
                                             </div>
@@ -474,8 +398,305 @@ function TeamHierarchy({ teams, setTeams }) {
             </div>
         </div>
     );
-
-
 }
-
 export default TeamHierarchy;
+
+// function TeamHierarchy() {
+//     const [teams, refetchTeams] = useState([]);
+//     const [activeTeams, setActiveTeams] = useState([]);
+//     const [activeActivities, setActiveActivities] = useState([]);
+//     const [subActivityTasks, setSubActivityTasks] = useState({});
+
+//     const refetchTeams = async () => {
+//         try {
+//             const response = await axios.get('/teams');
+//             refetchTeams(response.data);
+//         } catch (error) {
+//             console.error('Error updating teams data:', error);
+//         }
+//     };
+
+//     const toggleTeamActivities = (id) => {
+//         setActiveTeams(prevState =>
+//             prevState.includes(id) ? prevState.filter(teamId => teamId !== id) : [...prevState, id]
+//         );
+//     };
+
+//     const toggleActivitySubActivities = (teamId, Id) => {
+//         setActiveActivities(prevState => {
+//             const newActiveActivities = new Set(prevState);
+//             newActiveActivities.has(Id) ? newActiveActivities.delete(Id) : newActiveActivities.add(Id);
+//             return Array.from(newActiveActivities);
+//         });
+//     };
+
+//     const toggleSubActivityTasks = (teamId, activityId, subActivityId) => {
+//         setSubActivityTasks(prevState => ({
+//             ...prevState,
+//             [teamId]: {
+//                 ...(prevState[teamId] || {}),
+//                 [activityId]: {
+//                     ...(prevState[teamId]?.[activityId] || {}),
+//                     [subActivityId]: prevState[teamId]?.[activityId]?.[subActivityId] ? null : true
+//                 }
+//             }
+//         }));
+//     };
+
+//     const addTeam = async () => {
+//         const newTeamName = prompt('Masukkan nama tim baru:');
+//         if (newTeamName) {
+//             try {
+//                 await axios.post('/teams', { name: newTeamName });
+//                 refetchTeams();
+//             } catch (error) {
+//                 console.error('Error adding team:', error);
+//             }
+//         }
+//     };
+
+//     const renameTeam = async (id) => {
+//         const newName = prompt('Masukkan nama baru:');
+//         if (newName) {
+//             try {
+//                 await axios.put(`/teams/${id}`, { name: newName });
+//                 refetchTeams();
+//             } catch (error) {
+//                 console.error('Error renaming team:', error);
+//             }
+//         }
+//     };
+
+//     const deleteTeam = async (id) => {
+//         try {
+//             await axios.delete(`/teams/${id}`);
+//             refetchTeams();
+//         } catch (error) {
+//             console.error('Error deleting team:', error);
+//         }
+//     };
+
+//     const archiveTeam = async (id) => {
+//         // Implement archiving logic if applicable
+//         alert(`Tim Kerja ${teams.find(team => team.id === id).name} telah diarsipkan.`);
+//     };
+
+//     const addActivity = async (teamId) => {
+//         const newActivity = prompt('Masukkan nama kegiatan baru:');
+//         if (newActivity) {
+//             try {
+//                 await axios.post(`/teams/${teamId}/activities`, { name: newActivity });
+//                 refetchTeams();
+//             } catch (error) {
+//                 console.error('Error adding activity:', error);
+//             }
+//         }
+//     };
+
+//     const renameActivity = async (teamId, Id) => {
+//         const newName = prompt('Masukkan nama kegiatan baru:');
+//         if (newName) {
+//             try {
+//                 await axios.put(`/teams/${teamId}/activities/${Id}`, { name: newName });
+//                 refetchTeams();
+//             } catch (error) {
+//                 console.error('Error renaming activity:', error);
+//             }
+//         }
+//     };
+
+//     const deleteActivity = async (teamId, Id) => {
+//         try {
+//             await axios.delete(`/teams/${teamId}/activities/${Id}`);
+//             refetchTeams();
+//         } catch (error) {
+//             console.error('Error deleting activity:', error);
+//         }
+//     };
+
+//     const archiveActivity = async (teamId, Id) => {
+//         // Implement archiving logic if applicable
+//         alert(`Kegiatan ${teams.find(team => team.id === teamId).activities[Id].name} telah diarsipkan.`);
+//     };
+
+//     const addSubActivity = async (teamId, activityId) => {
+//         const newSubActivity = prompt('Masukkan nama sub-kegiatan baru:');
+//         if (newSubActivity) {
+//             try {
+//                 await axios.post(`/teams/${teamId}/activities/${activityId}/sub-activities`, { name: newSubActivity });
+//                 refetchTeams();
+//             } catch (error) {
+//                 console.error('Error adding sub-activity:', error);
+//             }
+//         }
+//     };
+
+//     const renameSubActivity = async (teamId, activityId, subActivityId) => {
+//         const newName = prompt('Masukkan nama sub-kegiatan baru:');
+//         if (newName) {
+//             try {
+//                 await axios.put(`/teams/${teamId}/activities/${activityId}/sub-activities/${subActivityId}`, { name: newName });
+//                 refetchTeams();
+//             } catch (error) {
+//                 console.error('Error renaming sub-activity:', error);
+//             }
+//         }
+//     };
+
+//     const deleteSubActivity = async (teamId, activityId, subActivityId) => {
+//         try {
+//             await axios.delete(`/teams/${teamId}/activities/${activityId}/sub-activities/${subActivityId}`);
+//             refetchTeams();
+//         } catch (error) {
+//             console.error('Error deleting sub-activity:', error);
+//         }
+//     };
+
+//     const archiveSubActivity = async (teamId, activityId, subActivityId) => {
+//         // Implement archiving logic if applicable
+//         alert(`Sub-Kegiatan ${teams.find(team => team.id === teamId).activities[activityId].subActivities[subActivityId].name} telah diarsipkan.`);
+//     };
+
+//     const addTask = async (teamId, activityId, subActivityId) => {
+//         const newTaskName = prompt('Masukkan nama tugas baru:');
+//         const dueDate = prompt('Masukkan deadline tugas (YYYY-MM-DD):');
+//         const driveLink = prompt('Masukkan link drive (bukti dukung):');
+
+//         if (newTaskName) {
+//             const newTask = {
+//                 name: newTaskName,
+//                 dateCreated: new Date().toISOString().split('T')[0],
+//                 dueDate: dueDate || 'Tidak ada',
+//                 driveLink: driveLink || '#',
+//                 completed: false
+//             };
+//             try {
+//                 await axios.post(`/teams/${teamId}/activities/${activityId}/sub-activities/${subActivityId}/tasks`, newTask);
+//                 refetchTeams();
+//             } catch (error) {
+//                 console.error('Error adding task:', error);
+//             }
+//         }
+//     };
+
+//     const renameTask = async (teamId, activityId, subActivityId, taskId, currentName) => {
+//         const newName = prompt('Masukkan nama tugas baru:', currentName);
+//         if (newName) {
+//             try {
+//                 await axios.put(`/teams/${teamId}/activities/${activityId}/sub-activities/${subActivityId}/tasks/${taskId}`, { name: newName });
+//                 refetchTeams();
+//             } catch (error) {
+//                 console.error('Error renaming task:', error);
+//             }
+//         }
+//     };
+
+//     const deleteTask = async (teamId, activityId, subActivityId, taskId) => {
+//         try {
+//             await axios.delete(`/teams/${teamId}/activities/${activityId}/sub-activities/${subActivityId}/tasks/${taskId}`);
+//             refetchTeams();
+//         } catch (error) {
+//             console.error('Error deleting task:', error);
+//         }
+//     };
+
+//     const archiveTask = async (teamId, activityId, subActivityId, taskId) => {
+//         // Implement archiving logic if applicable
+//         alert(`Tugas ${teams.find(team => team.id === teamId).activities[activityId].subActivities[subActivityId].tasks[taskId].name} telah diarsipkan.`);
+//     };
+
+//     const toggleTaskCompletion = async (teamId, activityId, subActivityId, taskId) => {
+//         try {
+//             await axios.put(`/teams/${teamId}/activities/${activityId}/sub-activities/${subActivityId}/tasks/${taskId}/toggle`, {});
+//             refetchTeams();
+//         } catch (error) {
+//             console.error('Error toggling task completion:', error);
+//         }
+//     };
+
+//     const handleDeadlineChange = async (teamId, activityId, subActivityId, taskId, newDeadline) => {
+//         try {
+//             await axios.put(`/teams/${teamId}/activities/${activityId}/sub-activities/${subActivityId}/tasks/${taskId}/deadline`, { dueDate: newDeadline });
+//             refetchTeams();
+//         } catch (error) {
+//             console.error('Error updating task deadline:', error);
+//         }
+//     };
+
+//     const handleDriveLinkChange = async (teamId, activityId, subActivityId, taskId, newLink) => {
+//         try {
+//             await axios.put(`/teams/${teamId}/activities/${activityId}/sub-activities/${subActivityId}/tasks/${taskId}/link`, { driveLink: newLink });
+//             refetchTeams();
+//         } catch (error) {
+//             console.error('Error updating task drive link:', error);
+//         }
+//     };
+
+//     return (
+//         <div className="team-hierarchy">
+//             <h1>Team Hierarchy</h1>
+//             <button onClick={addTeam}>Tambah Tim</button>
+//             {teams.map(team => (
+//                 <div key={team.id} className="team">
+//                     <h2>
+//                         <span onClick={() => toggleTeamActivities(team.id)}>{team.name}</span>
+//                         <button onClick={() => renameTeam(team.id)}>Ubah Nama</button>
+//                         <button onClick={() => deleteTeam(team.id)}>Hapus</button>
+//                         <button onClick={() => archiveTeam(team.id)}>Arsipkan</button>
+//                     </h2>
+//                     {activeTeams.includes(team.id) && (
+//                         <div className="activities">
+//                             {team.activities.map((activity, Id) => (
+//                                 <div key={Id} className="activity">
+//                                     <h3>
+//                                         <span onClick={() => toggleActivitySubActivities(team.id, Id)}>{activity.name}</span>
+//                                         <button onClick={() => renameActivity(team.id, Id)}>Ubah Nama</button>
+//                                         <button onClick={() => deleteActivity(team.id, Id)}>Hapus</button>
+//                                         <button onClick={() => archiveActivity(team.id, Id)}>Arsipkan</button>
+//                                     </h3>
+//                                     {activeActivities.includes(Id) && (
+//                                         <div className="sub-activities">
+//                                             {activity.subActivities.map((subActivity, subId) => (
+//                                                 <div key={subId} className="sub-activity">
+//                                                     <h4>
+//                                                         <span onClick={() => toggleSubActivityTasks(team.id, Id, subId)}>{subActivity.name}</span>
+//                                                         <button onClick={() => renameSubActivity(team.id, Id, subId)}>Ubah Nama</button>
+//                                                         <button onClick={() => deleteSubActivity(team.id, Id, subId)}>Hapus</button>
+//                                                         <button onClick={() => archiveSubActivity(team.id, Id, subId)}>Arsipkan</button>
+//                                                     </h4>
+//                                                     {subActivityTasks[team.id]?.[Id]?.[subId] && (
+//                                                         <div className="tasks">
+//                                                             {subActivity.tasks.map((task, taskId) => (
+//                                                                 <div key={taskId} className="task">
+//                                                                     <p>{task.name}</p>
+//                                                                     <p>Deadline: {task.dueDate}</p>
+//                                                                     <p>Link: <a href={task.driveLink} target="_blank" rel="noopener noreferrer">{task.driveLink}</a></p>
+//                                                                     <button onClick={() => renameTask(team.id, Id, subId, taskId, task.name)}>Ubah Nama</button>
+//                                                                     <button onClick={() => deleteTask(team.id, Id, subId, taskId)}>Hapus</button>
+//                                                                     <button onClick={() => toggleTaskCompletion(team.id, Id, subId, taskId)}>
+//                                                                         {task.completed ? 'Mark as Incomplete' : 'Mark as Complete'}
+//                                                                     </button>
+//                                                                     <button onClick={() => handleDeadlineChange(team.id, Id, subId, taskId, prompt('Masukkan deadline baru:', task.dueDate))}>Ubah Deadline</button>
+//                                                                     <button onClick={() => handleDriveLinkChange(team.id, Id, subId, taskId, prompt('Masukkan link drive baru:', task.driveLink))}>Ubah Link</button>
+//                                                                 </div>
+//                                                             ))}
+//                                                             <button onClick={() => addTask(team.id, Id, subId)}>Tambah Tugas</button>
+//                                                         </div>
+//                                                     )}
+//                                                 </div>
+//                                             ))}
+//                                             <button onClick={() => addSubActivity(team.id, Id)}>Tambah Sub-Kegiatan</button>
+//                                         </div>
+//                                     )}
+//                                 </div>
+//                             ))}
+//                             <button onClick={() => addActivity(team.id)}>Tambah Kegiatan</button>
+//                         </div>
+//                     )}
+//                 </div>
+//             ))}
+//         </div>
+//     );
+// }
+
+// export default TeamHierarchy;

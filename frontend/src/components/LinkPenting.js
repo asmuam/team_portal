@@ -17,11 +17,11 @@ const LinkPenting = ({ data }) => {
   };
 
   const handleAddLink = (teamId) => {
-    const title = prompt('Enter the link URL:');
-    const shortDescription = prompt('Enter the short description:');
-    if (title && shortDescription) {
-      const formattedUrl = formatUrl(title);
-      const link = { id: Date.now(), title: formattedUrl, shortDescription, fullDescription: shortDescription };
+    const url = prompt('Enter the link URL:');
+    const description = prompt('Enter the Description:');
+    if (url && description) {
+      const formattedUrl = formatUrl(url);
+      const link = { id: Date.now(), url: formattedUrl, description };
       setTeams(teams.map(team =>
         team.id === teamId ? { ...team, links: [...team.links, link] } : team
       ));
@@ -37,16 +37,15 @@ const LinkPenting = ({ data }) => {
   const handleEditLink = (teamId, linkId) => {
     const team = teams.find(team => team.id === teamId);
     const link = team.links.find(link => link.id === linkId);
-    const newTitle = prompt('Edit the link URL:', link.title);
-    const newShortDescription = prompt('Edit the short description:', link.shortDescription);
+    const newUrl = prompt('Edit the link URL:', link.url);
+    const newDescription = prompt('Edit the short description:', link.description);
     
-    if (newTitle && newShortDescription) {
-      const formattedUrl = formatUrl(newTitle);
+    if (newUrl && newDescription) {
+      const formattedUrl = formatUrl(newUrl);
       const updatedLink = {
         ...link,
-        title: formattedUrl,
-        shortDescription: newShortDescription,
-        fullDescription: newShortDescription,
+        url: formattedUrl,
+        description: newDescription,
       };
       
       setTeams(teams.map(team =>
@@ -70,18 +69,18 @@ const LinkPenting = ({ data }) => {
                 <div key={link.id} className="link-item">
                   <div className="link-info">
                     <a
-                      href={link.title}
+                      href={link.url}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="link-url"
                     >
-                      {link.title}
+                      {link.url}
                     </a>
                     <div className="link-description">
-                      <span>{link.shortDescription}</span>
+                      <span>{link.description}</span>
                       <span
                         className="info-icon"
-                        title={link.fullDescription}
+                        title={link.description}
                       >
                         ℹ️
                       </span>
