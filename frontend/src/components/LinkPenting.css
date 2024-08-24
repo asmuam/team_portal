@@ -1,0 +1,129 @@
+/* LinkPenting.css */
+
+.teams-container {
+    display: flex;
+    flex-wrap: wrap;
+    margin: 0 auto;
+    font-family: Arial, sans-serif;
+    gap: 20px;
+    align-items: flex-start; /* Ensures that columns align at the top */
+  }
+  
+  .team-item {
+    width: calc(33.333% - 20px); /* Set each team item to take up one-third of the width, minus the gap */
+    margin-bottom: 20px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    transition: height 0.3s ease; /* Smooth height transition */
+  }
+  
+  .team-toggle-button {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    padding: 10px 15px;
+    font-size: 16px;
+    font-weight: bold;
+    background-color: #f7f7f7;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  
+  .team-toggle-button:hover {
+    background-color: #e0e0e0;
+  }
+  
+  .links-container {
+    padding: 10px 15px;
+    background-color: #fafafa;
+  }
+  
+  .link-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 0;
+    border-bottom: 1px solid #ddd;
+  }
+  
+  .link-item:last-child {
+    border-bottom: none;
+  }
+  
+  .link-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: calc(100% - 50px); /* Reserve space for actions */
+  }
+  
+  .link-url {
+    color: #007bff;
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.3s ease;
+    flex-shrink: 0;
+    width: 200px; /* Set fixed width */
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  
+  .link-url:hover {
+    color: #0056b3;
+  }
+  
+  .link-description {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    flex-grow: 1;
+    overflow: hidden;
+  }
+  
+  .link-description span:first-child {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 200px; /* Set max width for description */
+  }
+  
+  .info-icon {
+    font-size: 14px;
+    cursor: pointer;
+    color: #888;
+    transition: color 0.3s ease;
+  }
+  
+  .info-icon:hover {
+    color: #333;
+  }
+  
+  .link-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding-left: 10px; /* Add padding to separate from the right side */
+    flex-shrink: 0;
+  }
+  
+  .delete-icon {
+    font-size: 16px;
+    cursor: pointer;
+    color: #e74c3c;
+    transition: color 0.3s ease;
+  }
+  
+  .delete-icon:hover {
+    color: #c0392b;
+  }
+
+  .edit-icon {
+    font-size: 16px;
+    cursor: pointer;
+    transition: color 0.3s ease;
+  }
+  

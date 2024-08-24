@@ -1,0 +1,66 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+enum Role {
+  admin
+  pegawai
+  mitra
+}
+
+model User {
+  id       Int       @id @default(autoincrement())
+  username String    @unique
+  password String
+  role     Role?  
+  refresh_token String?
+  Timkerja Timkerja? // This line is correct as it establishes the relation
+}
+
+model Timkerja {
+  id        Int        @id @default(autoincrement())
+  name      String
+  links     Json?
+  leader    User?      @relation(fields: [leader_id], references: [id], onDelete: SetNull)
+  leader_id Int?       @unique // This is the foreign key field that links to the User
+  kegiatan  Kegiatan[]
+}
+
+model Kegiatan {
+  id          Int           @id @default(autoincrement())
+  timkerja_id Int
+  name        String
+  timkerja    Timkerja      @relation(fields: [timkerja_id], references: [id], onDelete: Cascade)
+  subkegiatan Subkegiatan[]
+}
+
+model Subkegiatan {
+  id          Int      @id @default(autoincrement())
+  kegiatan_id Int
+  name        String
+  kegiatan    Kegiatan @relation(fields: [kegiatan_id], references: [id], onDelete: Cascade)
+  tugas       Tugas[]
+}
+
+model Tugas {
+  id             Int         @id @default(autoincrement())
+  subkegiatan_id Int
+  name           String
+  dateCreated    DateTime
+  dueDate        DateTime
+  dateUpload     DateTime?
+  link           String?
+  completed      Boolean     @default(false)
+  subkegiatan    Subkegiatan @relation(fields: [subkegiatan_id], references: [id], onDelete: Cascade)
+}

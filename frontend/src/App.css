@@ -41,16 +41,149 @@
 }
 
 .App-main {
-  flex: 1;
   display: flex;
-  /* justify-content: center; */
-  /* align-items: flex-start; */
+  flex-direction: column;
   padding: 20px;
+  gap: 20px; /* Adds space between the two pages */
 }
+
 
 .App-footer {
   background-color: #333;
   color: white;
   text-align: center;
   padding: 10px;
+}
+
+
+/* table */
+
+.filters {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 20px;
+}
+
+.filter-select {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.search-inputs {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.search-bar {
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 14px;
+  width: 200px;
+}
+
+.filter-select .react-select__control {
+  border: 1px solid #ccc;
+  box-shadow: none;
+  border-radius: 4px;
+  font-size: 14px;
+}
+
+.filter-select .react-select__control:focus {
+  border-color: #007bff;
+  box-shadow: 0 0 0 1px #007bff;
+}
+
+.filter-select .react-select__menu {
+  border-radius: 4px;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+  border: 1px solid #ddd;
+}
+
+th, td {
+  padding: 12px;
+  text-align: left;
+  border-bottom: 1px solid #ddd;
+}
+
+th {
+  background-color: #f4f4f4;
+}
+
+tr:nth-child(even) {
+  background-color: #f9f9f9;
+}
+
+th {
+  cursor: pointer;
+}
+
+th span {
+  font-size: 12px;
+  margin-left: 5px;
+  color: #333;
+}
+
+th span {
+  color: #007bff;
+}
+
+
+
+
+
+/* tabs */
+
+.tabs {
+  display: flex;
+  flex-direction: row;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.tabs button {
+  padding: 10px 20px;
+  cursor: pointer;
+  background-color: #ffffff;
+  border: 1px solid #6d5454;
+  border-radius: 4px;
+}
+
+.tabs button.active {
+  background-color: #bbb9b9;
+  font-weight: bold;
+}
+
+.tab-content .page {
+  display: none;
+}
+
+.tab-content .page.active {
+  display: block;
+}
+
+.tabs button:hover{
+  background-color: #6d5454;
+}
+
+.logout-button {
+  position: absolute;
+  top: 20px; /* Adjust this value based on your header padding */
+  right: 20px; /* Adjust this value based on your header padding */
+  background: none;
+  border: none;
+  font-size: 15px;
+  cursor: pointer;
+  color: red;
+}
+
+.logout-button:hover {
+  color: darkred;
 }
