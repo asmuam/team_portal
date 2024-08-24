@@ -3,38 +3,7 @@ import './TeamHierarchy.css';
 
 function TeamHierarchy() {
     const [teams, setTeams] = useState([
-        // {
-        //     id: 1,
-        //     name: 'Tim Kerja A',
-        //     activities: [
-        //         {
-        //             name: 'Kegiatan 1',
-        //             subActivities: [
-        //                 {
-        //                     name: 'Sub-Kegiatan 1.1',
-        //                     tasks: [
-        //                         { name: 'Tugas abcdefg', dateCreated: '2024-05-01', dueDate: '2024-08-10', dateUpload: '', link: '', completed: false, status: '' },
-        //                         { name: 'Tugas 2', dateCreated: '2024-07-02', dueDate: '2024-08-22', dateUpload: '', link: '', completed: true, status: '' }
-        //                     ]
-        //                 },
-        //                 {
-        //                     name: 'Sub-Kegiatan 1.2',
-        //                     tasks: []
-        //                 }
-        //             ]
-        //         },
-        //         {
-        //             name: 'Kegiatan 2',
-        //             subActivities: [
-        //                 {
-        //                     name: 'Sub-Kegiatan 2.1',
-        //                     tasks: [
-        //                     ]
-        //                 }
-        //             ]
-        //         }
-        //     ]
-        // }
+        //  
     ]);
 
 
