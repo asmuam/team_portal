@@ -1,14 +1,37 @@
 import React, { useState } from 'react';
 import axios from 'axios'
 import './TeamHierarchy.css';
+import TambahTeam from './modal/TambahTeam';
+import TambahActivity from './modal/TambahActivity';
+import TambahSubActivity from './modal/TambahSubActivity';
+
 
 function TeamHierarchy({ teams, setTeams }) {
     const [activeTeams, setActiveTeams] = useState([]);
     const [activeActivities, setActiveActivities] = useState([]);
     const [subActivityTasks, setSubActivityTasks] = useState({});
 
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [modalType, setModalType] = useState('');
+    const [currentTeamId, setCurrentTeamId] = useState(null);
+    const [currentActivityId, setCurrentActivityId] = useState(null);
+
     const URL = process.env.REACT_APP_API_URL
 
+     // Fungsi untuk membuka modal
+     const openModal = (type, teamId = null, activityId = null) => {
+        setModalType(type);
+        setCurrentTeamId(teamId);
+        setCurrentActivityId(activityId);
+        setIsModalOpen(true);
+    };
+    
+    const closeModal = () => {
+        setIsModalOpen(false);
+        setCurrentTeamId(null);
+        setCurrentActivityId(null);
+    };
+    
     const refetchTeams = async () => {
         try {
             const response = await fetch(`${URL}/teams`);
@@ -59,15 +82,12 @@ function TeamHierarchy({ teams, setTeams }) {
         }));
     };
 
-    const addTeam = async () => {
-        const newTeamName = prompt('Masukkan nama tim baru:');
-        if (newTeamName) {
-            try {
-                await axios.post(`${URL}/teams`, { name: newTeamName });
-                refetchTeams();
-            } catch (error) {
-                console.error('Error adding team:', error);
-            }
+const handleAddTeam = async (team) => {
+        try {
+            await axios.post(`${URL}/teams`, team);
+            refetchTeams();
+        } catch (error) {
+            console.error('Error adding team:', error);
         }
     };
 
@@ -97,12 +117,11 @@ function TeamHierarchy({ teams, setTeams }) {
         alert(`Tim Kerja ${teams.find(team => team.id === id).name} telah diarsipkan.`);
     };
 
-    const addActivity = async (teamId) => {
-        const newActivity = prompt('Masukkan nama kegiatan baru:');
-        if (newActivity) {
+    const handleAddActivity = async (teamId, activityData) => {
+        if (activityData.name) {
             try {
-                await axios.post(`${URL}/teams/${teamId}/activities`, { name: newActivity });
-                refetchTeams();
+                await axios.post(`${URL}/teams/${teamId}/activities`, { name: activityData.name });
+                refetchTeams(); // Segera perbarui daftar tim setelah menambahkan kegiatan
             } catch (error) {
                 console.error('Error adding activity:', error);
             }
@@ -135,17 +154,16 @@ function TeamHierarchy({ teams, setTeams }) {
         alert(`Kegiatan ${teams.find(team => team.id === teamId).activities[Id].name} telah diarsipkan.`);
     };
 
-    const addSubActivity = async (teamId, activityId) => {
-        const newSubActivity = prompt('Masukkan nama sub-kegiatan baru:');
-        if (newSubActivity) {
+    const handleAddSubActivity = async (teamId, activityId, subActivityData) => {
+        if (subActivityData.name) {
             try {
-                await axios.post(`${URL}/teams/${teamId}/activities/${activityId}/sub-activities`, { name: newSubActivity });
-                refetchTeams();
+                await axios.post(`${URL}/teams/${teamId}/activities/${activityId}/sub-activities`, { name: subActivityData.name });
+                refetchTeams(); // Segera perbarui daftar tim setelah menambahkan sub-activity
             } catch (error) {
                 console.error('Error adding sub-activity:', error);
             }
         }
-    };
+    };    
 
     const renameSubActivity = async (teamId, activityId, subActivityId) => {
         const newName = prompt('Masukkan nama sub-kegiatan baru:');
@@ -378,24 +396,52 @@ function TeamHierarchy({ teams, setTeams }) {
                                                         </div>
                                                     );
                                                 })}
-                                                <div className="add-sub-activity-box" onClick={() => addSubActivity(team.id, activity.id)}>
-                                                    + Tambah Sub-Kegiatan {activity.name}
+                                                <div className="add-sub-activity-box" onClick={() => openModal('subactivity', team.id, activity.id)}>
+                                                    + Tambah Sub-Kegiatan Tim {team.name}
                                                 </div>
                                             </div>
                                         )}
                                     </div>
                                 ))}
-                                <div className="add-activity-box" onClick={() => addActivity(team.id)}>
+                                <div className="add-activity-box" onClick={() => openModal('activity', team.id)}>
                                     + Tambah Kegiatan Tim {team.name}
                                 </div>
                             </div>
                         )}
                     </div>
                 ))}
-                <div className="add-team-box" onClick={addTeam}>
+                <div className="add-team-box" onClick={() => openModal('team')}>
                     + Tambah Tim Kerja
                 </div>
             </div>
+
+        {/* Modal untuk menambahkan tim */}
+        {modalType === 'team' && (
+            <TambahTeam
+                isOpen={isModalOpen}
+                onClose={closeModal}
+                onSubmit={handleAddTeam}
+            />
+        )}
+
+        {/* Modal untuk menambahkan aktivitas */}
+        {modalType === 'activity' && currentTeamId && (
+            <TambahActivity
+                isOpen={isModalOpen}
+                onClose={closeModal}
+                onSubmit={(activityData) => handleAddActivity(currentTeamId, activityData)}
+            />
+        )}
+
+        {/* Modal untuk menambahkan aktivitas */}
+        {modalType === 'subactivity' && currentTeamId && currentActivityId && (
+            <TambahSubActivity
+                isOpen={isModalOpen}
+                onClose={closeModal}
+                onSubmit={(subActivityData) => handleAddSubActivity(currentTeamId, currentActivityId, subActivityData)}
+            />
+        )}
+
         </div>
     );
 }
