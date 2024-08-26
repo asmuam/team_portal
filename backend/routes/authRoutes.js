@@ -71,6 +71,16 @@ router.post('/login', async (req, res) => {
   }
 });
 
+// {
+//   "success": true,
+//   "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsInVzZXJuYW1lIjoiYWRpYiIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTcyNDY0NzQ0MiwiZXhwIjoxNzI0NjUxMDQyfQ.BJHWxGe3y_F1idrCfNhJPODySPcR69PgUCtH0YhwHeo"
+// }
+// {
+//   "success": false,
+//   "message": "Username atau password tidak valid"
+// }
+
+
 // Refresh token route
 router.post('/refresh', async (req, res) => {
   try {
