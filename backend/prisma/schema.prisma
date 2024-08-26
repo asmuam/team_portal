@@ -64,3 +64,30 @@ model Tugas {
   completed      Boolean     @default(false)
   subkegiatan    Subkegiatan @relation(fields: [subkegiatan_id], references: [id], onDelete: Cascade)
 }
+
+model TimkerjaProgress {
+  timkerja_id   Int
+  timkerja_name String
+  progress      Float
+
+  @@map("TimkerjaProgress") // Map this Prisma model to the SQL view
+  @@unique([timkerja_id])   // Menandai timkerja_id sebagai kriteria unik
+}
+
+model KegiatanProgress {
+  kegiatan_id   Int
+  kegiatan_name String
+  progress      Float
+
+  @@map("KegiatanProgress") // Map this Prisma model to the SQL view
+  @@unique([kegiatan_id])   // Menandai kegiatan_id sebagai kriteria unik
+}
+
+model SubkegiatanProgress {
+  subkegiatan_id   Int
+  subkegiatan_name String
+  progress         Float
+
+  @@map("SubkegiatanProgress") // Map this Prisma model to the SQL view
+  @@unique([subkegiatan_id])   // Menandai subkegiatan_id sebagai kriteria unik
+}

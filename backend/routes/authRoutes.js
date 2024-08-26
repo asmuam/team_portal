@@ -38,13 +38,13 @@ router.post('/login', async (req, res) => {
 
     // Buat access token dan refresh token
     const accessToken = jwt.sign(
-      { userId: user.id, role: user.role },
+      { userId: user.id, username: user.username, role: user.role },
       JWT_SECRET,
       { expiresIn: '1h' } // Access token berlaku selama 1 jam
     );
 
     const refreshToken = jwt.sign(
-      { userId: user.id, role: user.role },
+      { userId: user.id, username: user.username, role: user.role },
       REFRESH_TOKEN_SECRET,
       { expiresIn: '7d' } // Refresh token berlaku selama 7 hari
     );
@@ -93,7 +93,7 @@ router.post('/refresh', async (req, res) => {
 
       // Buat ulang access token
       const accessToken = jwt.sign(
-        { userId: user.userId, role: user.role },
+        { userId: user.userId, username: user.username, role: user.role },
         JWT_SECRET,
         { expiresIn: '1h' } // Access token berlaku selama 1 jam
       );
