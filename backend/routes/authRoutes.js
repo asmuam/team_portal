@@ -40,7 +40,7 @@ router.post('/login', async (req, res) => {
     const accessToken = jwt.sign(
       { userId: user.id, username: user.username, role: user.role },
       ACCESS_TOKEN_SECRET,
-      { expiresIn: '1h' } // Access token berlaku selama 1 jam
+      { expiresIn: '5m' } // Access token berlaku selama 1 jam
     );
 
     const refreshToken = jwt.sign(
@@ -48,6 +48,12 @@ router.post('/login', async (req, res) => {
       REFRESH_TOKEN_SECRET,
       { expiresIn: '7d' } // Refresh token berlaku selama 7 hari
     );
+
+    // Update user record with the new refresh token
+    await prismaClient.user.update({
+      where: { id: user.id },
+      data: { refresh_token: refreshToken },
+    });
 
     // Kirim refresh token dalam cookie
     res.cookie('refreshToken', refreshToken, {
@@ -59,7 +65,9 @@ router.post('/login', async (req, res) => {
     // Kirim access token dalam respons JSON
     res.status(200).json({
       success: true,
+      uid : user.id,
       accessToken,
+      role : user.role
     });
 
   } catch (e) {
@@ -70,6 +78,16 @@ router.post('/login', async (req, res) => {
     });
   }
 });
+
+// {
+//   "success": true,
+//   "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsInVzZXJuYW1lIjoiYWRpYiIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTcyNDY0NzQ0MiwiZXhwIjoxNzI0NjUxMDQyfQ.BJHWxGe3y_F1idrCfNhJPODySPcR69PgUCtH0YhwHeo"
+// }
+// {
+//   "success": false,
+//   "message": "Username atau password tidak valid"
+// }
+
 
 // Refresh token route
 router.post('/refresh', async (req, res) => {
@@ -111,9 +129,9 @@ router.post('/refresh', async (req, res) => {
 
 // Logout route (optional, if you need server-side token invalidation)
 router.post('/logout', (req, res) => {
-    // Invalidate token on the server side if needed (e.g., add it to a blacklist)
-    res.clearCookie('refreshToken'); // Clear the refresh token cookie
-    res.json({ success: true, message: 'Logged out successfully' });
+  // Invalidate token on the server side if needed (e.g., add it to a blacklist)
+  res.clearCookie('refreshToken'); // Clear the refresh token cookie
+  res.json({ success: true, message: 'Logged out successfully' });
 });
 
 export default router;

@@ -67,6 +67,7 @@ model Tugas {
   subkegiatan    Subkegiatan @relation(fields: [subkegiatan_id], references: [id], onDelete: Cascade)
 }
 
+// hapus dahulu tabel pada mysql dibawah ini lalu ganti dengan query pada view.sql
 model TimkerjaProgress {
   timkerja_id   Int
   timkerja_name String

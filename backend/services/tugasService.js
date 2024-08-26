@@ -41,17 +41,3 @@ export const toggleTugasCompletion = async (id) => {
     data: { completed: !task.completed },
   });
 };
-
-export const updateTugasDeadline = async (id, newDeadline) => {
-  return prisma.tugas.update({
-    where: { id: parseInt(id) },
-    data: { dueDate: new Date(newDeadline) },
-  });
-};
-
-export const updateTugasLink = async (id, newLink) => {
-  return prisma.tugas.update({
-    where: { id: parseInt(id) },
-    data: { link: newLink },
-  });
-};
