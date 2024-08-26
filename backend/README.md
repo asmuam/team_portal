@@ -329,6 +329,108 @@ Response:
   "completed": false
 }
 ```
+### Links
+#### Get all links from a team
+- **Endpoint:** `GET /teams/:teamId/links`
+- **Description:** Retrieve all links associated with a specific team.
+
+Response:
+```json
+{
+  "links": [
+    {
+      "id": "id",
+      "url": "newURL 1",
+      "description": "URL Description"
+    },
+    {
+      "id": "id",
+      "url": "newURL 2",
+      "description": "URL Description"
+    }
+  ]
+}
+```
+
+#### Add link from a team
+- **Endpoint:** `POST /teams/:teamId/links`
+- **Description:** Add a new link to a specific team.
+
+Request Body:
+```json
+{
+  "url": "newURL",
+  "description": "URL Description"
+}
+```
+Response:
+```json
+{
+  "id": 3,
+  "name": "Team Name",
+  "links": [
+    {
+      "id": "id",
+      "url": "newURL 1",
+      "description": "URL Description 1"
+    },
+    {
+      "id": "id",
+      "url": "newURL 2",
+      "description": "URL Description 2"
+    }
+  ],
+  "leader_id": null
+}
+```
+#### Delete a Link from a Team
+- **Endpoint:** `DELETE /teams/:teamId/links/:linkId`
+- **Description:**Remove a specific link from a team.
+
+Response:
+```json
+{
+  "id": 3,
+  "name": "Team Name",
+  "links": [
+    {
+      "id": "id",
+      "url": "newURL",
+      "description": "URL Description"
+    }
+  ],
+  "leader_id": null
+}
+
+```
+#### Edit a Link in a Team
+- **Endpoint:** `PATCH /teams/:teamId/links/:linkId`
+- **Description:**Update an existing link in a team.
+
+Request Body:
+```json
+{
+  "url": "newURL",
+  "description": "newDescription"
+}
+```
+Response:
+```json
+{
+  "id": 3,
+  "name": "Team Name",
+  "links": [
+    {
+      "id": "id",
+      "url": "newURL",
+      "description": "newDescription"
+    }
+  ],
+  "leader_id": null
+}
+
+```
+
 ## Error Handling
 All endpoints return appropriate HTTP status codes and error messages. Common error codes include:
 

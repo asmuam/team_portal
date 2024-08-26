@@ -16,8 +16,8 @@ const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
   const [auth, setAuth] = useState({
-    // user: sessionStorage.getItem("user"),
-    // role: [sessionStorage.getItem("role")],
+    uid: sessionStorage.getItem("uid"),
+    role: sessionStorage.getItem("role"),
     token: localStorage.getItem("authToken"),
   });
 

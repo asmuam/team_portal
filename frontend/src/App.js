@@ -7,12 +7,17 @@ import LinkPenting from './components/LinkPenting.js';
 import Login from './components/Login.js';
 import RequiredNonAuth from "./components/auth/auth-path.js";
 import RequiredAuth from "./components/auth/required-path.js";
+import useAuth from './hooks/use-auth.js';
 
 function App() {
-
     const [teams, setTeams] = useState([]);
+    const [activeTab, setActiveTab] = useState('teamHierarchy'); // Default tab
+    const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+    const { setAuth } = useAuth();
 
     useEffect(() => {
+        // Fetch teams when the component mounts
         const fetchTeams = async () => {
             try {
                 const response = await fetch(`${process.env.REACT_APP_API_URL}/teams`);
@@ -30,22 +35,25 @@ function App() {
         fetchTeams();
     }, []);
 
-
-    const [activeTab, setActiveTab] = useState('teamHierarchy'); // Default tab
-
-    const [isAuthenticated, setIsAuthenticated] = useState(false);
-
-    const handleLogin = (token) => {
-        localStorage.setItem('authToken', token);
-        setIsAuthenticated(true);
-    };
-
     useEffect(() => {
+        // Check for token in local storage
         const token = localStorage.getItem('authToken');
         if (token) {
             setIsAuthenticated(true);
         }
     }, []);
+
+    const handleLogin = (result) => {
+        localStorage.setItem('authToken', result.accessToken);
+        sessionStorage.setItem('uid', result.uid);
+        sessionStorage.setItem('role', result.role);
+        setIsAuthenticated(true);
+        setAuth({
+            uid: result.uid,
+            role: result.role,
+            token: result.accessToken
+        });
+    };
 
     const handleLogout = async () => {
         if (window.confirm('Are you sure you want to log out?')) {
@@ -58,11 +66,12 @@ function App() {
                 }
             });
 
-            localStorage.removeItem('authToken');
+            localStorage.removeItem('authToken'); // Correct way to remove an item
+            sessionStorage.removeItem('uid'); // Remove session storage items
+            sessionStorage.removeItem('role');
             setIsAuthenticated(false);
         }
     };
-
 
     return (
         <div className='App'>
