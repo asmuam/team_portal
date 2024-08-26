@@ -39,7 +39,7 @@ model Timkerja {
 
 model Kegiatan {
   id                  Int           @id @default(autoincrement())
-  tanggal_pelaksanaan DateTime
+  tanggal_pelaksanaan DateTime      @default(now())
   timkerja_id         Int
   name                String
   timkerja            Timkerja      @relation(fields: [timkerja_id], references: [id], onDelete: Cascade)
@@ -48,7 +48,7 @@ model Kegiatan {
 
 model Subkegiatan {
   id          Int      @id @default(autoincrement())
-  tanggal_pelaksanaan DateTime
+  tanggal_pelaksanaan  DateTime @default(now())
   kegiatan_id Int
   name        String
   kegiatan    Kegiatan @relation(fields: [kegiatan_id], references: [id], onDelete: Cascade)

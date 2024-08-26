@@ -24,3 +24,34 @@ export const deleteTugas = async (id) => {
     where: { id: parseInt(id) },
   });
 };
+
+export const toggleTugasCompletion = async (id) => {
+  // Find the task
+  const task = await prisma.tugas.findUnique({
+    where: { id: parseInt(id) }
+  });
+
+  if (!task) {
+    throw new Error('Task not found');
+  }
+
+  // Toggle completion status
+  return prisma.tugas.update({
+    where: { id: parseInt(id) },
+    data: { completed: !task.completed },
+  });
+};
+
+export const updateTugasDeadline = async (id, newDeadline) => {
+  return prisma.tugas.update({
+    where: { id: parseInt(id) },
+    data: { dueDate: new Date(newDeadline) },
+  });
+};
+
+export const updateTugasLink = async (id, newLink) => {
+  return prisma.tugas.update({
+    where: { id: parseInt(id) },
+    data: { link: newLink },
+  });
+};

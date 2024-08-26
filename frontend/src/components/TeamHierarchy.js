@@ -11,7 +11,7 @@ function TeamHierarchy({ teams, setTeams }) {
 
     const refetchTeams = async () => {
         try {
-            const response = await fetch(`${URL}/team`);
+            const response = await fetch(`${URL}/teams`);
             if (!response.ok) {
                 throw new Error('Network response was not ok');
             }
@@ -63,7 +63,7 @@ function TeamHierarchy({ teams, setTeams }) {
         const newTeamName = prompt('Masukkan nama tim baru:');
         if (newTeamName) {
             try {
-                await axios.post(`${URL}/team`, { name: newTeamName });
+                await axios.post(`${URL}/teams`, { name: newTeamName });
                 refetchTeams();
             } catch (error) {
                 console.error('Error adding team:', error);
@@ -75,7 +75,7 @@ function TeamHierarchy({ teams, setTeams }) {
         const newName = prompt('Masukkan nama baru:');
         if (newName) {
             try {
-                await axios.patch(`${URL}/team/${id}`, { name: newName });
+                await axios.patch(`${URL}/teams/${id}`, { name: newName });
                 refetchTeams();
             } catch (error) {
                 console.error('Error renaming team:', error);
@@ -85,7 +85,7 @@ function TeamHierarchy({ teams, setTeams }) {
 
     const deleteTeam = async (id) => {
         try {
-            await axios.delete(`${URL}/team/${id}`);
+            await axios.delete(`${URL}/teams/${id}`);
             refetchTeams();
         } catch (error) {
             console.error('Error deleting team:', error);
@@ -101,7 +101,7 @@ function TeamHierarchy({ teams, setTeams }) {
         const newActivity = prompt('Masukkan nama kegiatan baru:');
         if (newActivity) {
             try {
-                await axios.post(`${URL}/team/${teamId}/activities`, { name: newActivity });
+                await axios.post(`${URL}/teams/${teamId}/activities`, { name: newActivity });
                 refetchTeams();
             } catch (error) {
                 console.error('Error adding activity:', error);
@@ -113,7 +113,7 @@ function TeamHierarchy({ teams, setTeams }) {
         const newName = prompt('Masukkan nama kegiatan baru:');
         if (newName) {
             try {
-                await axios.patch(`${URL}/team/${teamId}/activities/${Id}`, { name: newName });
+                await axios.patch(`${URL}/teams/${teamId}/activities/${Id}`, { name: newName });
                 refetchTeams();
             } catch (error) {
                 console.error('Error renaming activity:', error);
@@ -123,7 +123,7 @@ function TeamHierarchy({ teams, setTeams }) {
 
     const deleteActivity = async (teamId, Id) => {
         try {
-            await axios.delete(`${URL}/team/${teamId}/activities/${Id}`);
+            await axios.delete(`${URL}/teams/${teamId}/activities/${Id}`);
             refetchTeams();
         } catch (error) {
             console.error('Error deleting activity:', error);
@@ -139,7 +139,7 @@ function TeamHierarchy({ teams, setTeams }) {
         const newSubActivity = prompt('Masukkan nama sub-kegiatan baru:');
         if (newSubActivity) {
             try {
-                await axios.post(`${URL}/team/${teamId}/activities/${activityId}/sub-activities`, { name: newSubActivity });
+                await axios.post(`${URL}/teams/${teamId}/activities/${activityId}/sub-activities`, { name: newSubActivity });
                 refetchTeams();
             } catch (error) {
                 console.error('Error adding sub-activity:', error);
@@ -151,7 +151,7 @@ function TeamHierarchy({ teams, setTeams }) {
         const newName = prompt('Masukkan nama sub-kegiatan baru:');
         if (newName) {
             try {
-                await axios.patch(`${URL}/team/${teamId}/activities/${activityId}/sub-activities/${subActivityId}`, { name: newName });
+                await axios.patch(`${URL}/teams/${teamId}/activities/${activityId}/sub-activities/${subActivityId}`, { name: newName });
                 refetchTeams();
             } catch (error) {
                 console.error('Error renaming sub-activity:', error);
@@ -161,7 +161,7 @@ function TeamHierarchy({ teams, setTeams }) {
 
     const deleteSubActivity = async (teamId, activityId, subActivityId) => {
         try {
-            await axios.delete(`${URL}/team/${teamId}/activities/${activityId}/sub-activities/${subActivityId}`);
+            await axios.delete(`${URL}/teams/${teamId}/activities/${activityId}/sub-activities/${subActivityId}`);
             refetchTeams();
         } catch (error) {
             console.error('Error deleting sub-activity:', error);
@@ -187,7 +187,7 @@ function TeamHierarchy({ teams, setTeams }) {
                 completed: false
             };
             try {
-                await axios.post(`${URL}/team/${teamId}/activities/${activityId}/sub-activities/${subActivityId}/tasks`, newTask);
+                await axios.post(`${URL}/teams/${teamId}/activities/${activityId}/sub-activities/${subActivityId}/tasks`, newTask);
                 refetchTeams();
             } catch (error) {
                 console.error('Error adding task:', error);
@@ -199,7 +199,7 @@ function TeamHierarchy({ teams, setTeams }) {
         const newName = prompt('Masukkan nama tugas baru:', currentName);
         if (newName) {
             try {
-                await axios.patch(`${URL}/team/${teamId}/activities/${activityId}/sub-activities/${subActivityId}/tasks/${taskId}`, { name: newName });
+                await axios.patch(`${URL}/teams/${teamId}/activities/${activityId}/sub-activities/${subActivityId}/tasks/${taskId}`, { name: newName });
                 refetchTeams();
             } catch (error) {
                 console.error('Error renaming task:', error);
@@ -209,7 +209,7 @@ function TeamHierarchy({ teams, setTeams }) {
 
     const deleteTask = async (teamId, activityId, subActivityId, taskId) => {
         try {
-            await axios.delete(`${URL}/team/${teamId}/activities/${activityId}/sub-activities/${subActivityId}/tasks/${taskId}`);
+            await axios.delete(`${URL}/teams/${teamId}/activities/${activityId}/sub-activities/${subActivityId}/tasks/${taskId}`);
             refetchTeams();
         } catch (error) {
             console.error('Error deleting task:', error);
@@ -223,7 +223,7 @@ function TeamHierarchy({ teams, setTeams }) {
 
     const toggleTaskCompletion = async (teamId, activityId, subActivityId, taskId) => {
         try {
-            await axios.patch(`${URL}/team/${teamId}/activities/${activityId}/sub-activities/${subActivityId}/tasks/${taskId}/completion`, {});
+            await axios.patch(`${URL}/teams/${teamId}/activities/${activityId}/sub-activities/${subActivityId}/tasks/${taskId}/completion`, {});
             refetchTeams();
         } catch (error) {
             console.error('Error toggling task completion:', error);
@@ -232,7 +232,7 @@ function TeamHierarchy({ teams, setTeams }) {
 
     const handleDeadlineChange = async (teamId, activityId, subActivityId, taskId, newDeadline) => {
         try {
-            await axios.patch(`${URL}/team/${teamId}/activities/${activityId}/sub-activities/${subActivityId}/tasks/${taskId}/deadline`, { dueDate: newDeadline });
+            await axios.patch(`${URL}/teams/${teamId}/activities/${activityId}/sub-activities/${subActivityId}/tasks/${taskId}/deadline`, { dueDate: newDeadline });
             refetchTeams();
         } catch (error) {
             console.error('Error updating task deadline:', error);
@@ -241,7 +241,7 @@ function TeamHierarchy({ teams, setTeams }) {
 
     const handleLinkChange = async (newLink, teamId, activityId, subActivityId, taskId) => {
         try {
-            await axios.patch(`${URL}/team/${teamId}/activities/${activityId}/sub-activities/${subActivityId}/tasks/${taskId}/link`, { newLink: newLink });
+            await axios.patch(`${URL}/teams/${teamId}/activities/${activityId}/sub-activities/${subActivityId}/tasks/${taskId}/link`, { newLink: newLink });
             refetchTeams();
         } catch (error) {
             console.error('Error updating task drive link:', error);
