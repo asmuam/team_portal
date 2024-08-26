@@ -38,15 +38,17 @@ model Timkerja {
 }
 
 model Kegiatan {
-  id          Int           @id @default(autoincrement())
-  timkerja_id Int
-  name        String
-  timkerja    Timkerja      @relation(fields: [timkerja_id], references: [id], onDelete: Cascade)
-  subkegiatan Subkegiatan[]
+  id                  Int           @id @default(autoincrement())
+  tanggal_pelaksanaan DateTime
+  timkerja_id         Int
+  name                String
+  timkerja            Timkerja      @relation(fields: [timkerja_id], references: [id], onDelete: Cascade)
+  subkegiatan         Subkegiatan[]
 }
 
 model Subkegiatan {
   id          Int      @id @default(autoincrement())
+  tanggal_pelaksanaan DateTime
   kegiatan_id Int
   name        String
   kegiatan    Kegiatan @relation(fields: [kegiatan_id], references: [id], onDelete: Cascade)

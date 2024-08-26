@@ -2,7 +2,7 @@ import express from 'express';
 import dotenv from 'dotenv';
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcryptjs';
-import prismaClient from '../prisma/config'; // Sesuaikan dengan path prismaClient Anda
+import prismaClient from '../prisma/config.js'; // Sesuaikan dengan path prismaClient Anda
 
 dotenv.config();
 

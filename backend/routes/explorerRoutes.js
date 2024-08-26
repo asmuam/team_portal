@@ -1,10 +1,12 @@
-const express = require('express');
+import express from 'express';
+import prisma from '../prisma/config.js'; // Sesuaikan dengan path dan format ESM
+import * as timkerjaService from '../services/timKerjaService.js';
+
 const router = express.Router();
-const { PrismaClient } = require('@prisma/client');
 
-const prisma = new PrismaClient();
 
-router.get('/teams', async (req, res) => {
+// full direct
+router.get('/team', async (req, res) => {
   try {
     const teams = await getTeams();
     res.json(teams);
@@ -13,9 +15,8 @@ router.get('/teams', async (req, res) => {
     res.status(500).json({ error: 'Internal Server Error' });
   }
 });
-
 const getTeams = async () => {
-  const teams = await prisma.Timkerja.findMany({
+  const teams = await prisma.timkerja.findMany({
     include: {
       kegiatan: {
         include: {
@@ -53,52 +54,52 @@ const getTeams = async () => {
 };
 
 // Add a Team
-router.post('/teams', async (req, res) => {
-  const { name } = req.body;
+router.get('/team', async (req, res) => {
   try {
-      const team = await prisma.Timkerja.create({
-          data: { name }
-      });
-      res.json(team);
+    const timkerja = await timkerjaService.getAllTimkerja();
+    res.json(timkerja);
   } catch (error) {
-      res.status(500).json({ error: error.message });
+    res.status(500).json({ error: 'Internal Server Error' });
   }
 });
 
-// Rename a Team
-router.put('/teams/:id', async (req, res) => {
-  const { id } = req.params;
-  const { name } = req.body;
+router.post('/team', async (req, res) => {
   try {
-      const team = await prisma.Timkerja.update({
-          where: { id: parseInt(id) },
-          data: { name }
-      });
-      res.json(team);
+    const team = await timkerjaService.createTimkerja(req.body);
+    res.status(201).json(team);
   } catch (error) {
-      res.status(500).json({ error: error.message });
+    res.status(500).json({ error: error.message });
   }
 });
 
-// Delete a Team
-router.delete('/teams/:id', async (req, res) => {
-  const { id } = req.params;
+router.put('/team/:id', async (req, res) => {
   try {
-      const team = await prisma.Timkerja.delete({
-          where: { id: parseInt(id) }
-      });
-      res.json(team);
+    const team = await timkerjaService.updateTimkerja(req.params.id, req.body);
+    res.json(team);
   } catch (error) {
-      res.status(500).json({ error: error.message });
+    res.status(500).json({ error: error.message });
   }
 });
+
+router.delete('/team/:id', async (req, res) => {
+  try {
+    const team = await timkerjaService.deleteTimkerja(req.params.id);
+    res.json(team);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+
+// archive team
+
 
 // Add an Activity
-router.post('/teams/:teamId/activities', async (req, res) => {
+router.post('/team/:teamId/activities', async (req, res) => {
   const { teamId } = req.params;
   const { name } = req.body;
   try {
-      const activity = await prisma.Kegiatan.create({
+      const activity = await prisma.kegiatan.create({
           data: {
               name,
               timkerja_id: parseInt(teamId)
@@ -111,11 +112,11 @@ router.post('/teams/:teamId/activities', async (req, res) => {
 });
 
 // Rename an Activity
-router.put('/teams/:teamId/activities/:activityId', async (req, res) => {
+router.patch('/team/:teamId/activities/:activityId', async (req, res) => {
   const { teamId, activityId } = req.params;
   const { name } = req.body;
   try {
-      const activity = await prisma.Kegiatan.update({
+      const activity = await prisma.kegiatan.update({
           where: { id: parseInt(activityId) },
           data: { name }
       });
@@ -126,10 +127,10 @@ router.put('/teams/:teamId/activities/:activityId', async (req, res) => {
 });
 
 // Delete an Activity
-router.delete('/teams/:teamId/activities/:activityId', async (req, res) => {
+router.delete('/team/:teamId/activities/:activityId', async (req, res) => {
   const { teamId, activityId } = req.params;
   try {
-      const activity = await prisma.Kegiatan.delete({
+      const activity = await prisma.kegiatan.delete({
           where: { id: parseInt(activityId) }
       });
       res.json(activity);
@@ -138,12 +139,14 @@ router.delete('/teams/:teamId/activities/:activityId', async (req, res) => {
   }
 });
 
+// archive kegiatan
+
 // Add a Sub-Activity
-router.post('/teams/:teamId/activities/:activityId/sub-activities', async (req, res) => {
+router.post('/team/:teamId/activities/:activityId/sub-activities', async (req, res) => {
   const { activityId } = req.params;
   const { name } = req.body;
   try {
-      const subActivity = await prisma.Subkegiatan.create({
+      const subActivity = await prisma.subkegiatan.create({
           data: {
               name,
               kegiatan_id: parseInt(activityId)
@@ -156,11 +159,11 @@ router.post('/teams/:teamId/activities/:activityId/sub-activities', async (req, 
 });
 
 // Rename a Sub-Activity
-router.put('/teams/:teamId/activities/:activityId/sub-activities/:subActivityId', async (req, res) => {
+router.patch('/team/:teamId/activities/:activityId/sub-activities/:subActivityId', async (req, res) => {
   const { subActivityId } = req.params;
   const { name } = req.body;
   try {
-      const subActivity = await prisma.Subkegiatan.update({
+      const subActivity = await prisma.subkegiatan.update({
           where: { id: parseInt(subActivityId) },
           data: { name }
       });
@@ -171,10 +174,10 @@ router.put('/teams/:teamId/activities/:activityId/sub-activities/:subActivityId'
 });
 
 // Delete a Sub-Activity
-router.delete('/teams/:teamId/activities/:activityId/sub-activities/:subActivityId', async (req, res) => {
+router.delete('/team/:teamId/activities/:activityId/sub-activities/:subActivityId', async (req, res) => {
   const { subActivityId } = req.params;
   try {
-      const subActivity = await prisma.Subkegiatan.delete({
+      const subActivity = await prisma.subkegiatan.delete({
           where: { id: parseInt(subActivityId) }
       });
       res.json(subActivity);
@@ -183,12 +186,14 @@ router.delete('/teams/:teamId/activities/:activityId/sub-activities/:subActivity
   }
 });
 
+// archive subkeg
+
 // Add a Task
-router.post('/teams/:teamId/activities/:activityId/sub-activities/:subActivityId/tasks', async (req, res) => {
+router.post('/team/:teamId/activities/:activityId/sub-activities/:subActivityId/tasks', async (req, res) => {
   const { subActivityId } = req.params;
   const { name, dueDate, link, dateCreated } = req.body;
   try {
-      const task = await prisma.Tugas.create({
+      const task = await prisma.tugas.create({
           data: {
               name,
               dateCreated: new Date(dateCreated),
@@ -204,11 +209,11 @@ router.post('/teams/:teamId/activities/:activityId/sub-activities/:subActivityId
 });
 
 // Rename a Task
-router.put('/teams/:teamId/activities/:activityId/sub-activities/:subActivityId/tasks/:taskId', async (req, res) => {
+router.patch('/team/:teamId/activities/:activityId/sub-activities/:subActivityId/tasks/:taskId', async (req, res) => {
   const { taskId } = req.params;
   const { name } = req.body;
   try {
-      const task = await prisma.Tugas.update({
+      const task = await prisma.tugas.update({
           where: { id: parseInt(taskId) },
           data: { name }
       });
@@ -219,10 +224,10 @@ router.put('/teams/:teamId/activities/:activityId/sub-activities/:subActivityId/
 });
 
 // Delete a Task
-router.delete('/teams/:teamId/activities/:activityId/sub-activities/:subActivityId/tasks/:taskId', async (req, res) => {
+router.delete('/team/:teamId/activities/:activityId/sub-activities/:subActivityId/tasks/:taskId', async (req, res) => {
   const { taskId } = req.params;
   try {
-      const task = await prisma.Tugas.delete({
+      const task = await prisma.tugas.delete({
           where: { id: parseInt(taskId) }
       });
       res.json(task);
@@ -231,31 +236,40 @@ router.delete('/teams/:teamId/activities/:activityId/sub-activities/:subActivity
   }
 });
 
+// archive task
+
 // Toggle Task Completion
-router.patch('/teams/:teamId/activities/:activityId/sub-activities/:subActivityId/tasks/:taskId/completion', async (req, res) => {
+router.patch('/team/:teamId/activities/:activityId/sub-activities/:subActivityId/tasks/:taskId/completion', async (req, res) => {
   const { taskId } = req.params;
   try {
-      const task = await prisma.Tugas.findUnique({ where: { id: parseInt(taskId) } });
+      // Temukan tugas berdasarkan ID
+      const task = await prisma.tugas.findUnique({
+          where: { id: parseInt(taskId) }
+      });
+
+      // Jika tugas ditemukan, update status completion
       if (task) {
-          const updatedTask = await prisma.task.update({
+          const updatedTask = await prisma.tugas.update({
               where: { id: parseInt(taskId) },
-              data: { completed: !task.completed }
+              data: { completed: !task.completed } // Toggle status completed
           });
           res.json(updatedTask);
       } else {
           res.status(404).json({ error: 'Task not found' });
       }
   } catch (error) {
+      console.error('Error updating task completion:', error); // Tambahkan log untuk debugging
       res.status(500).json({ error: error.message });
   }
 });
 
+
 // Handle Deadline Change
-router.patch('/teams/:teamId/activities/:activityId/sub-activities/:subActivityId/tasks/:taskId/deadline', async (req, res) => {
+router.patch('/team/:teamId/activities/:activityId/sub-activities/:subActivityId/tasks/:taskId/deadline', async (req, res) => {
   const { taskId } = req.params;
   const { newDeadline } = req.body;
   try {
-      const task = await prisma.Tugas.update({
+      const task = await prisma.tugas.update({
           where: { id: parseInt(taskId) },
           data: { dueDate: new Date(newDeadline) }
       });
@@ -266,13 +280,13 @@ router.patch('/teams/:teamId/activities/:activityId/sub-activities/:subActivityI
 });
 
 // Handle Link Change
-router.patch('/teams/:teamId/activities/:activityId/sub-activities/:subActivityId/tasks/:taskId/link', async (req, res) => {
+router.patch('/team/:teamId/activities/:activityId/sub-activities/:subActivityId/tasks/:taskId/link', async (req, res) => {
   const { taskId } = req.params;
   const { newLink } = req.body;
   try {
-      const task = await prisma.Tugas.update({
+      const task = await prisma.tugas.update({
           where: { id: parseInt(taskId) },
-          data: { driveLink: newLink }
+          data: { link: newLink }
       });
       res.json(task);
   } catch (error) {
@@ -280,4 +294,4 @@ router.patch('/teams/:teamId/activities/:activityId/sub-activities/:subActivityI
   }
 });
 
-module.exports = router;
+export default router;
