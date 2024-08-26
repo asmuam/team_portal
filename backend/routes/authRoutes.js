@@ -8,7 +8,7 @@ dotenv.config();
 
 const router = express.Router();
 
-const JWT_SECRET = process.env.JWT_SECRET;
+const ACCESS_TOKEN_SECRET = process.env.ACCESS_TOKEN_SECRET;
 const REFRESH_TOKEN_SECRET = process.env.REFRESH_TOKEN_SECRET;
 
 // Login route
@@ -39,7 +39,7 @@ router.post('/login', async (req, res) => {
     // Buat access token dan refresh token
     const accessToken = jwt.sign(
       { userId: user.id, username: user.username, role: user.role },
-      JWT_SECRET,
+      ACCESS_TOKEN_SECRET,
       { expiresIn: '1h' } // Access token berlaku selama 1 jam
     );
 
