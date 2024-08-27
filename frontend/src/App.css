@@ -1,52 +1,54 @@
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
-}
-
-.App-header {
-  background-color: #282c34;
-  min-height: 10vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
-}
-
-.App-link {
-  color: #61dafb;
-}
-
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-/* src/App.css */
 .App {
   display: flex;
   flex-direction: column;
   min-height: 100vh;
 }
 
-.App-main {
+.App-header {
+  background-color: #282c34;
+  min-height: 10vh;
   display: flex;
-  flex-direction: column;
-  padding: 20px;
-  gap: 20px; /* Adds space between the two pages */
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 20px; /* Add padding to the sides */
+  color: white;
 }
 
+.App-header h1 {
+  margin: 0;
+  font-size: 24px;
+}
+
+.tabs {
+  display: flex;
+  gap: 10px;
+}
+
+.tabs button {
+  padding: 10px 20px;
+  cursor: pointer;
+  background-color: #ffffff;
+  border: 1px solid #6d5454;
+  border-radius: 4px;
+  color: #333;
+  font-size: 14px;
+}
+
+.tabs button:hover {
+  background-color: #6d5454;
+  color: #fff;
+}
+
+.tabs button.active {
+  background-color: #bbb9b9;
+  font-weight: bold;
+}
+
+.App-main {
+  flex: 1;
+  padding: 20px;
+  gap: 20px; /* Adds space between the content sections */
+}
 
 .App-footer {
   background-color: #333;
@@ -55,9 +57,7 @@
   padding: 10px;
 }
 
-
-/* table */
-
+/* Table Styles */
 .filters {
   display: flex;
   flex-direction: column;
@@ -107,7 +107,8 @@ table {
   border: 1px solid #ddd;
 }
 
-th, td {
+th,
+td {
   padding: 12px;
   text-align: left;
   border-bottom: 1px solid #ddd;
@@ -128,55 +129,10 @@ th {
 th span {
   font-size: 12px;
   margin-left: 5px;
-  color: #333;
-}
-
-th span {
   color: #007bff;
 }
 
-
-
-
-
-/* tabs */
-
-.tabs {
-  display: flex;
-  flex-direction: row;
-  gap: 10px;
-  margin-bottom: 20px;
-}
-
-.tabs button {
-  padding: 10px 20px;
-  cursor: pointer;
-  background-color: #ffffff;
-  border: 1px solid #6d5454;
-  border-radius: 4px;
-}
-
-.tabs button.active {
-  background-color: #bbb9b9;
-  font-weight: bold;
-}
-
-.tab-content .page {
-  display: none;
-}
-
-.tab-content .page.active {
-  display: block;
-}
-
-.tabs button:hover{
-  background-color: #6d5454;
-}
-
 .logout-button {
-  position: absolute;
-  top: 20px; /* Adjust this value based on your header padding */
-  right: 20px; /* Adjust this value based on your header padding */
   background: none;
   border: none;
   font-size: 15px;

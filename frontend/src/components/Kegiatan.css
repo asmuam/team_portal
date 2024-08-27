@@ -1,0 +1,17 @@
+.kegiatan {
+  display: flex;
+  flex-wrap: wrap;
+  margin: 0 auto;
+  font-family: Arial, sans-serif;
+  gap: 20px;
+  align-items: flex-start;
+  margin: 0 20px;
+}
+.activity-list {
+  gap: 20px; /* Tambahkan jarak antar item */
+  flex-wrap: wrap;
+  margin-top: 10px;
+  margin-bottom: 20px;
+
+  width: 100%; /* Pastikan lebar 100% */
+}
