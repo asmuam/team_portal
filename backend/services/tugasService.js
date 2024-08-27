@@ -1,4 +1,4 @@
-import prisma from '../prisma/config.js'; // Sesuaikan dengan path dan format ESM
+import prisma from "../prisma/config.js"; // Sesuaikan dengan path dan format ESM
 
 export const getTugasBySubkegiatanId = async (subkegiatanId) => {
   return prisma.tugas.findMany({
@@ -15,7 +15,11 @@ export const createTugas = async (data) => {
 export const updateTugas = async (id, data) => {
   return prisma.tugas.update({
     where: { id: parseInt(id) },
-    data,
+    data: {
+      ...data,
+      dueDate: data.dueDate ? new Date(data.dueDate) : null,
+      link: data.link, // Menggunakan data.link yang benar
+    },
   });
 };
 
@@ -28,11 +32,11 @@ export const deleteTugas = async (id) => {
 export const toggleTugasCompletion = async (id) => {
   // Find the task
   const task = await prisma.tugas.findUnique({
-    where: { id: parseInt(id) }
+    where: { id: parseInt(id) },
   });
 
   if (!task) {
-    throw new Error('Task not found');
+    throw new Error("Task not found");
   }
 
   // Toggle completion status
