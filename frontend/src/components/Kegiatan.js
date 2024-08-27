@@ -116,7 +116,7 @@ function Kegiatan() {
   }, [teamId]);
 
   const handleActivityClick = (activityId) => {
-    navigate(`/teamHierarchy/kegiatan/${teamId}/subkegiatan/${activityId}`);
+    navigate(`/explorer/kegiatan/${teamId}/subkegiatan/${activityId}`);
   };
 
   const handleAddActivity = async () => {

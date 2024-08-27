@@ -100,9 +100,9 @@ function App() {
                 <Route path="/explorer" element={<TeamHierarchy teams={teams} setTeams={setTeams} />} />
                 <Route path="/table" element={<DataTable data={teams} />} />
                 <Route path="/links" element={<LinkPenting data={teams} />} />
-                <Route path="/teamHierarchy/kegiatan/:teamId" element={<Kegiatan />} />
-                <Route path="/teamHierarchy/kegiatan/:teamId/subkegiatan/:activityId" element={<SubKegiatan />} />
-                <Route path="/teamHierarchy/kegiatan/:teamId/subkegiatan/:activityId/tugas/:subActivityId" element={<Tugas />} />
+                <Route path="/explorer/kegiatan/:teamId" element={<Kegiatan />} />
+                <Route path="/explorer/kegiatan/:teamId/subkegiatan/:activityId" element={<SubKegiatan />} />
+                <Route path="/explorer/kegiatan/:teamId/subkegiatan/:activityId/tugas/:subActivityId" element={<Tugas />} />
               </Routes>
             </main>
             <footer className="App-footer">

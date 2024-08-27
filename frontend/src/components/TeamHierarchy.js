@@ -66,7 +66,7 @@ function TeamHierarchy({ teams, setTeams }) {
 
   const handleTeamClick = (e, id) => {
     e.stopPropagation(); // Prevent unwanted navigation
-    navigate(`/teamHierarchy/kegiatan/${id}`);
+    navigate(`/explorer/kegiatan/${id}`);
   };
 
   const handleAddTeam = async () => {

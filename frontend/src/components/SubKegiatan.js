@@ -183,7 +183,7 @@ function SubKegiatan() {
   };
 
   const handleSubActivityClick = (subActivityId) => {
-    navigate(`/teamHierarchy/kegiatan/${teamId}/subkegiatan/${activityId}/tugas/${subActivityId}`);
+    navigate(`/explorer/kegiatan/${teamId}/subkegiatan/${activityId}/tugas/${subActivityId}`);
   };
 
   const formatDate = (dateString) => {
