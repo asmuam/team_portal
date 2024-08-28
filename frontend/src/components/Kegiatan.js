@@ -125,7 +125,7 @@ function Kegiatan() {
   const handleAddActivity = async () => {
     if (newActivityName) {
       try {
-        await axios.post(`${URL}/teams/${teamId}/activities/v2`, { name: newActivityName, tanggal_pelaksanaan: tanggalPelaksanaan });
+        await axios.post(`${URL}/teams/${teamId}/activities/`, { name: newActivityName, tanggal_pelaksanaan: tanggalPelaksanaan });
         refetchActivities();
         closeModal();
       } catch (error) {
@@ -162,7 +162,7 @@ function Kegiatan() {
   };
 
   const archiveActivity = async (Id) => {
-    alert(`Kegiatan telah diarsipkan.`);
+    alert("Fitur arsip belum tersedia")
     // Implement actual archiving logic here if needed
     refetchActivities();
   };

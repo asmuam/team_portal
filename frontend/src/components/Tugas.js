@@ -4,7 +4,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { Box, Button, Modal, TextField, IconButton, Typography } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import EditIcon from "@mui/icons-material/Edit";
-import CopyIcon from "@mui/icons-material/Book";
+import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import CancelIcon from "@mui/icons-material/Cancel";
 
@@ -55,6 +55,7 @@ const ActionButton = styled(IconButton)({
 });
 
 const ProgressWrapper = styled(Box)({
+  marginTop: "15px",
   display: "flex",
   alignItems: "center",
   gap: "8px",
@@ -214,7 +215,7 @@ function Tugas() {
     }
   };
 
-  const handleTaskCompletion = async () => {
+  const handleTaskCompletion = async (currentTaskId) => {
     try {
       await axios.patch(`${URL}/teams/${teamId}/activities/${activityId}/sub-activities/${subActivityId}/tasks/${currentTaskId}/completion`, {});
       refetchTasks();
@@ -262,6 +263,17 @@ function Tugas() {
 
   const progress = calculateProgress(tasks);
   const navigate = useNavigate();
+
+  const archiveTask = async (teamId, activityId, subActivityId, taskId) => {
+    // Implement archiving logic if applicable
+    alert("Fitur arsip belum tersedia")
+  };
+  const formatLink = (link) => {
+    if (!/^https?:\/\//i.test(link)) {
+      return `https://${link}`;
+    }
+    return link;
+  };
 
   return (
     <div className="task-container">
@@ -337,6 +349,7 @@ function Tugas() {
             <TableHeader>Task</TableHeader>
             <TableHeader>Due Date</TableHeader>
             <TableHeader>Link</TableHeader>
+            <TableHeader>Verified</TableHeader>
             <TableHeader>Actions</TableHeader>
           </tr>
         </thead>
@@ -345,14 +358,29 @@ function Tugas() {
             <tr key={task.id}>
               <TableCell>{task.name}</TableCell>
               <TableCell>{formatDate(task.dueDate)}</TableCell>
-              <TableCell>
+              <TableCell
+                sx={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 1
+                }}>
                 {/* <TextField type="text" value={task.link} /> */}
-                <TableCell>{task.link}</TableCell>
-
-                <ActionButton onClick={() => copyToClipboard(task.link)}>
-                  <CopyIcon />
+                <a
+                  href={formatLink(task.link)}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{ textDecoration: 'none', color: 'blue', cursor: 'pointer' }}
+                >
+                  {task.link}
+                </a>
+                {/* <ActionButton onClick={() => copyToClipboard(task.link)}>
+                  <ContentCopyIcon />
+                </ActionButton> */}
+              </TableCell>
+              <TableCell>
+                <ActionButton onClick={() => handleTaskCompletion(task.id)}>
+                  {task.completed ? <CheckCircleIcon color="success" /> : <CancelIcon color="error" />}
                 </ActionButton>
-                <ActionButton onClick={() => handleTaskCompletion()}>{task.completed ? <CancelIcon color="error" /> : <CheckCircleIcon color="success" />}</ActionButton>
               </TableCell>
               <TableCell>
                 <ActionButton onClick={() => openModal("edit", task.id, task.name, task.dueDate, task.link)}>

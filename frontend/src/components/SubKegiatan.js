@@ -179,7 +179,7 @@ function SubKegiatan() {
   };
 
   const archiveSubActivity = async (subActivityId) => {
-    alert(`Subkegiatan telah diarsipkan.`);
+    alert("Fitur arsip belum tersedia")
     // Implement actual archiving logic here if needed
     refetchSubActivities();
   };
@@ -330,6 +330,9 @@ function SubKegiatan() {
             onChange={(e) => setTanggalPelaksanaan(e.target.value)}
             onKeyDown={handleKeyPress} // Handle "Enter" key press
             required
+            InputLabelProps={{
+              shrink: true,
+            }}
           />
           <Button variant="contained" color="primary" onClick={modalType === "add" ? handleAddSubActivity : handleEditSubActivity} fullWidth>
             {modalType === "add" ? "Tambah Sub-Kegiatan" : "Update Sub-Kegiatan"}

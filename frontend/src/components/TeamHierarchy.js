@@ -113,8 +113,8 @@ function TeamHierarchy({ teams, setTeams }) {
 
   const archiveTeam = async (e, id) => {
     e.stopPropagation(); // Prevent unwanted navigation
-    alert(`Tim Kerja ${teams.find((team) => team.id === id).name} telah diarsipkan.`);
-    // You can implement actual archiving logic here if needed
+    // alert(`Tim Kerja ${teams.find((team) => team.id === id).name} telah diarsipkan.`);
+    alert("Fitur arsip belum tersedia")// You can implement actual archiving logic here if needed
     refetchTeams();
   };
 
