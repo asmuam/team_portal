@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { Box, Button, Modal, TextField, IconButton, Typography } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import EditIcon from "@mui/icons-material/Edit";
@@ -13,6 +13,7 @@ import AddIcon from "@mui/icons-material/Add";
 import { styled } from "@mui/system";
 import CircularProgress from "@mui/material/CircularProgress";
 import TugasBreadcrumbs from "./breadcrumb/TugasBreadcrumbs";
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 
 // Styled Components
 const ModalContent = styled(Box)({
@@ -262,16 +263,72 @@ function Tugas() {
   };
 
   const progress = calculateProgress(tasks);
+  const navigate = useNavigate();
 
   return (
     <div className="task-container">
       <TugasBreadcrumbs />
-      <h1>
-        {teamName} - {activityName} - {subActivityName}
-      </h1>
-      <AddTaskButton onClick={() => openModal("add")} color="primary">
-        <AddIcon />
-      </AddTaskButton>
+      <Button
+          variant="contained"
+          color="primary"
+          onClick={() => navigate(`/explorer/kegiatan/${teamId}/subkegiatan/${activityId}`)}
+          startIcon={<ArrowBackIcon />}
+          sx={{
+            borderRadius: '6px',
+            fontSize: '16px',
+            fontWeight: 600,
+            padding: '10px 20px',
+            textTransform: 'none',
+            boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
+            transition: 'all 0.3s ease',
+            backgroundColor: '#007bff',  // Set a primary color for consistency
+            color: '#ffffff',  // Ensure text color is visible on the background
+            '&:hover': {
+              backgroundColor: '#0056b3',
+              boxShadow: '0 6px 10px rgba(0, 0, 0, 0.15)',
+            },
+            '&:active': {
+              backgroundColor: '#004494',
+              transform: 'scale(0.98)',
+            },
+            '&:focus': {
+              outline: 'none',
+              boxShadow: '0 0 0 3px rgba(38, 143, 255, 0.5)',
+            },
+            marginRight: '10px',  // Add margin to the right for spacing
+          }}
+      >
+        Back
+      </Button>
+      <Button
+          variant="contained"
+          color="primary"
+          onClick={() => openModal("add")}
+          startIcon={<AddIcon />}
+          sx={{
+            borderRadius: '6px',
+            fontSize: '16px',
+            fontWeight: 600,
+            padding: '10px 20px',
+            textTransform: 'none',
+            boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
+            transition: 'all 0.3s ease',
+            '&:hover': {
+              backgroundColor: '#0056b3',
+              boxShadow: '0 6px 10px rgba(0, 0, 0, 0.15)',
+            },
+            '&:active': {
+              backgroundColor: '#004494',
+              transform: 'scale(0.98)',
+            },
+            '&:focus': {
+              outline: 'none',
+              boxShadow: '0 0 0 3px rgba(38, 143, 255, 0.5)',
+            },
+          }}
+      >
+        Tambah Tugas Baru
+      </Button>
       <ProgressWrapper>
         <CircularProgress variant="determinate" value={progress} />
         <ProgressText>{Math.round(progress)}% Completed</ProgressText>
@@ -322,7 +379,9 @@ function Tugas() {
             </IconButton>
           </Box>
           <TextField label="Task Name" fullWidth value={taskName} onChange={(e) => setTaskName(e.target.value)} margin="normal" />
-          <TextField label="Due Date" type="date" fullWidth value={dueDate} onChange={(e) => setDueDate(e.target.value)} margin="normal" />
+          <TextField label="Due Date" type="date" fullWidth value={dueDate} onChange={(e) => setDueDate(e.target.value)} margin="normal" InputLabelProps={{
+            shrink: true,  // Ini memastikan label selalu berada di posisi atas
+          }}/>
           <TextField label="Link" fullWidth value={link} onChange={(e) => setLink(e.target.value)} margin="normal" />
           <Box display="flex" justifyContent="flex-end" marginTop="16px">
             {modalType === "add" ? (

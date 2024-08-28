@@ -6,8 +6,8 @@ import { styled } from "@mui/system";
 import CloseIcon from "@mui/icons-material/Close";
 import "./Kegiatan.css";
 import AddIcon from "@mui/icons-material/Add";
-import Breadcrumbs from "@mui/material/Breadcrumbs";
 import KegiatanBreadcrumbs from "./breadcrumb/KegiatanBreadcrumbs";
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 
 // Styled Components
 const ModalContent = styled(Box)({
@@ -179,6 +179,38 @@ function Kegiatan() {
         <Button
             variant="contained"
             color="primary"
+            onClick={() => navigate("/explorer")}
+            startIcon={<ArrowBackIcon />}
+            sx={{
+              borderRadius: '6px',
+              fontSize: '16px',
+              fontWeight: 600,
+              padding: '10px 20px',
+              textTransform: 'none',
+              boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
+              transition: 'all 0.3s ease',
+              backgroundColor: '#007bff',  // Set a primary color for consistency
+              color: '#ffffff',  // Ensure text color is visible on the background
+              '&:hover': {
+                backgroundColor: '#0056b3',
+                boxShadow: '0 6px 10px rgba(0, 0, 0, 0.15)',
+              },
+              '&:active': {
+                backgroundColor: '#004494',
+                transform: 'scale(0.98)',
+              },
+              '&:focus': {
+                outline: 'none',
+                boxShadow: '0 0 0 3px rgba(38, 143, 255, 0.5)',
+              },
+              marginRight: '10px',  // Add margin to the right for spacing
+            }}
+        >
+          Back
+        </Button>
+        <Button
+            variant="contained"
+            color="primary"
             onClick={() => openModal("add")}
             startIcon={<AddIcon />}
             sx={{
@@ -189,6 +221,8 @@ function Kegiatan() {
               textTransform: 'none',
               boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
               transition: 'all 0.3s ease',
+              backgroundColor: '#007bff',  // Set a primary color for consistency
+              color: '#ffffff',  // Ensure text color is visible on the background
               '&:hover': {
                 backgroundColor: '#0056b3',
                 boxShadow: '0 6px 10px rgba(0, 0, 0, 0.15)',
@@ -298,7 +332,7 @@ function Kegiatan() {
               onKeyDown={handleKeyPress}
               required
               InputLabelProps={{
-                shrink: true, 
+                shrink: true,
               }}
           />
           <Button variant="contained" color="primary" onClick={modalType === "add" ? handleAddActivity : handleEditActivity} fullWidth>
