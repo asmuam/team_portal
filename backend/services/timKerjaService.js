@@ -12,7 +12,11 @@ export const getTimkerjaById = async (id) => {
 
 export const createTimkerja = async (data) => {
   return prisma.timkerja.create({
-    data,
+    data: {
+      name: data.name, // Memastikan nama dari data yang diterima
+      links: [],       // Mengatur links ke array kosong
+      // Tambahkan field lain sesuai dengan model `Timkerja`
+    },
   });
 };
 
