@@ -1,10 +1,10 @@
-import express from 'express';
-import * as linkPentingService from '../services/linkPentingService.js'; // Sesuaikan dengan path
+import express from "express";
+import * as linkPentingService from "../services/linkPentingService.js"; // Sesuaikan dengan path
 
 const router = express.Router();
 
 // get all link from a team
-router.get('/teams/:teamId/links', async (req, res) => {
+router.get("/teams/:teamId/links", async (req, res) => {
   const { teamId } = req.params;
 
   try {
@@ -15,28 +15,13 @@ router.get('/teams/:teamId/links', async (req, res) => {
   }
 });
 
-// resp {
-//   "links": [
-//       {
-//           "id": 1724653947393,
-//           "url": "ZI.byl.bps.go.id",
-//           "description": "akses dengan vpn web zi byl bps "
-//       },
-//       {
-//           "id": 1724653985967,
-//           "url": "bps.go.id",
-//           "description": " bps "
-//       }
-//   ]
-// }
-
 // Add a link to a team
-router.post('/teams/:teamId/links', async (req, res) => {
+router.post("/teams/:teamId/links", async (req, res) => {
   const { teamId } = req.params;
   const { url, description } = req.body;
 
   if (!url || !description) {
-    return res.status(400).json({ error: 'URL and description are required' });
+    return res.status(400).json({ error: "URL and description are required" });
   }
 
   const link = { id: Date.now(), url, description };
@@ -71,9 +56,8 @@ router.post('/teams/:teamId/links', async (req, res) => {
 //     "leader_id": null
 // }
 
-
 // Delete a link from a team
-router.delete('/teams/:teamId/links/:linkId', async (req, res) => {
+router.delete("/teams/:teamId/links/:linkId", async (req, res) => {
   const { teamId, linkId } = req.params;
 
   try {
@@ -84,22 +68,8 @@ router.delete('/teams/:teamId/links/:linkId', async (req, res) => {
   }
 });
 
-
-// resp {
-//   "id": 3,
-//   "name": "ZI",
-//   "links": [
-//       {
-//           "id": 1724653947393,
-//           "url": "ZI.byl.bps.go.id",
-//           "description": "akses dengan vpn web zi byl bps "
-//       }
-//   ],
-//   "leader_id": null
-// }
-
 // Edit a link in a team
-router.patch('/teams/:teamId/links/:linkId', async (req, res) => {
+router.patch("/teams/:teamId/links/:linkId", async (req, res) => {
   const { teamId, linkId } = req.params;
   const { url, description } = req.body;
 
@@ -109,7 +79,7 @@ router.patch('/teams/:teamId/links/:linkId', async (req, res) => {
   if (description) newLink.description = description;
 
   if (Object.keys(newLink).length === 0) {
-    return res.status(400).json({ error: 'At least one field (url or description) is required to update' });
+    return res.status(400).json({ error: "At least one field (url or description) is required to update" });
   }
 
   try {
@@ -119,23 +89,5 @@ router.patch('/teams/:teamId/links/:linkId', async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 });
-
-
-// req {
-//   "url":"bps.go.com",
-//   "description":"bps"
-//   }
-// resp {
-//   "id": 3,
-//   "name": "ZI",
-//   "links": [
-//       {
-//           "id": 1724654145007,
-//           "url": "bps.go.com",
-//           "description": "bps"
-//       }
-//   ],
-//   "leader_id": null
-// }
 
 export default router;
