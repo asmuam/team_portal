@@ -568,35 +568,35 @@ router.post("/teams/:teamId/activities/:activityId/sub-activities/:subActivityId
 // update
 router.patch("/teams/:teamId/activities/:activityId/sub-activities/:subActivityId/tasks/:taskId", async (req, res) => {
   const { taskId } = req.params;
-  const { name, dueDate, link } = req.body; // Menggunakan nama parameter yang konsisten
+  const { name, dueDate, link } = req.body; // Fields to update
 
   try {
     // Prepare update data
     const updateData = {};
     if (name !== undefined) updateData.name = name;
-    if (dueDate !== undefined) updateData.dueDate = new Date(dueDate); // Menggunakan dueDate yang benar
+    if (dueDate !== undefined) updateData.dueDate = new Date(dueDate); // Ensure correct date format
     if (link !== undefined) {
       updateData.link = link;
-      updateData.dateUpload = new Date();
+      updateData.dateUpload = new Date(); // Assuming dateUpload is also updated with link
     }
 
-    // Apply updates if there is any data to update
-    if (Object.keys(updateData).length > 0) {
+    // Check if there are fields to update
+    const hasUpdateData = Object.keys(updateData).length > 0;
+
+    // Handle update
+    if (hasUpdateData) {
       const updatedTask = await tugasService.updateTugas(taskId, updateData);
-      res.json(updatedTask);
+      return res.json(updatedTask); // Return after sending response
     }
 
-    // Toggle completion status if requested
-    if (toggleCompletion !== undefined) {
-      const toggledTask = await tugasService.toggleTugasCompletion(taskId);
-      res.json(toggledTask);
-    } else if (Object.keys(updateData).length === 0 && toggleCompletion === undefined) {
-      res.status(400).json({ error: "No valid fields to update" });
-    }
+    // Handle case where no valid fields are provided
+    return res.status(400).json({ error: "No valid fields to update" });
+
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    return res.status(500).json({ error: error.message });
   }
 });
+
 
 // req {
 //   "name":"cek kesiapan device mitra"
