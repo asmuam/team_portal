@@ -330,6 +330,9 @@ function SubKegiatan() {
             onChange={(e) => setTanggalPelaksanaan(e.target.value)}
             onKeyDown={handleKeyPress} // Handle "Enter" key press
             required
+            InputLabelProps={{
+              shrink: true,
+            }}
           />
           <Button variant="contained" color="primary" onClick={modalType === "add" ? handleAddSubActivity : handleEditSubActivity} fullWidth>
             {modalType === "add" ? "Tambah Sub-Kegiatan" : "Update Sub-Kegiatan"}
