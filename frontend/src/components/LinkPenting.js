@@ -2,6 +2,9 @@ import React, { useState } from "react";
 import { Modal, Box, TextField, Button } from "@mui/material";
 import "./LinkPenting.css"; // Ensure to import your CSS file
 import { useTeams } from '../context/TeamsContext'; // Adjust path as needed
+import axios from "axios";
+
+const API_URL = process.env.REACT_APP_API_URL;
 
 const LinkPenting = () => {
   const { teams, setTeams } = useTeams();
@@ -39,35 +42,54 @@ const LinkPenting = () => {
     setLinkDescription("");
   };
 
-  const handleAddLink = () => {
+  const handleAddLink = async () => {
     const formattedUrl = formatUrl(linkUrl);
-    const newLink = { id: Date.now(), url: formattedUrl, description: linkDescription };
-
-    setTeams(teams.map((team) => (team.id === currentTeamId ? { ...team, links: [...team.links, newLink] } : team)));
-
-    closeModal();
+    const newLink = { url: formattedUrl, description: linkDescription };
+    try {
+      const response = await axios.post(`${API_URL}/teams/${currentTeamId}/links`, newLink);
+      const { links } = response.data;
+      setTeams((prevTeams) =>
+        prevTeams.map((team) =>
+          team.id === currentTeamId ? { ...team, links } : team
+        )
+      );
+      closeModal();
+    } catch (error) {
+      console.error("Error adding link:", error);
+    }
   };
 
-  const handleEditLink = () => {
+  const handleEditLink = async () => {
     const formattedUrl = formatUrl(linkUrl);
-
-    setTeams(
-      teams.map((team) =>
-        team.id === currentTeamId
-          ? {
-              ...team,
-              links: team.links.map((link) => (link.id === currentLinkId ? { ...link, url: formattedUrl, description: linkDescription } : link)),
-            }
-          : team
-      )
-    );
-
-    closeModal();
+    try {
+      const response = await axios.patch(`${API_URL}/teams/${currentTeamId}/links/${currentLinkId}`, {
+        url: formattedUrl,
+        description: linkDescription,
+      });
+      const { links } = response.data;
+      setTeams((prevTeams) =>
+        prevTeams.map((team) =>
+          team.id === currentTeamId ? { ...team, links } : team
+        )
+      );
+      closeModal();
+    } catch (error) {
+      console.error("Error updating link:", error);
+    }
   };
 
-  const handleDeleteLink = (teamId, linkId) => {
-    setTeams(teams.map((team) => (team.id === teamId ? { ...team, links: team.links.filter((link) => link.id !== linkId) } : team)));
-  };
+  const handleDeleteLink = async (teamId, linkId) => {
+    try {
+      const response = await axios.delete(`${API_URL}/teams/${teamId}/links/${linkId}`);
+      const { links } = response.data;
+      setTeams((prevTeams) =>
+        prevTeams.map((team) =>
+          team.id === teamId ? { ...team, links } : team
+        )
+      );
+    } catch (error) {
+      console.error("Error deleting link:", error);
+    }  };
 
   return (
     <div className="teams-container">
