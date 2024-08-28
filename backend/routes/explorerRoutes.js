@@ -8,16 +8,16 @@ import * as tugasService from "../services/tugasService.js";
 const router = express.Router();
 
 // full direct
-router.get("/teams", async (req, res) => {
+router.get("/allData", async (req, res) => {
   try {
-    const teams = await getTeams();
+    const teams = await getAllData();
     res.json(teams);
   } catch (error) {
     console.error("Error fetching teams:", error);
     res.status(500).json({ error: "Internal Server Error" });
   }
 });
-const getTeams = async () => {
+const getAllData = async () => {
   const teams = await prisma.timkerja.findMany({
     include: {
       kegiatan: {
@@ -55,8 +55,114 @@ const getTeams = async () => {
     links: team.links || [],
   }));
 };
+
+// resp [
+//   {
+//       "id": 1,
+//       "name": "IPDS",
+//       "activities": [
+//           {
+//               "id": 1,
+//               "name": "pengolahan sp 2022",
+//               "tanggal_pelaksanaan": "2024-08-26T03:49:57.116Z",
+//               "subActivities": [
+//                   {
+//                       "id": 1,
+//                       "name": "kj",
+//                       "tasks": [
+//                           {
+//                               "id": 1,
+//                               "name": "kk",
+//                               "dateCreated": "2024-08-26",
+//                               "dueDate": "2024-11-11",
+//                               "dateUpload": "2024-08-28",
+//                               "link": "bps.go.id",
+//                               "completed": false
+//                           },
+//                           {
+//                               "id": 2,
+//                               "name": "jnjnj",
+//                               "dateCreated": "2024-08-26",
+//                               "dueDate": "2020-11-11",
+//                               "dateUpload": "",
+//                               "link": "#",
+//                               "completed": false
+//                           }
+//                       ]
+//                   }
+//               ]
+//           },
+//           {
+//               "id": 2,
+//               "name": "pengolahan ST2023",
+//               "tanggal_pelaksanaan": "2024-08-09T00:00:00.000Z",
+//               "subActivities": []
+//           },
+//           {
+//               "id": 4,
+//               "name": "pengolahan KSA 2023",
+//               "tanggal_pelaksanaan": "2024-08-26T05:02:12.557Z",
+//               "subActivities": [
+//                   {
+//                       "id": 2,
+//                       "name": "persiapan organik KSA 2023",
+//                       "tasks": [
+//                           {
+//                               "id": 4,
+//                               "name": "cek kesiapan tempat",
+//                               "dateCreated": "2024-08-26",
+//                               "dueDate": "2024-09-19",
+//                               "dateUpload": "2024-08-26",
+//                               "link": "bps.go.id",
+//                               "completed": true
+//                           }
+//                       ]
+//                   }
+//               ]
+//           },
+//           {
+//               "id": 5,
+//               "name": "cek",
+//               "tanggal_pelaksanaan": "2001-12-01T00:00:00.000Z",
+//               "subActivities": [
+//                   {
+//                       "id": 4,
+//                       "name": "Pencacahan",
+//                       "tasks": []
+//                   },
+//                   {
+//                       "id": 5,
+//                       "name": "Pelatihan",
+//                       "tasks": []
+//                   }
+//               ]
+//           }
+//       ],
+//       "links": [
+//           {
+//               "id": 1724654823312,
+//               "url": "bps.go.xx",
+//               "description": "klaten"
+//           }
+//       ]
+//   },
+//   {
+//       "id": 3,
+//       "name": "ZI",
+//       "activities": [],
+//       "links": [
+//           {
+//               "id": 1724654145007,
+//               "url": "bps.go.com",
+//               "description": "bps"
+//           }
+//       ]
+//   }
+// ]
+
 // get all Team
-router.get("/teams/v2", async (req, res) => {
+
+router.get("/teams", async (req, res) => {
   try {
     const timkerja = await timkerjaService.getAllTimkerja();
     res.json(timkerja);
@@ -64,6 +170,43 @@ router.get("/teams/v2", async (req, res) => {
     res.status(500).json({ error: "Internal Server Error" });
   }
 });
+
+// [
+//   {
+//       "id": 1,
+//       "name": "IPDS",
+//       "links": [],
+//       "leader_id": null
+//   },
+//   {
+//       "id": 3,
+//       "name": "ZI",
+//       "links": [
+//           {
+//               "id": 1724654145007,
+//               "url": "edited url",
+//               "description": "edited desc"
+//           },
+//           {
+//               "id": 1724812162450,
+//               "url": "ZI.byl.bps.go.id",
+//               "description": "akses dengan vpn web zi byl bps"
+//           },
+//           {
+//               "id": 1724812216918,
+//               "url": "ZI.byl.bps.go.id",
+//               "description": "akses dengan vpn web zi byl bps"
+//           }
+//       ],
+//       "leader_id": null
+//   },
+//   {
+//       "id": 5,
+//       "name": "tim kerja 88",
+//       "links": null,
+//       "leader_id": null
+//   }
+// ]
 
 // add team
 router.post("/teams", async (req, res) => {
@@ -75,6 +218,18 @@ router.post("/teams", async (req, res) => {
   }
 });
 
+// req {
+//   "name":"tim kerja 88"
+// }
+
+// resp {
+//   "id": 2,
+//   "name": "tim kerja 88",
+//   "links": null,
+//   "leader_id": null
+// }
+
+
 router.patch('/teams/:id', async (req, res) => {
   try {
     const team = await timkerjaService.updateTimkerja(req.params.id, req.body);
@@ -83,6 +238,17 @@ router.patch('/teams/:id', async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 });
+
+// req {
+//   "name":"tim kerja 99"
+// }
+
+// resp {
+//   "id": 2,
+//   "name": "tim kerja 99",
+//   "links": null,
+//   "leader_id": null
+// }
 
 router.delete("/teams/:id", async (req, res) => {
   try {
@@ -93,6 +259,19 @@ router.delete("/teams/:id", async (req, res) => {
   }
 });
 
+// req {
+//   "name":"tim kerja 99"
+// }
+
+// resp {
+//   "id": 2,
+//   "name": "tim kerja 99",
+//   "links": null,
+//   "leader_id": null
+// }
+
+//archive team soon
+
 router.get("/teams/:teamId/activities", async (req, res) => {
   try {
     const { teamId } = req.params;
@@ -102,6 +281,15 @@ router.get("/teams/:teamId/activities", async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 });
+
+// resp [
+//   {
+//       "id": 1,
+//       "tanggal_pelaksanaan": "2024-08-26T03:49:57.116Z",
+//       "timkerja_id": 1,
+//       "name": "pengolahan sp 2022"
+//   }
+// ]
 
 // Add an Activity
 router.post("/teams/:teamId/activities", async (req, res) => {
@@ -119,28 +307,35 @@ router.post("/teams/:teamId/activities", async (req, res) => {
   }
 });
 
-// Add an Activity V2 (with tanggal_pelaksanaan)
-router.post("/teams/:teamId/activities/v2", async (req, res) => {
-  const { teamId } = req.params;
-  const { name, tanggal_pelaksanaan } = req.body;
-  try {
-    const activity = await kegiatanService.createKegiatan({
-      name,
-      timkerja_id: parseInt(teamId),
-      tanggal_pelaksanaan: tanggal_pelaksanaan ? new Date(tanggal_pelaksanaan) : new Date(), // Inline default date
-    });
-    res.json(activity);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
+// req yyyy-mm-dd{
+//   "name":"pengolahan ST2023",
+//   "tanggal_pelaksanaan":"2024-08-09"
+// }
+
+// resp {
+//   "id": 2,
+//   "tanggal_pelaksanaan": "2024-08-09T00:00:00.000Z",
+//   "timkerja_id": 1,
+//   "name": "pengolahan ST2023"
+// }
+
+// resp with default date.now{
+//   "id": 3,
+//   "tanggal_pelaksanaan": "2024-08-26T04:59:50.775Z",
+//   "timkerja_id": 1,
+//   "name": "pengolahan KSA"
+// }
+
 
 // Edit an Activity (with tanggal_pelaksanaan)
 router.patch("/teams/:teamId/activities/:activityId", async (req, res) => {
   const { activityId } = req.params;
   const { name, tanggal_pelaksanaan } = req.body;
   try {
-    const updatedFields = { name };
+    const updatedFields = {}
+    if (name){
+      updatedFields.name = name;
+    }
     if (tanggal_pelaksanaan) {
       updatedFields.tanggal_pelaksanaan = new Date(tanggal_pelaksanaan);
     }
@@ -150,6 +345,25 @@ router.patch("/teams/:teamId/activities/:activityId", async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 });
+
+// req {
+//   "tanggal_pelaksanaan":"2024-08-09"
+//   }
+// resp {
+//   "id": 7,
+//   "tanggal_pelaksanaan": "2024-08-09T00:00:00.000Z",
+//   "timkerja_id": 1,
+//   "name": "kegiatan 989"
+// }
+// req {
+//   "name":"kegiatan 989"
+//   }
+// resp {
+//   "id": 7,
+//   "tanggal_pelaksanaan": "2024-01-01T00:00:00.000Z",
+//   "timkerja_id": 1,
+//   "name": "kegiatan 989"
+// }
 
 // Delete an Activity
 router.delete("/teams/:teamId/activities/:activityId", async (req, res) => {
@@ -162,6 +376,13 @@ router.delete("/teams/:teamId/activities/:activityId", async (req, res) => {
   }
 });
 
+// resp {
+//   "id": 7,
+//   "tanggal_pelaksanaan": "2024-08-09T00:00:00.000Z",
+//   "timkerja_id": 1,
+//   "name": "kegiatan 989"
+// }
+
 // Get Sub-Activities by Activity ID
 router.get("/teams/:teamId/activities/:activityId/sub-activities", async (req, res) => {
   try {
@@ -172,6 +393,21 @@ router.get("/teams/:teamId/activities/:activityId/sub-activities", async (req, r
     res.status(500).json({ error: error.message });
   }
 });
+
+// resp [
+//   {
+//       "id": 2,
+//       "tanggal_pelaksanaan": "2024-08-26T05:04:32.718Z",
+//       "kegiatan_id": 4,
+//       "name": "persiapan organik KSA 2023"
+//   },
+//   {
+//       "id": 3,
+//       "tanggal_pelaksanaan": "2024-08-26T05:05:51.199Z",
+//       "kegiatan_id": 4,
+//       "name": "persiapan mitra KSA 2023"
+//   }
+// ]
 
 router.post("/teams/:teamId/activities/:activityId/sub-activities", async (req, res) => {
   const { activityId } = req.params;
@@ -188,20 +424,56 @@ router.post("/teams/:teamId/activities/:activityId/sub-activities", async (req, 
   }
 });
 
-// Rename a Sub-Activity
+// req {
+//   "name":"sub-kegiatan 88",
+//   "tanggal_pelaksanaan":"2024-09-09"
+//   }
+// resp {
+//   "id": 6,
+//   "tanggal_pelaksanaan": "2024-09-09T00:00:00.000Z",
+//   "kegiatan_id": 5,
+//   "name": "sub-kegiatan 88"
+// }
+
+// edit a Sub-Activity
 router.patch("/teams/:teamId/activities/:activityId/sub-activities/:subActivityId", async (req, res) => {
   const { subActivityId } = req.params;
   const { name, tanggal_pelaksanaan } = req.body; // Tambahkan tanggal_pelaksanaan
   try {
-    const subActivity = await subkegiatanService.updateSubkegiatan(subActivityId, {
-      name,
-      tanggal_pelaksanaan, // Tambahkan tanggal_pelaksanaan
-    });
+    const updatedFields = {}
+    if (name){
+      updatedFields.name = name;
+    }
+    if (tanggal_pelaksanaan) {
+      updatedFields.tanggal_pelaksanaan = new Date(tanggal_pelaksanaan);
+    }
+    const subActivity = await subkegiatanService.updateSubkegiatan(subActivityId, updatedFields);
     res.json(subActivity);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 });
+
+// req {
+//   "name":"sub-kegiatan 111"  }
+// resp {
+//   "id": 6,
+//   "tanggal_pelaksanaan": "2000-09-09T00:00:00.000Z",
+//   "kegiatan_id": 5,
+//   "name": "sub-kegiatan 999"
+// }
+
+// req {
+//   "tanggal_pelaksanaan":"1999-09-09"
+//   }
+// resp {
+//   "id": 6,
+//   "tanggal_pelaksanaan": "1999-09-09T00:00:00.000Z",
+//   "kegiatan_id": 5,
+//   "name": "sub-kegiatan 111"
+// }
+
+
 // Delete a Sub-Activity
 router.delete("/teams/:teamId/activities/:activityId/sub-activities/:subActivityId", async (req, res) => {
   const { subActivityId } = req.params;
@@ -213,6 +485,16 @@ router.delete("/teams/:teamId/activities/:activityId/sub-activities/:subActivity
   }
 });
 
+// resp {
+//   "id": 6,
+//   "tanggal_pelaksanaan": "2000-09-09T00:00:00.000Z",
+//   "kegiatan_id": 5,
+//   "name": "sub-kegiatan 999"
+// }
+
+// archive subkeg soon
+
+
 // Get all tasks for a specific sub-activity
 router.get("/teams/:teamId/activities/:activityId/sub-activities/:subActivityId/tasks", async (req, res) => {
   const { subActivityId } = req.params;
@@ -223,6 +505,29 @@ router.get("/teams/:teamId/activities/:activityId/sub-activities/:subActivityId/
     res.status(500).json({ error: error.message });
   }
 });
+
+// resp [
+//   {
+//       "id": 1,
+//       "subkegiatan_id": 1,
+//       "name": "kk",
+//       "dateCreated": "2024-08-26T00:00:00.000Z",
+//       "dueDate": "2024-11-11T00:00:00.000Z",
+//       "dateUpload": "2024-08-28T00:22:48.859Z",
+//       "link": "bps.go.id",
+//       "completed": false
+//   },
+//   {
+//       "id": 2,
+//       "subkegiatan_id": 1,
+//       "name": "jnjnj",
+//       "dateCreated": "2024-08-26T00:00:00.000Z",
+//       "dueDate": "2020-11-11T00:00:00.000Z",
+//       "dateUpload": null,
+//       "link": "#",
+//       "completed": false
+//   }
+// ]
 
 // Add a Task
 router.post("/teams/:teamId/activities/:activityId/sub-activities/:subActivityId/tasks", async (req, res) => {
@@ -242,10 +547,28 @@ router.post("/teams/:teamId/activities/:activityId/sub-activities/:subActivityId
   }
 });
 
+// req {
+//   "name": "task numero uno",
+//   "dueDate": "2024-09-01",
+//   "dateCreated": "",
+//   "link": ""
+// }
+
+// resp {
+//   "id": 5,
+//   "subkegiatan_id": 1,
+//   "name": "task numero uno",
+//   "dateCreated": "2024-08-28T02:21:59.546Z",
+//   "dueDate": "2024-09-01T00:00:00.000Z",
+//   "dateUpload": null,
+//   "link": "",
+//   "completed": false
+// }
+
 // update
 router.patch("/teams/:teamId/activities/:activityId/sub-activities/:subActivityId/tasks/:taskId", async (req, res) => {
   const { taskId } = req.params;
-  const { name, dueDate, link, toggleCompletion } = req.body; // Menggunakan nama parameter yang konsisten
+  const { name, dueDate, link } = req.body; // Menggunakan nama parameter yang konsisten
 
   try {
     // Prepare update data
@@ -275,6 +598,50 @@ router.patch("/teams/:teamId/activities/:activityId/sub-activities/:subActivityI
   }
 });
 
+// req {
+//   "name":"cek kesiapan device mitra"
+//   }
+
+// resp {
+//   "id": 3,
+//   "subkegiatan_id": 2,
+//   "name": "cek kesiapan device mitra",
+//   "dateCreated": "2024-08-26T05:12:22.357Z",
+//   "dueDate": "2024-09-01T00:00:00.000Z",
+//   "dateUpload": null,
+//   "link": "",
+//   "completed": false
+// }
+
+// req {
+//   "newDeadline":"2024-09-19"
+//   }
+// resp {
+//   "id": 4,
+//   "subkegiatan_id": 2,
+//   "name": "cek kesiapan tempat",
+//   "dateCreated": "2024-08-26T05:13:35.816Z",
+//   "dueDate": "2024-09-19T00:00:00.000Z",
+//   "dateUpload": null,
+//   "link": null,
+//   "completed": true
+// }
+
+
+// req {
+//   "newLink":"bps.go.id"
+//   }
+// resp {
+//   "id": 4,
+//   "subkegiatan_id": 2,
+//   "name": "cek kesiapan tempat",
+//   "dateCreated": "2024-08-26T05:13:35.816Z",
+//   "dueDate": "2024-09-19T00:00:00.000Z",
+//   "dateUpload": "2024-08-26T05:36:50.980Z",
+//   "link": "bps.go.id",
+//   "completed": true
+// }
+
 // Delete a Task
 router.delete("/teams/:teamId/activities/:activityId/sub-activities/:subActivityId/tasks/:taskId", async (req, res) => {
   const { taskId } = req.params;
@@ -285,6 +652,17 @@ router.delete("/teams/:teamId/activities/:activityId/sub-activities/:subActivity
     res.status(500).json({ error: error.message });
   }
 });
+
+// resp {
+//   "id": 3,
+//   "subkegiatan_id": 2,
+//   "name": "cek kesiapan device mitra",
+//   "dateCreated": "2024-08-26T05:12:22.357Z",
+//   "dueDate": "2024-09-01T00:00:00.000Z",
+//   "dateUpload": null,
+//   "link": "",
+//   "completed": false
+// }
 
 // Toggle Task Completion
 router.patch("/teams/:teamId/activities/:activityId/sub-activities/:subActivityId/tasks/:taskId/completion", async (req, res) => {
@@ -297,5 +675,18 @@ router.patch("/teams/:teamId/activities/:activityId/sub-activities/:subActivityI
     res.status(500).json({ error: error.message });
   }
 });
+
+// resp {
+//   "id": 4,
+//   "subkegiatan_id": 2,
+//   "name": "cek kesiapan tempat",
+//   "dateCreated": "2024-08-26T05:13:35.816Z",
+//   "dueDate": "2024-09-02T00:00:00.000Z",
+//   "dateUpload": null,
+//   "link": null,
+//   "completed": true
+// }
+
+// archive tugas soon
 
 export default router;

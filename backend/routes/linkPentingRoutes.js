@@ -1,4 +1,4 @@
-import express from "express";
+import express, { response } from "express";
 import * as linkPentingService from "../services/linkPentingService.js"; // Sesuaikan dengan path
 
 const router = express.Router();
@@ -14,6 +14,16 @@ router.get("/teams/:teamId/links", async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 });
+
+// {
+//   "links": [
+//       {
+//           "id": 1724654823312,
+//           "url": "bps.go.xx",
+//           "description": "klaten"
+//       }
+//   ]
+// }
 
 // Add a link to a team
 router.post("/teams/:teamId/links", async (req, res) => {
@@ -39,21 +49,26 @@ router.post("/teams/:teamId/links", async (req, res) => {
 //   "description":"akses dengan vpn web zi byl bps"
 //   }
 // resp {
-//     "id": 3,
-//     "name": "ZI",
-//     "links": [
-//         {
-//             "id": 1724653947393,
-//             "url": "ZI.byl.bps.go.id",
-//             "description": "akses dengan vpn web zi byl bps "
-//         },
-//         {
-//             "id": 1724653985967,
-//             "url": "bps.go.id",
-//             "description": " bps "
-//         }
-//     ],
-//     "leader_id": null
+//   "id": 3,
+//   "name": "ZI",
+//   "links": [
+//       {
+//           "id": 1724654145007,
+//           "url": "bps.go.com",
+//           "description": "bps"
+//       },
+//       {
+//           "id": 1724812162450,
+//           "url": "ZI.byl.bps.go.id",
+//           "description": "akses dengan vpn web zi byl bps"
+//       },
+//       {
+//           "id": 1724812216918,
+//           "url": "ZI.byl.bps.go.id",
+//           "description": "akses dengan vpn web zi byl bps"
+//       }
+//   ],
+//   "leader_id": null
 // }
 
 // Delete a link from a team
@@ -67,6 +82,24 @@ router.delete("/teams/:teamId/links/:linkId", async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 });
+
+// {
+//   "id": 3,
+//   "name": "ZI",
+//   "links": [
+//       {
+//           "id": 1724654145007,
+//           "url": "bps.go.com",
+//           "description": "bps"
+//       },
+//       {
+//           "id": 1724812162450,
+//           "url": "ZI.byl.bps.go.id",
+//           "description": "akses dengan vpn web zi byl bps"
+//       }
+//   ],
+//   "leader_id": null
+// }
 
 // Edit a link in a team
 router.patch("/teams/:teamId/links/:linkId", async (req, res) => {
@@ -90,4 +123,54 @@ router.patch("/teams/:teamId/links/:linkId", async (req, res) => {
   }
 });
 
+
+// req {
+//   "url":"edited url"}
+// resp {
+//   "id": 3,
+//   "name": "ZI",
+//   "links": [
+//       {
+//           "id": 1724654145007,
+//           "url": "edited url",
+//           "description": "bps"
+//       },
+//       {
+//           "id": 1724812162450,
+//           "url": "ZI.byl.bps.go.id",
+//           "description": "akses dengan vpn web zi byl bps"
+//       },
+//       {
+//           "id": 1724812216918,
+//           "url": "ZI.byl.bps.go.id",
+//           "description": "akses dengan vpn web zi byl bps"
+//       }
+//   ],
+//   "leader_id": null
+// }
+
+// req {
+//   "description":"edited description"}
+// resp {
+//   "id": 3,
+//   "name": "ZI",
+//   "links": [
+//       {
+//           "id": 1724654145007,
+//           "url": "edited url",
+//           "description": "edited desc"
+//       },
+//       {
+//           "id": 1724812162450,
+//           "url": "ZI.byl.bps.go.id",
+//           "description": "akses dengan vpn web zi byl bps"
+//       },
+//       {
+//           "id": 1724812216918,
+//           "url": "ZI.byl.bps.go.id",
+//           "description": "akses dengan vpn web zi byl bps"
+//       }
+//   ],
+//   "leader_id": null
+// }
 export default router;

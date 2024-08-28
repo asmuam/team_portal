@@ -22,10 +22,7 @@ export const createSubkegiatan = async (data) => {
 export const updateSubkegiatan = async (id, data) => {
   return prisma.subkegiatan.update({
     where: { id: parseInt(id) },
-    data: {
-      ...data,
-      tanggal_pelaksanaan: data.tanggal_pelaksanaan ? new Date(data.tanggal_pelaksanaan) : null,
-    },
+      data,
   });
 };
 
