@@ -5,6 +5,7 @@ import { Modal, Box, Button, TextField, Typography, IconButton } from "@mui/mate
 import { styled } from "@mui/system";
 import CloseIcon from "@mui/icons-material/Close";
 import "./TeamHierarchy.css";
+import AddIcon from "@mui/icons-material/Add";
 
 const ModalContent = styled(Box)({
   position: "absolute",
@@ -118,9 +119,35 @@ function TeamHierarchy({ teams, setTeams }) {
   return (
     <div className="team-hierarchy">
       <div className="header">
-        <button className="add-team-button" onClick={() => openModal("add")}>
-          <i className="fas fa-plus"></i> {/* Font Awesome icon */}
-        </button>
+        <Button
+            variant="contained"
+            color="primary"
+            onClick={() => openModal("add")}
+            startIcon={<AddIcon />}
+            sx={{
+              borderRadius: '6px',
+              fontSize: '16px',
+              fontWeight: 600,
+              padding: '10px 20px',
+              textTransform: 'none',
+              boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
+              transition: 'all 0.3s ease',
+              '&:hover': {
+                backgroundColor: '#0056b3',
+                boxShadow: '0 6px 10px rgba(0, 0, 0, 0.15)',
+              },
+              '&:active': {
+                backgroundColor: '#004494',
+                transform: 'scale(0.98)',
+              },
+              '&:focus': {
+                outline: 'none',
+                boxShadow: '0 0 0 3px rgba(38, 143, 255, 0.5)',
+              },
+            }}
+        >
+          Tambah Tim Baru
+        </Button>
       </div>
       <div className="team-list">
         {teams.map((team) => (
