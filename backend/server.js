@@ -4,10 +4,12 @@ import authRoutes from './routes/authRoutes.js'; // Jangan lupa untuk menambahka
 import explorerRoutes from './routes/explorerRoutes.js'; // Jangan lupa untuk menambahkan ekstensi .js
 import linkPentingRoutes from './routes/linkPentingRoutes.js'; // Jangan lupa untuk menambahkan ekstensi .js
 import authenticateToken from './middleware/authMiddleware.js'; // Jangan lupa untuk menambahkan ekstensi .js
+import cookieParser from 'cookie-parser';
 
 const app = express();
 app.use(cors()); // Enable CORS
 app.use(express.json());
+app.use(cookieParser()); // membaca cookies
 
 app.use('/api', authRoutes);  // Add authRoutes to handle authentication
 app.use('/api', explorerRoutes);  

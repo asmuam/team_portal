@@ -81,7 +81,9 @@ router.post('/login', async (req, res) => {
 
 // {
 //   "success": true,
-//   "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsInVzZXJuYW1lIjoiYWRpYiIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTcyNDY0NzQ0MiwiZXhwIjoxNzI0NjUxMDQyfQ.BJHWxGe3y_F1idrCfNhJPODySPcR69PgUCtH0YhwHeo"
+//   "uid": 1,
+//   "accessToken": "accessToken",
+//   "role": "role"
 // }
 // {
 //   "success": false,
@@ -93,14 +95,14 @@ router.post('/login', async (req, res) => {
 router.post('/refresh', async (req, res) => {
   try {
     const refreshToken = req.cookies.refreshToken;
-    const { id } = req.body;
+    const { uid } = req.body;
 
     // Validasi input
     if (!refreshToken) return res.status(401).json({ message: 'Refresh token tidak ditemukan' });
 
     // Temukan pengguna berdasarkan id
     const user = await prismaClient.user.findUnique({
-      where: { id: +id },
+      where: { id: +uid },
     });
 
     if (!user) return res.status(404).json({ message: 'Akun tidak ditemukan' });
@@ -112,7 +114,7 @@ router.post('/refresh', async (req, res) => {
       // Buat ulang access token
       const accessToken = jwt.sign(
         { userId: user.userId, username: user.username, role: user.role },
-        JWT_SECRET,
+        ACCESS_TOKEN_SECRET,
         { expiresIn: '1h' } // Access token berlaku selama 1 jam
       );
 
@@ -127,11 +129,20 @@ router.post('/refresh', async (req, res) => {
   }
 });
 
+// resp {
+//   "accessToken": "newAccessToken"
+// }
+
 // Logout route (optional, if you need server-side token invalidation)
 router.post('/logout', (req, res) => {
   // Invalidate token on the server side if needed (e.g., add it to a blacklist)
   res.clearCookie('refreshToken'); // Clear the refresh token cookie
   res.json({ success: true, message: 'Logged out successfully' });
 });
+
+// resp {
+//   "success": true,
+//   "message": "Logged out successfully"
+// }
 
 export default router;
