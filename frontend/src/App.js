@@ -12,6 +12,7 @@ import Tugas from "./components/Tugas";
 
 function App() {
   const [teams, setTeams] = useState([]);
+  const [allData, setAllData] = useState([]);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   const { setAuth } = useAuth();
@@ -32,6 +33,24 @@ function App() {
     };
 
     fetchTeams();
+  }, []);
+
+  useEffect(() => {
+    const fetchAllData = async () => {
+      try {
+        const response = await fetch(`${process.env.REACT_APP_API_URL}/allData`);
+        if (!response.ok) {
+          throw new Error("Network response was not ok");
+        }
+        const data = await response.json();
+        console.log("Fetched teams:", data);
+        setAllData(data);
+      } catch (error) {
+        console.error("Failed to fetch teams:", error);
+      }
+    };
+
+    fetchAllData();
   }, []);
 
   useEffect(() => {
@@ -98,7 +117,7 @@ function App() {
               <Routes>
                 <Route path="/" element={<Navigate to="/explorer" />} />
                 <Route path="/explorer" element={<TeamHierarchy teams={teams} setTeams={setTeams} />} />
-                <Route path="/table" element={<DataTable data={teams} />} />
+                <Route path="/table" element={<DataTable data={allData} />} />
                 <Route path="/links" element={<LinkPenting data={teams} />} />
                 <Route path="/explorer/kegiatan/:teamId" element={<Kegiatan />} />
                 <Route path="/explorer/kegiatan/:teamId/subkegiatan/:activityId" element={<SubKegiatan />} />
