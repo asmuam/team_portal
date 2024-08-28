@@ -415,7 +415,7 @@ router.post("/teams/:teamId/activities/:activityId/sub-activities", async (req, 
   try {
     const subActivity = await subkegiatanService.createSubkegiatan({
       name,
-      tanggal_pelaksanaan, // Tambahkan tanggal_pelaksanaan
+      tanggal_pelaksanaan: tanggal_pelaksanaan ? new Date(tanggal_pelaksanaan) : new Date(), // Inline default date
       kegiatan_id: parseInt(activityId),
     });
     res.json(subActivity);
