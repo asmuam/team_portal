@@ -6,6 +6,8 @@ import { styled } from "@mui/system";
 import CloseIcon from "@mui/icons-material/Close";
 import "./TeamHierarchy.css";
 import AddIcon from "@mui/icons-material/Add";
+import Breadcrumbs from "@mui/material/Breadcrumbs";
+import TeamHierarchyBreadcrumbs from "./breadcrumb/TeamHierarchyBreadcrumbs";
 
 const ModalContent = styled(Box)({
   position: "absolute",
@@ -119,6 +121,7 @@ function TeamHierarchy({ teams, setTeams }) {
   return (
     <div className="team-hierarchy">
       <div className="header">
+        <TeamHierarchyBreadcrumbs />
         <Button
             variant="contained"
             color="primary"

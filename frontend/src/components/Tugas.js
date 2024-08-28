@@ -12,6 +12,7 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import AddIcon from "@mui/icons-material/Add";
 import { styled } from "@mui/system";
 import CircularProgress from "@mui/material/CircularProgress";
+import TugasBreadcrumbs from "./breadcrumb/TugasBreadcrumbs";
 
 // Styled Components
 const ModalContent = styled(Box)({
@@ -264,6 +265,7 @@ function Tugas() {
 
   return (
     <div className="task-container">
+      <TugasBreadcrumbs />
       <h1>
         {teamName} - {activityName} - {subActivityName}
       </h1>
