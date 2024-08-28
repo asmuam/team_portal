@@ -17,41 +17,6 @@ function App() {
   const { auth, setAuth } = useAuth();
   const isAuthenticated = !!auth.token;
 
-  useEffect(() => {
-    const fetchTeams = async () => {
-      try {
-        const response = await fetch(`${process.env.REACT_APP_API_URL}/teams`);
-        if (!response.ok) {
-          throw new Error("Network response was not ok");
-        }
-        const data = await response.json();
-        console.log("Fetched teams:", data);
-        setTeams(data);
-      } catch (error) {
-        console.error("Failed to fetch teams:", error);
-      }
-    };
-
-    fetchTeams();
-  }, []);
-
-  useEffect(() => {
-    const fetchAllData = async () => {
-      try {
-        const response = await fetch(`${process.env.REACT_APP_API_URL}/allData`);
-        if (!response.ok) {
-          throw new Error("Network response was not ok");
-        }
-        const data = await response.json();
-        console.log("Fetched teams:", data);
-        setAllData(data);
-      } catch (error) {
-        console.error("Failed to fetch teams:", error);
-      }
-    };
-
-    fetchAllData();
-  }, []);
 
   const handleLogin = (result) => {
     localStorage.setItem("authToken", result.accessToken);
@@ -108,7 +73,7 @@ function App() {
               <Routes>
                 <Route path="/" element={<Navigate to="/explorer" />} />
                 <Route path="/explorer" element={<TeamHierarchy teams={teams} setTeams={setTeams} />} />
-                <Route path="/table" element={<DataTable data={allData} />} />
+                <Route path="/table" element={<DataTable />} />
                 <Route path="/links" element={<LinkPenting />} />
                 <Route path="/explorer/kegiatan/:teamId" element={<Kegiatan />} />
                 <Route path="/explorer/kegiatan/:teamId/subkegiatan/:activityId" element={<SubKegiatan />} />

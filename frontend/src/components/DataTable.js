@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import { useTable, useSortBy } from "react-table";
 import Select from "react-select";
 import DatePicker from "react-datepicker";
@@ -13,7 +13,8 @@ const formatDate = (dateString) => {
   }).format(date);
 };
 
-const DataTable = ({ data }) => {
+const DataTable = () => {
+  const [data, setData] = useState([]);
   const [filter, setFilter] = useState({
     team: "",
     activity: "",
@@ -21,6 +22,23 @@ const DataTable = ({ data }) => {
     taskSearch: "",
     activitySearch: "",
   });
+
+  useEffect(() => {
+    const fetchAllData = async () => {
+      try {
+        const response = await fetch(`${process.env.REACT_APP_API_URL}/allData`);
+        if (!response.ok) {
+          throw new Error("Network response was not ok");
+        }
+        const fetchedData = await response.json();
+        setData(fetchedData);
+      } catch (error) {
+        console.error("Failed to fetch data:", error);
+      }
+    };
+
+    fetchAllData();
+  }, []);
 
   const [pelaksanaanDateRange, setPelaksanaanDateRange] = useState([null, null]);
   const [dueDateRange, setdueDateRange] = useState([null, null]);
