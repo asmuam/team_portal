@@ -23,10 +23,10 @@ const DataTable = ({ data }) => {
   });
 
   const [pelaksanaanDateRange, setPelaksanaanDateRange] = useState([null, null]);
-  const [createdDateRange, setCreatedDateRange] = useState([null, null]);
+  const [dueDateRange, setdueDateRange] = useState([null, null]);
 
   const [pelaksanaanStartDate, pelaksanaanEndDate] = pelaksanaanDateRange;
-  const [createdStartDate, createdEndDate] = createdDateRange;
+  const [dueStartDate, dueEndDate] = dueDateRange;
 
   const teams = useMemo(() => {
     return [...new Set(data.map((team) => team.name))];
@@ -71,22 +71,22 @@ const DataTable = ({ data }) => {
         const matchesActivitySearch = row.activity.trim().toLowerCase().includes(filter.activitySearch.trim().toLowerCase());
 
         const taskPelaksanaanDate = new Date(row.tanggal_pelaksanaan);
-        const taskCreatedDate = new Date(row.dateCreated);
+        const taskdueDate = new Date(row.dueDate);
 
         const matchesPelaksanaanDateRange = !pelaksanaanStartDate || (taskPelaksanaanDate >= pelaksanaanStartDate && taskPelaksanaanDate <= (pelaksanaanEndDate || new Date()));
-        const matchesCreatedDateRange = !createdStartDate || (taskCreatedDate >= createdStartDate && taskCreatedDate <= (createdEndDate || new Date()));
+        const matchesdueDateRange = !dueStartDate || (taskdueDate >= dueStartDate && taskdueDate <= (dueEndDate || new Date()));
 
         return (
           matchesTaskSearch &&
           matchesActivitySearch &&
           matchesPelaksanaanDateRange &&
-          matchesCreatedDateRange &&
+          matchesdueDateRange &&
           (!filter.team || row.team === filter.team) &&
           (!filter.activity || row.activity === filter.activity) &&
           (!filter.subActivity || row.subActivity === filter.subActivity)
         );
       });
-  }, [data, filter, pelaksanaanStartDate, pelaksanaanEndDate, createdStartDate, createdEndDate]);
+  }, [data, filter, pelaksanaanStartDate, pelaksanaanEndDate, dueStartDate, dueEndDate]);
 
   const completedCount = filteredData.filter((row) => row.completed).length;
   const incompleteCount = filteredData.filter((row) => !row.completed).length;
@@ -96,7 +96,7 @@ const DataTable = ({ data }) => {
       { Header: "Tim", accessor: "team" },
       { Header: "Kegiatan", accessor: "activity" },
       {
-        Header: "Tanggal Pelaksanaan",
+        Header: "Tanggal Pelaksanaan Kegiatan",
         accessor: "tanggal_pelaksanaan",
         Cell: ({ value }) => formatDate(value),
       },
@@ -188,12 +188,12 @@ const DataTable = ({ data }) => {
 
         <div className="date-filters" style={{ display: "flex", justifyContent: "flex-end" }}>
           <div style={{ marginRight: "20px" }}>
-            <label style={{ marginRight: "10px" }}>Tanggal Pelaksanaan:</label>
+            <label style={{ marginRight: "10px" }}>Filter By Tanggal Pelaksanaan:</label>
             <DatePicker selectsRange startDate={pelaksanaanStartDate} endDate={pelaksanaanEndDate} onChange={(update) => setPelaksanaanDateRange(update)} isClearable placeholderText="" />
           </div>
           <div>
-            <label style={{ marginRight: "10px" }}>Deadline:</label>
-            <DatePicker selectsRange startDate={createdStartDate} endDate={createdEndDate} onChange={(update) => setCreatedDateRange(update)} isClearable placeholderText="" />
+            <label style={{ marginRight: "10px" }}>Filter By Deadline:</label>
+            <DatePicker selectsRange startDate={dueStartDate} endDate={dueEndDate} onChange={(update) => setdueDateRange(update)} isClearable placeholderText="" />
           </div>
         </div>
       </div>

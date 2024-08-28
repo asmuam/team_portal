@@ -178,7 +178,7 @@ function SubKegiatan() {
   };
 
   const archiveSubActivity = async (subActivityId) => {
-    alert(`Subkegiatan telah diarsipkan.`);
+    alert("Fitur arsip belum tersedia")
     // Implement actual archiving logic here if needed
     refetchSubActivities();
   };
