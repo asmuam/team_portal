@@ -72,7 +72,7 @@ Response:
 }
 ```
 #### Update a Team
-- **Endpoint:** `PUT /teams/:id`
+- **Endpoint:** `PATCH /teams/:id`
 - **- **Description:**** Update an existing team.
 - **Request Body:**
 ```json

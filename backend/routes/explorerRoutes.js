@@ -135,7 +135,7 @@ router.post('/teams', async (req, res) => {
 //   "leader_id": null
 // }
 
-router.put('/teams/:id', async (req, res) => {
+router.patch('/teams/:id', async (req, res) => {
   try {
     const team = await timkerjaService.updateTimkerja(req.params.id, req.body);
     res.json(team);
