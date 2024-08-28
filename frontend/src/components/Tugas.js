@@ -55,6 +55,7 @@ const ActionButton = styled(IconButton)({
 });
 
 const ProgressWrapper = styled(Box)({
+  marginTop: "15px",
   display: "flex",
   alignItems: "center",
   gap: "8px",
