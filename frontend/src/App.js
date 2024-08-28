@@ -9,9 +9,10 @@ import { BrowserRouter as Router, Routes, Route, Navigate, Link } from "react-ro
 import Kegiatan from "./components/Kegiatan";
 import SubKegiatan from "./components/SubKegiatan";
 import Tugas from "./components/Tugas";
+import { useTeams } from './context/TeamsContext'; // Adjust path as needed
 
 function App() {
-  const [teams, setTeams] = useState([]);
+  const { teams, setTeams } = useTeams();
   const [allData, setAllData] = useState([]);
   const { auth, setAuth } = useAuth();
   const isAuthenticated = !!auth.token;
