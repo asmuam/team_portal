@@ -6,6 +6,7 @@ import TambahSubActivity from "./modal/TambahSubActivity";
 import { Box, Button, Typography, IconButton, Modal, TextField } from "@mui/material";
 import { styled } from "@mui/system";
 import CloseIcon from "@mui/icons-material/Close";
+import SubKegiatanBreadcrumbs from "./breadcrumb/SubKegiatanBreadcrumbs";
 
 // Styled Components
 const ModalContent = styled(Box)({
@@ -193,6 +194,7 @@ function SubKegiatan() {
 
   return (
     <div className="sub-activity-container">
+      <SubKegiatanBreadcrumbs />
       <h1>Detail Kegiatan</h1>
 
       <div className="header" style={{ marginBottom: "10px" }}>
