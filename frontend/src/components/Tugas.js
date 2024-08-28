@@ -12,8 +12,8 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import AddIcon from "@mui/icons-material/Add";
 import { styled } from "@mui/system";
 import CircularProgress from "@mui/material/CircularProgress";
-import TugasBreadcrumbs from "./breadcrumb/TugasBreadcrumbs";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+import ExploreBreadcrumb from "./common/ExploreBreadcrumb";
 
 // Styled Components
 const ModalContent = styled(Box)({
@@ -64,11 +64,9 @@ const ProgressWrapper = styled(Box)({
 const ProgressText = styled(Typography)({
   fontWeight: "bold",
 });
-
-const AddTaskButton = styled(IconButton)({
+styled(IconButton)({
   marginBottom: "16px",
 });
-
 function Tugas() {
   const { teamId, activityId, subActivityId } = useParams();
   const [tasks, setTasks] = useState([]);
@@ -279,7 +277,7 @@ function Tugas() {
 
   return (
     <div className="task-container">
-      <TugasBreadcrumbs />
+      <ExploreBreadcrumb />
       <Button
           variant="contained"
           color="primary"

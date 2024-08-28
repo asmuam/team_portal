@@ -6,8 +6,8 @@ import { styled } from "@mui/system";
 import CloseIcon from "@mui/icons-material/Close";
 import "./Kegiatan.css";
 import AddIcon from "@mui/icons-material/Add";
-import KegiatanBreadcrumbs from "./breadcrumb/KegiatanBreadcrumbs";
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import ExploreBreadcrumb from "./common/ExploreBreadcrumb";
 
 // Styled Components
 const ModalContent = styled(Box)({
@@ -175,7 +175,7 @@ function Kegiatan() {
   return (
     <div className="kegiatan">
       <div className="header">
-        <KegiatanBreadcrumbs />
+        <ExploreBreadcrumb />
         <Button
             variant="contained"
             color="primary"
