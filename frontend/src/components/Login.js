@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 function Login({ onLogin }) {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
+    const navigate = useNavigate(); // Add this line
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -19,6 +21,7 @@ function Login({ onLogin }) {
             const result = await response.json();
             if (response.ok) {
                 onLogin(result);
+                navigate("/explorer"); // Redirect to main page upon successful login
             } else {
                 setError(result.message || 'Login failed');
             }
