@@ -290,13 +290,16 @@ function Kegiatan() {
             required
           />
           <InputField
-            label="Tanggal Pelaksanaan"
-            type="date"
-            variant="outlined"
-            value={tanggalPelaksanaan}
-            onChange={(e) => setTanggalPelaksanaan(e.target.value)}
-            onKeyDown={handleKeyPress} // Handle "Enter" key press
-            required
+              label="Tanggal Pelaksanaan"
+              type="date"
+              variant="outlined"
+              value={tanggalPelaksanaan}
+              onChange={(e) => setTanggalPelaksanaan(e.target.value)}
+              onKeyDown={handleKeyPress}
+              required
+              InputLabelProps={{
+                shrink: true, 
+              }}
           />
           <Button variant="contained" color="primary" onClick={modalType === "add" ? handleAddActivity : handleEditActivity} fullWidth>
             {modalType === "add" ? "Tambah Kegiatan" : "Update Kegiatan"}
