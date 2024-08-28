@@ -1,5 +1,5 @@
 import { node } from "prop-types";
-import { createContext, useState } from "react";
+import { createContext, useState, useEffect } from "react";
 
 /**
  * File untuk membuat state global
@@ -20,6 +20,21 @@ export const AuthProvider = ({ children }) => {
     role: sessionStorage.getItem("role"),
     token: localStorage.getItem("authToken"),
   });
+  const [loading, setLoading] = useState(true);
+
+
+  useEffect(() => {
+    const uid = sessionStorage.getItem("uid");
+    const role = sessionStorage.getItem("role");
+    const token = localStorage.getItem("authToken");
+    
+    setAuth({ uid, role, token });
+    setLoading(false);
+  }, []);
+
+  if (loading) {
+    return <div>Loading...</div>; // or any loading spinner/component
+  }
 
   return (
     <AuthContext.Provider value={{ auth, setAuth }}>

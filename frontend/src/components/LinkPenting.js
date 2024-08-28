@@ -1,9 +1,10 @@
 import React, { useState } from "react";
 import { Modal, Box, TextField, Button } from "@mui/material";
 import "./LinkPenting.css"; // Ensure to import your CSS file
+import { useTeams } from '../context/TeamsContext'; // Adjust path as needed
 
-const LinkPenting = ({ data }) => {
-  const [teams, setTeams] = useState(data);
+const LinkPenting = () => {
+  const { teams, setTeams } = useTeams();
   const [openTeam, setOpenTeam] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalType, setModalType] = useState("");

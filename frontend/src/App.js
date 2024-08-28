@@ -13,9 +13,8 @@ import Tugas from "./components/Tugas";
 function App() {
   const [teams, setTeams] = useState([]);
   const [allData, setAllData] = useState([]);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-
-  const { setAuth } = useAuth();
+  const { auth, setAuth } = useAuth();
+  const isAuthenticated = !!auth.token;
 
   useEffect(() => {
     const fetchTeams = async () => {
@@ -53,18 +52,10 @@ function App() {
     fetchAllData();
   }, []);
 
-  useEffect(() => {
-    const token = localStorage.getItem("authToken");
-    if (token) {
-      setIsAuthenticated(true);
-    }
-  }, []);
-
   const handleLogin = (result) => {
     localStorage.setItem("authToken", result.accessToken);
     sessionStorage.setItem("uid", result.uid);
     sessionStorage.setItem("role", result.role);
-    setIsAuthenticated(true);
     setAuth({
       uid: result.uid,
       role: result.role,
@@ -85,7 +76,6 @@ function App() {
       localStorage.removeItem("authToken");
       sessionStorage.removeItem("uid");
       sessionStorage.removeItem("role");
-      setIsAuthenticated(false);
     }
   };
 
@@ -118,7 +108,7 @@ function App() {
                 <Route path="/" element={<Navigate to="/explorer" />} />
                 <Route path="/explorer" element={<TeamHierarchy teams={teams} setTeams={setTeams} />} />
                 <Route path="/table" element={<DataTable data={allData} />} />
-                <Route path="/links" element={<LinkPenting data={teams} />} />
+                <Route path="/links" element={<LinkPenting />} />
                 <Route path="/explorer/kegiatan/:teamId" element={<Kegiatan />} />
                 <Route path="/explorer/kegiatan/:teamId/subkegiatan/:activityId" element={<SubKegiatan />} />
                 <Route path="/explorer/kegiatan/:teamId/subkegiatan/:activityId/tugas/:subActivityId" element={<Tugas />} />

@@ -4,12 +4,15 @@ import "./index.css";
 import App from "./App.js";
 import reportWebVitals from "./reportWebVitals.js";
 import { AuthProvider } from "./context/AuthContext";
+import { TeamsProvider } from './context/TeamsContext.js'; // Adjust path as needed
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
   <React.StrictMode>
     <AuthProvider>
-      <App />
+      <TeamsProvider>
+        <App />
+      </TeamsProvider>
     </AuthProvider>
   </React.StrictMode>
 );
