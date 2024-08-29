@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from "react";
-import {useParams, useNavigate, Link} from "react-router-dom";
+import { useParams, useNavigate, Link } from "react-router-dom";
 import axios from "axios";
 import { Box, Button, Typography, IconButton, Modal, TextField } from "@mui/material";
 import { styled } from "@mui/system";
 import CloseIcon from "@mui/icons-material/Close";
 import "./Kegiatan.css";
 import AddIcon from "@mui/icons-material/Add";
-import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import ExploreBreadcrumb from "./common/ExploreBreadcrumb";
 
 // Styled Components
@@ -73,6 +73,13 @@ const ActionIcon = styled("span")({
   },
 });
 
+const PaginationControls = styled(Box)({
+  display: "flex",
+  justifyContent: "center",
+  alignItems: "center",
+  marginTop: "20px",
+});
+
 function Kegiatan() {
   const { teamId } = useParams();
   const [activities, setActivities] = useState([]);
@@ -81,6 +88,8 @@ function Kegiatan() {
   const [currentActivityId, setCurrentActivityId] = useState(null);
   const [newActivityName, setNewActivityName] = useState("");
   const [tanggalPelaksanaan, setTanggalPelaksanaan] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [activitiesPerPage] = useState(4); // Number of activities per page
   const navigate = useNavigate();
   const URL = process.env.REACT_APP_API_URL;
 
@@ -162,7 +171,7 @@ function Kegiatan() {
   };
 
   const archiveActivity = async (Id) => {
-    alert("Fitur arsip belum tersedia")
+    alert("Fitur arsip belum tersedia");
     // Implement actual archiving logic here if needed
     refetchActivities();
   };
@@ -172,76 +181,82 @@ function Kegiatan() {
     return new Date(dateString).toLocaleDateString("id-ID", options);
   };
 
+  const indexOfLastActivity = currentPage * activitiesPerPage;
+  const indexOfFirstActivity = indexOfLastActivity - activitiesPerPage;
+  const currentActivities = activities.slice(indexOfFirstActivity, indexOfLastActivity);
+
+  const totalPages = Math.ceil(activities.length / activitiesPerPage);
+
   return (
     <div className="kegiatan">
       <div className="header">
         <ExploreBreadcrumb />
         <Button
-            variant="contained"
-            color="primary"
-            onClick={() => navigate("/explorer")}
-            startIcon={<ArrowBackIcon />}
-            sx={{
-              borderRadius: '6px',
-              fontSize: '16px',
-              fontWeight: 600,
-              padding: '10px 20px',
-              textTransform: 'none',
-              boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
-              transition: 'all 0.3s ease',
-              backgroundColor: '#007bff',  // Set a primary color for consistency
-              color: '#ffffff',  // Ensure text color is visible on the background
-              '&:hover': {
-                backgroundColor: '#0056b3',
-                boxShadow: '0 6px 10px rgba(0, 0, 0, 0.15)',
-              },
-              '&:active': {
-                backgroundColor: '#004494',
-                transform: 'scale(0.98)',
-              },
-              '&:focus': {
-                outline: 'none',
-                boxShadow: '0 0 0 3px rgba(38, 143, 255, 0.5)',
-              },
-              marginRight: '10px',  // Add margin to the right for spacing
-            }}
+          variant="contained"
+          color="primary"
+          onClick={() => navigate("/explorer")}
+          startIcon={<ArrowBackIcon />}
+          sx={{
+            borderRadius: "6px",
+            fontSize: "16px",
+            fontWeight: 600,
+            padding: "10px 20px",
+            textTransform: "none",
+            boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
+            transition: "all 0.3s ease",
+            backgroundColor: "#007bff", // Set a primary color for consistency
+            color: "#ffffff", // Ensure text color is visible on the background
+            "&:hover": {
+              backgroundColor: "#0056b3",
+              boxShadow: "0 6px 10px rgba(0, 0, 0, 0.15)",
+            },
+            "&:active": {
+              backgroundColor: "#004494",
+              transform: "scale(0.98)",
+            },
+            "&:focus": {
+              outline: "none",
+              boxShadow: "0 0 0 3px rgba(38, 143, 255, 0.5)",
+            },
+            marginRight: "10px", // Add margin to the right for spacing
+          }}
         >
           Back
         </Button>
         <Button
-            variant="contained"
-            color="primary"
-            onClick={() => openModal("add")}
-            startIcon={<AddIcon />}
-            sx={{
-              borderRadius: '6px',
-              fontSize: '16px',
-              fontWeight: 600,
-              padding: '10px 20px',
-              textTransform: 'none',
-              boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
-              transition: 'all 0.3s ease',
-              backgroundColor: '#007bff',  // Set a primary color for consistency
-              color: '#ffffff',  // Ensure text color is visible on the background
-              '&:hover': {
-                backgroundColor: '#0056b3',
-                boxShadow: '0 6px 10px rgba(0, 0, 0, 0.15)',
-              },
-              '&:active': {
-                backgroundColor: '#004494',
-                transform: 'scale(0.98)',
-              },
-              '&:focus': {
-                outline: 'none',
-                boxShadow: '0 0 0 3px rgba(38, 143, 255, 0.5)',
-              },
-            }}
+          variant="contained"
+          color="primary"
+          onClick={() => openModal("add")}
+          startIcon={<AddIcon />}
+          sx={{
+            borderRadius: "6px",
+            fontSize: "16px",
+            fontWeight: 600,
+            padding: "10px 20px",
+            textTransform: "none",
+            boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
+            transition: "all 0.3s ease",
+            backgroundColor: "#007bff", // Set a primary color for consistency
+            color: "#ffffff", // Ensure text color is visible on the background
+            "&:hover": {
+              backgroundColor: "#0056b3",
+              boxShadow: "0 6px 10px rgba(0, 0, 0, 0.15)",
+            },
+            "&:active": {
+              backgroundColor: "#004494",
+              transform: "scale(0.98)",
+            },
+            "&:focus": {
+              outline: "none",
+              boxShadow: "0 0 0 3px rgba(38, 143, 255, 0.5)",
+            },
+          }}
         >
           Tambah Kegiatan Baru
         </Button>
       </div>
       <div className="activity-list">
-        {activities.map((activity) => (
+        {currentActivities.map((activity) => (
           <ActivityBox key={activity.id} onClick={() => handleActivityClick(activity.id)} style={{ marginBottom: "20px;" }}>
             <ActivityName>{activity.name}</ActivityName>
             <Typography variant="body2" color="textSecondary">
@@ -300,6 +315,18 @@ function Kegiatan() {
           </ActivityBox>
         ))}
       </div>
+
+      <PaginationControls style={{ marginTop: "-35px" }}>
+        <Button onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))} disabled={currentPage === 1} style={{ fontSize: "25px" }}>
+          &lt;
+        </Button>
+        <Typography>
+          Page {currentPage} of {totalPages}
+        </Typography>
+        <Button onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))} disabled={currentPage === totalPages} style={{ fontSize: "25px" }}>
+          &gt;
+        </Button>
+      </PaginationControls>
       <Modal open={isModalOpen} onClose={closeModal} aria-labelledby="activity-modal-title" aria-describedby="activity-modal-description">
         <ModalContent>
           <Header id="activity-modal-title" variant="h6">
@@ -324,16 +351,16 @@ function Kegiatan() {
             required
           />
           <InputField
-              label="Tanggal Pelaksanaan"
-              type="date"
-              variant="outlined"
-              value={tanggalPelaksanaan}
-              onChange={(e) => setTanggalPelaksanaan(e.target.value)}
-              onKeyDown={handleKeyPress}
-              required
-              InputLabelProps={{
-                shrink: true,
-              }}
+            label="Tanggal Pelaksanaan"
+            type="date"
+            variant="outlined"
+            value={tanggalPelaksanaan}
+            onChange={(e) => setTanggalPelaksanaan(e.target.value)}
+            onKeyDown={handleKeyPress}
+            required
+            InputLabelProps={{
+              shrink: true,
+            }}
           />
           <Button variant="contained" color="primary" onClick={modalType === "add" ? handleAddActivity : handleEditActivity} fullWidth>
             {modalType === "add" ? "Tambah Kegiatan" : "Update Kegiatan"}

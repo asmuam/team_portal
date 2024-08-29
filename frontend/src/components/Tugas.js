@@ -411,7 +411,7 @@ function Tugas() {
         </tbody>
       </TaskTable>
       {tasks.length > tasksPerPage && (
-        <PaginationControls style={{ display: "flex", justifyContent: "space-between" }}>
+        <PaginationControls style={{ display: "flex", justifyContent: "flex-start" }}>
           <Button disabled={currentPage === 1} onClick={() => setCurrentPage(currentPage - 1)} style={{ fontSize: "25px" }}>
             &lt;
           </Button>
