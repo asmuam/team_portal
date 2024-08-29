@@ -23,6 +23,9 @@ const DataTable = () => {
     activitySearch: "",
   });
 
+  const [currentPage, setCurrentPage] = useState(0);
+  const rowsPerPage = 5;
+
   useEffect(() => {
     const fetchAllData = async () => {
       try {
@@ -156,6 +159,19 @@ const DataTable = () => {
 
   const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } = tableInstance;
 
+  // Pagination Logic
+  const startRow = currentPage * rowsPerPage;
+  const endRow = startRow + rowsPerPage;
+  const paginatedRows = rows.slice(startRow, endRow);
+
+  const pageCount = Math.ceil(rows.length / rowsPerPage);
+
+  const handlePageChange = (newPage) => {
+    if (newPage >= 0 && newPage < pageCount) {
+      setCurrentPage(newPage);
+    }
+  };
+
   return (
     <>
       <div className="filter-container">
@@ -204,41 +220,33 @@ const DataTable = () => {
           </div>
         </div>
 
-        <div className="date-filters" style={{ display: "flex", justifyContent: "flex-end" }}>
-          <div style={{ marginRight: "20px" }}>
-            <label style={{ marginRight: "10px" }}>Filter By Tanggal Pelaksanaan:</label>
-            <DatePicker selectsRange startDate={pelaksanaanStartDate} endDate={pelaksanaanEndDate} onChange={(update) => setPelaksanaanDateRange(update)} isClearable placeholderText="" />
+        <div className="date-filters" style={{ display: "flex", justifyContent: "flex-end", gap: "10px" }}>
+          <div>
+            <label>Filter By Tanggal Pelaksanaan: </label>
+            <DatePicker selected={pelaksanaanStartDate} onChange={(dates) => setPelaksanaanDateRange(dates)} startDate={pelaksanaanStartDate} endDate={pelaksanaanEndDate} selectsRange isClearable dateFormat="yyyy-MM-dd" />
           </div>
           <div>
-            <label style={{ marginRight: "10px" }}>Filter By Deadline:</label>
-            <DatePicker selectsRange startDate={dueStartDate} endDate={dueEndDate} onChange={(update) => setdueDateRange(update)} isClearable placeholderText="" />
+            <label>Filter by Deadline </label>
+            <DatePicker selected={dueStartDate} onChange={(dates) => setdueDateRange(dates)} startDate={dueStartDate} endDate={dueEndDate} selectsRange isClearable dateFormat="yyyy-MM-dd" />
           </div>
         </div>
       </div>
 
-      <table {...getTableProps()} style={{ width: "100%", marginTop: "20px" }}>
+      <table {...getTableProps()} className="data-table">
         <thead>
           {headerGroups.map((headerGroup) => (
             <tr {...headerGroup.getHeaderGroupProps()}>
               {headerGroup.headers.map((column) => (
                 <th {...column.getHeaderProps(column.getSortByToggleProps())}>
                   {column.render("Header")}
-                  <span
-                    style={{
-                      marginLeft: "5px",
-                      fontSize: "12px",
-                      fontWeight: "bold",
-                    }}
-                  >
-                    {column.isSorted ? (column.isSortedDesc ? "▼" : "▲") : ""}
-                  </span>
+                  <span>{column.isSorted ? (column.isSortedDesc ? " 🔽" : " 🔼") : ""}</span>
                 </th>
               ))}
             </tr>
           ))}
         </thead>
         <tbody {...getTableBodyProps()}>
-          {rows.map((row) => {
+          {paginatedRows.map((row) => {
             prepareRow(row);
             return (
               <tr {...row.getRowProps()}>
@@ -250,6 +258,18 @@ const DataTable = () => {
           })}
         </tbody>
       </table>
+
+      <div className="pagination-controls" style={{ display: "flex", justifyContent: "space-between", marginTop: "20px" }}>
+        <button onClick={() => handlePageChange(currentPage - 1)} disabled={currentPage === 0}>
+          &lt;
+        </button>
+        <span>
+          Page {currentPage + 1} of {pageCount}
+        </span>
+        <button onClick={() => handlePageChange(currentPage + 1)} disabled={currentPage === pageCount - 1}>
+          &gt;
+        </button>
+      </div>
     </>
   );
 };
