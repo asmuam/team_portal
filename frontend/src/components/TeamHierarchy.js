@@ -100,7 +100,7 @@ function TeamHierarchy({ teams, setTeams }) {
   const handleTeamClick = (e, id, link_drive) => {
     e.stopPropagation(); // Prevent unwanted navigation
     setLinkDrive(link_drive); // Set the link_drive in context
-    navigate(`/explorer/kegiatan/${id}`);
+    navigate(`/explorer/team/${id}/kegiatan`);
   };
 
   const handleAddTeam = async () => {
@@ -174,7 +174,7 @@ function TeamHierarchy({ teams, setTeams }) {
   };
 
   const driveFolderUrl = `https://drive.google.com/drive/folders/${process.env.REACT_APP_ROOT_DRIVE_FOLDER_ID}`;
-
+  setLinkDrive(driveFolderUrl)
   return (
     <div className="team-hierarchy">
       <div className="header">

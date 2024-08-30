@@ -203,7 +203,7 @@ function SubKegiatan() {
 
   const handleSubActivityClick = (subActivityId, link_drive) => {
     setLinkDrive(link_drive); // Set the link_drive in context
-    navigate(`/explorer/kegiatan/${teamId}/subkegiatan/${activityId}/tugas/${subActivityId}`);
+    navigate(`/explorer/team/${teamId}/kegiatan/${activityId}/subkegiatan/${subActivityId}/tugas`);
   };
 
   const formatDate = (dateString) => {
@@ -217,6 +217,8 @@ function SubKegiatan() {
 
   const totalPages = Math.ceil(subActivities.length / activitiesPerPage);
   const driveFolderUrl = linkDrive
+  setLinkDrive(driveFolderUrl)
+
   return (
     <div className="sub-activity-container">
       <ExploreBreadcrumb />
@@ -224,7 +226,7 @@ function SubKegiatan() {
         <Button
           variant="contained"
           color="primary"
-          onClick={() => navigate(`/explorer/kegiatan/${teamId}`)}
+          onClick={() => navigate(`/explorer/team/${teamId}/kegiatan`)}
           startIcon={<ArrowBackIcon />}
           sx={{
             borderRadius: "6px",

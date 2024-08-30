@@ -138,7 +138,7 @@ function Kegiatan() {
 
   const handleActivityClick = (activityId, link_drive) => {
     setLinkDrive(link_drive); // Set the link_drive in context
-    navigate(`/explorer/kegiatan/${teamId}/subkegiatan/${activityId}`);
+    navigate(`/explorer/team/${teamId}/kegiatan/${activityId}/subkegiatan`);
   };
 
   const handleAddActivity = async () => {
@@ -212,6 +212,7 @@ function Kegiatan() {
 
   const totalPages = Math.ceil(activities.length / tasksPerPage);
   const driveFolderUrl = linkDrive;
+  setLinkDrive(driveFolderUrl)
 
   return (
     <div className="kegiatan">

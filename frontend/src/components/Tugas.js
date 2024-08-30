@@ -307,7 +307,7 @@ function Tugas() {
       <Button
         variant="contained"
         color="primary"
-        onClick={() => navigate(`/explorer/kegiatan/${teamId}/subkegiatan/${activityId}`)}
+        onClick={() => navigate(`/explorer/team/${teamId}/kegiatan/${activityId}/subkegiatan`)}
         startIcon={<ArrowBackIcon />}
         sx={{
           borderRadius: "6px",

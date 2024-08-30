@@ -17,9 +17,9 @@ function AppRouter({ isAuthenticated, teams, setTeams, handleLogin }) {
                 <Route path="/explorer" element={isAuthenticated ? <TeamHierarchy teams={teams} setTeams={setTeams} /> : <Navigate to="/login" />} />
                 <Route path="/table" element={isAuthenticated ? <DataTable /> : <Navigate to="/login" />} />
                 <Route path="/links" element={isAuthenticated ? <LinkPenting /> : <Navigate to="/login" />} />
-                <Route path="/explorer/kegiatan/:teamId" element={isAuthenticated ? <Kegiatan /> : <Navigate to="/login" />} />
-                <Route path="/explorer/kegiatan/:teamId/subkegiatan/:activityId" element={isAuthenticated ? <SubKegiatan /> : <Navigate to="/login" />} />
-                <Route path="/explorer/kegiatan/:teamId/subkegiatan/:activityId/tugas/:subActivityId" element={isAuthenticated ? <Tugas /> : <Navigate to="/login" />} />
+                <Route path="/explorer/team/:teamId/kegiatan" element={isAuthenticated ? <Kegiatan /> : <Navigate to="/login" />} />
+                <Route path="/explorer/team/:teamId/kegiatan/:activityId/subkegiatan" element={isAuthenticated ? <SubKegiatan /> : <Navigate to="/login" />} />
+                <Route path="/explorer/team/:teamId/kegiatan/:activityId/subkegiatan/:subActivityId/tugas" element={isAuthenticated ? <Tugas /> : <Navigate to="/login" />} />
             </Routes>
     );
 }
