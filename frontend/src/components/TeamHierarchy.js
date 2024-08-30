@@ -8,6 +8,8 @@ import "./TeamHierarchy.css";
 import AddIcon from "@mui/icons-material/Add";
 import Breadcrumbs from "@mui/material/Breadcrumbs";
 import ExploreBreadcrumb from "./common/ExploreBreadcrumb";
+import { AddToDrive } from '@mui/icons-material'; // Import the Google Drive icon
+import { useDriveLink } from "../context/DriveContext";
 
 const ModalContent = styled(Box)({
   position: "absolute",
@@ -46,6 +48,7 @@ function TeamHierarchy({ teams, setTeams }) {
   const [users, setUsers] = useState([]); // State for users
   const [selectedKetua, setSelectedKetua] = useState(""); // State for selected ketua ID
   const navigate = useNavigate();
+  const { setLinkDrive } = useDriveLink(); // Access the context setter
 
   const URL = process.env.REACT_APP_API_URL;
 
@@ -92,8 +95,9 @@ function TeamHierarchy({ teams, setTeams }) {
     }
   };
 
-  const handleTeamClick = (e, id) => {
+  const handleTeamClick = (e, id, link_drive) => {
     e.stopPropagation(); // Prevent unwanted navigation
+    setLinkDrive(link_drive); // Set the link_drive in context
     navigate(`/explorer/kegiatan/${id}`);
   };
 
@@ -150,6 +154,8 @@ function TeamHierarchy({ teams, setTeams }) {
     refetchTeams();
   };
 
+  const driveFolderUrl = `https://drive.google.com/drive/folders/${process.env.REACT_APP_ROOT_DRIVE_FOLDER_ID}`;
+
   return (
     <div className="team-hierarchy">
       <div className="header">
@@ -167,6 +173,41 @@ function TeamHierarchy({ teams, setTeams }) {
             textTransform: "none",
             boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
             transition: "all 0.3s ease",
+            backgroundColor: "#007bff", // Set a primary color for consistency
+            color: "#ffffff", // Ensure text color is visible on the background
+            "&:hover": {
+              backgroundColor: "#0056b3",
+              boxShadow: "0 6px 10px rgba(0, 0, 0, 0.15)",
+            },
+            "&:active": {
+              backgroundColor: "#004494",
+              transform: "scale(0.98)",
+            },
+            "&:focus": {
+              outline: "none",
+              boxShadow: "0 0 0 3px rgba(38, 143, 255, 0.5)",
+            },
+            marginRight: "10px", // Add margin to the right for spacing
+          }}
+        >
+          Tambah Tim Baru
+        </Button>
+        <Button
+          variant="contained"
+          color="primary"
+          href={driveFolderUrl}
+          target="_blank" // Opens the link in a new tab
+          rel="noopener noreferrer" // Security best practice
+          sx={{
+            borderRadius: "6px",
+            fontSize: "16px",
+            fontWeight: 600,
+            padding: "10px 20px",
+            textTransform: "none",
+            boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
+            transition: "all 0.3s ease",
+            backgroundColor: "#007bff", // Set a primary color for consistency
+            color: "#ffffff", // Ensure text color is visible on the background
             "&:hover": {
               backgroundColor: "#0056b3",
               boxShadow: "0 6px 10px rgba(0, 0, 0, 0.15)",
@@ -180,14 +221,15 @@ function TeamHierarchy({ teams, setTeams }) {
               boxShadow: "0 0 0 3px rgba(38, 143, 255, 0.5)",
             },
           }}
+          startIcon={<AddToDrive />} // Add the icon here
         >
-          Tambah Tim Baru
+          Lihat Drive INOVEAZY
         </Button>
       </div>
       <div className="team-list">
         {teams.map((team) => (
           <div className="team-container" key={team.id}>
-            <div className="team-box" onClick={(e) => handleTeamClick(e, team.id)}>
+            <div className="team-box" onClick={(e) => handleTeamClick(e, team.id, team.link_drive)}>
               <div className="team-name">{team.name}</div>
               <div className="team-ketua">Ketua :{team.leader.name}</div> {/* Display ketua */}
               <br />

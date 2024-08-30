@@ -8,6 +8,8 @@ import "./Kegiatan.css";
 import AddIcon from "@mui/icons-material/Add";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import ExploreBreadcrumb from "./common/ExploreBreadcrumb";
+import { AddToDrive } from '@mui/icons-material'; // Import the Google Drive icon
+import { useDriveLink } from "../context/DriveContext";
 
 // Styled Components
 const ModalContent = styled(Box)({
@@ -93,6 +95,7 @@ function Kegiatan() {
   const [activitiesPerPage] = useState(4); // Number of activities per page
   const navigate = useNavigate();
   const URL = process.env.REACT_APP_API_URL;
+  const { setLinkDrive, linkDrive } = useDriveLink(); // Access the link_drive from context
 
   const openModal = (type, activityId = null, activityName = "", tanggal = "", deskripsi = "") => {
     setModalType(type);
@@ -130,7 +133,8 @@ function Kegiatan() {
     }
   }, [teamId]);
 
-  const handleActivityClick = (activityId) => {
+  const handleActivityClick = (activityId, link_drive) => {
+    setLinkDrive(link_drive); // Set the link_drive in context
     navigate(`/explorer/kegiatan/${teamId}/subkegiatan/${activityId}`);
   };
 
@@ -189,6 +193,7 @@ function Kegiatan() {
   const currentActivities = activities.slice(indexOfFirstActivity, indexOfLastActivity);
 
   const totalPages = Math.ceil(activities.length / activitiesPerPage);
+  const driveFolderUrl = linkDrive;
 
   return (
     <div className="kegiatan">
@@ -253,14 +258,49 @@ function Kegiatan() {
               outline: "none",
               boxShadow: "0 0 0 3px rgba(38, 143, 255, 0.5)",
             },
+            marginRight: "10px", // Add margin to the right for spacing
           }}
         >
           Tambah Kegiatan Baru
         </Button>
+        <Button
+          variant="contained"
+          color="primary"
+          href={driveFolderUrl}
+          target="_blank" // Opens the link in a new tab
+          rel="noopener noreferrer" // Security best practice
+          sx={{
+            borderRadius: "6px",
+            fontSize: "16px",
+            fontWeight: 600,
+            padding: "10px 20px",
+            textTransform: "none",
+            boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
+            transition: "all 0.3s ease",
+            backgroundColor: "#007bff", // Set a primary color for consistency
+            color: "#ffffff", // Ensure text color is visible on the background
+            "&:hover": {
+              backgroundColor: "#0056b3",
+              boxShadow: "0 6px 10px rgba(0, 0, 0, 0.15)",
+            },
+            "&:active": {
+              backgroundColor: "#004494",
+              transform: "scale(0.98)",
+            },
+            "&:focus": {
+              outline: "none",
+              boxShadow: "0 0 0 3px rgba(38, 143, 255, 0.5)",
+            },
+          }}
+          startIcon={<AddToDrive />} // Add the icon here
+        >
+          Lihat Drive Tim
+        </Button>
       </div>
+
       <div className="activity-list">
         {currentActivities.map((activity) => (
-          <ActivityBox key={activity.id} onClick={() => handleActivityClick(activity.id)} style={{ marginBottom: "20px;" }}>
+          <ActivityBox key={activity.id} onClick={() => handleActivityClick(activity.id, activity.link_drive)} style={{ marginBottom: "20px;" }}>
             <ActivityName>{activity.name}</ActivityName>
             <Typography variant="body2" color="textSecondary">
               Tanggal : {formatDate(activity.tanggal_pelaksanaan)} {/* Format tanggal */}

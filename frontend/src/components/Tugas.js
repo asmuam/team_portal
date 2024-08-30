@@ -14,6 +14,8 @@ import { styled } from "@mui/system";
 import CircularProgress from "@mui/material/CircularProgress";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import ExploreBreadcrumb from "./common/ExploreBreadcrumb";
+import { AddToDrive } from "@mui/icons-material";
+import { useDriveLink } from "../context/DriveContext";
 
 // Styled Components
 const ModalContent = styled(Box)({
@@ -91,6 +93,7 @@ function Tugas() {
   const [activityName, setActivityName] = useState("");
   const [subActivityName, setSubActivityName] = useState("");
   const [subActivityTasks, setSubActivityTasks] = useState({});
+  const { linkDrive } = useDriveLink(); // Access the link_drive from context
 
   const URL = process.env.REACT_APP_API_URL;
 
@@ -295,6 +298,7 @@ function Tugas() {
   const currentTasks = tasks.slice(indexOfFirstTask, indexOfLastTask);
 
   const totalPages = Math.ceil(tasks.length / tasksPerPage);
+  const driveFolderUrl = linkDrive;
 
   return (
     <div className="task-container">
@@ -356,10 +360,44 @@ function Tugas() {
             outline: "none",
             boxShadow: "0 0 0 3px rgba(38, 143, 255, 0.5)",
           },
+          marginRight: "10px", // Add margin to the right for spacing
         }}
       >
         Tambah Tugas Baru
       </Button>
+      <Button
+          variant="contained"
+          color="primary"
+          href={driveFolderUrl}
+          target="_blank" // Opens the link in a new tab
+          rel="noopener noreferrer" // Security best practice
+          sx={{
+            borderRadius: "6px",
+            fontSize: "16px",
+            fontWeight: 600,
+            padding: "10px 20px",
+            textTransform: "none",
+            boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
+            transition: "all 0.3s ease",
+            backgroundColor: "#007bff", // Set a primary color for consistency
+            color: "#ffffff", // Ensure text color is visible on the background
+            "&:hover": {
+              backgroundColor: "#0056b3",
+              boxShadow: "0 6px 10px rgba(0, 0, 0, 0.15)",
+            },
+            "&:active": {
+              backgroundColor: "#004494",
+              transform: "scale(0.98)",
+            },
+            "&:focus": {
+              outline: "none",
+              boxShadow: "0 0 0 3px rgba(38, 143, 255, 0.5)",
+            },
+          }}
+          startIcon={<AddToDrive />} // Add the icon here
+        >
+          Lihat Drive Sub-Kegiatan
+        </Button>
       <ProgressWrapper>
         <CircularProgress variant="determinate" value={progress} />
         <ProgressText>{Math.round(progress)}% Completed</ProgressText>
@@ -370,7 +408,7 @@ function Tugas() {
             <TableHeader>Task</TableHeader>
             <TableHeader>Due Date</TableHeader>
             <TableHeader>Deskripsi</TableHeader>
-            <TableHeader>Link</TableHeader>
+            <TableHeader>File</TableHeader>
             <TableHeader>Verified</TableHeader>
             <TableHeader>Actions</TableHeader>
           </tr>

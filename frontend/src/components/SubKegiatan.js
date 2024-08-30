@@ -8,6 +8,8 @@ import { styled } from "@mui/system";
 import CloseIcon from "@mui/icons-material/Close";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import ExploreBreadcrumb from "./common/ExploreBreadcrumb";
+import { AddToDrive } from "@mui/icons-material";
+import { useDriveLink } from "../context/DriveContext";
 
 // Styled Components
 const ModalContent = styled(Box)({
@@ -86,6 +88,7 @@ function SubKegiatan() {
   const [tanggalPelaksanaan, setTanggalPelaksanaan] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [activitiesPerPage] = useState(4);
+  const { setLinkDrive, linkDrive } = useDriveLink(); // Access the link_drive from context
 
   const URL = process.env.REACT_APP_API_URL;
   const navigate = useNavigate();
@@ -196,7 +199,8 @@ function SubKegiatan() {
     refetchSubActivities();
   };
 
-  const handleSubActivityClick = (subActivityId) => {
+  const handleSubActivityClick = (subActivityId, link_drive) => {
+    setLinkDrive(link_drive); // Set the link_drive in context
     navigate(`/explorer/kegiatan/${teamId}/subkegiatan/${activityId}/tugas/${subActivityId}`);
   };
 
@@ -210,12 +214,10 @@ function SubKegiatan() {
   const currentActivities = subActivities.slice(indexOfFirstActivity, indexOfLastActivity);
 
   const totalPages = Math.ceil(subActivities.length / activitiesPerPage);
-
+  const driveFolderUrl = linkDrive
   return (
     <div className="sub-activity-container">
       <ExploreBreadcrumb />
-      <h1>Detail Kegiatan</h1>
-
       <div className="header" style={{ marginBottom: "10px" }}>
         <Button
           variant="contained"
@@ -280,11 +282,44 @@ function SubKegiatan() {
         >
           Tambah Sub-Kegiatan
         </Button>
+        <Button
+          variant="contained"
+          color="primary"
+          href={driveFolderUrl}
+          target="_blank" // Opens the link in a new tab
+          rel="noopener noreferrer" // Security best practice
+          sx={{
+            borderRadius: "6px",
+            fontSize: "16px",
+            fontWeight: 600,
+            padding: "10px 20px",
+            textTransform: "none",
+            boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
+            transition: "all 0.3s ease",
+            backgroundColor: "#007bff", // Set a primary color for consistency
+            color: "#ffffff", // Ensure text color is visible on the background
+            "&:hover": {
+              backgroundColor: "#0056b3",
+              boxShadow: "0 6px 10px rgba(0, 0, 0, 0.15)",
+            },
+            "&:active": {
+              backgroundColor: "#004494",
+              transform: "scale(0.98)",
+            },
+            "&:focus": {
+              outline: "none",
+              boxShadow: "0 0 0 3px rgba(38, 143, 255, 0.5)",
+            },
+          }}
+          startIcon={<AddToDrive />} // Add the icon here
+        >
+          Lihat Drive Kegiatan
+        </Button>
       </div>
       <div className="sub-activity-list">
         {currentActivities.map((subActivity) => (
           <div key={subActivity.id} style={{ marginBottom: "20px;" }}>
-            <SubActivityBox onClick={() => handleSubActivityClick(subActivity.id)}>
+            <SubActivityBox onClick={() => handleSubActivityClick(subActivity.id, subActivity.link_drive)}>
               <SubActivityName>{subActivity.name}</SubActivityName>
               <Typography variant="body2" color="textSecondary">
                 Tanggal : {formatDate(subActivity.tanggal_pelaksanaan)} {/* Format tanggal */}
