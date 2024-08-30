@@ -1,14 +1,16 @@
 import React from 'react';
 import Button from '@mui/material/Button';
-import AddIcon from '@mui/icons-material/Add';
+import FolderOpen from '@mui/icons-material/FolderOpen'; // Example icon
 
-const AddButton = ({ onClick, text }) => {
+const DriveButton = ({ driveFolderUrl }) => {
     return (
         <Button
             variant="contained"
             color="primary"
-            onClick={onClick}
-            startIcon={<AddIcon />}
+            startIcon={<FolderOpen />}
+            href={driveFolderUrl}
+            target="_blank" // Opens the link in a new tab
+            rel="noopener noreferrer" // Security best practice
             sx={{
                 borderRadius: "6px",
                 fontSize: "16px",
@@ -32,9 +34,9 @@ const AddButton = ({ onClick, text }) => {
                 marginRight: "10px", // Add margin to the right for spacing
             }}
         >
-            {text}
+            Buka Drive
         </Button>
     );
 };
 
-export default AddButton;
+export default DriveButton;

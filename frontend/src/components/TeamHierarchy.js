@@ -9,7 +9,7 @@ import AddIcon from "@mui/icons-material/Add";
 import Breadcrumbs from "@mui/material/Breadcrumbs";
 import ExploreBreadcrumb from "./common/ExploreBreadcrumb";
 import AddButton from "./common/AddButton";
-import { AddToDrive } from '@mui/icons-material'; // Import the Google Drive icon
+import DriveButton from "./common/DriveButton";
 import { useDriveLink } from "../context/DriveContext";
 
 const ModalContent = styled(Box)({
@@ -180,6 +180,7 @@ function TeamHierarchy({ teams, setTeams }) {
       <div className="header">
         <ExploreBreadcrumb />
         <AddButton onClick={() => openModal("add")} text="Tambah Tim Baru" />
+        <DriveButton driveFolderUrl={driveFolderUrl}/>
       </div>
       <div className="team-list">
         {teams.map((team) => (

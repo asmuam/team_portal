@@ -15,7 +15,7 @@ import CircularProgress from "@mui/material/CircularProgress";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import ExploreBreadcrumb from "./common/ExploreBreadcrumb";
 import AddButton from "./common/AddButton";
-import { AddToDrive } from "@mui/icons-material";
+import DriveButton from "./common/DriveButton";
 import { useDriveLink } from "../context/DriveContext";
 
 // Styled Components
@@ -337,6 +337,7 @@ function Tugas() {
         Back
       </Button>
       <AddButton onClick={() => openModal("add")} text="Tambah Tugas Baru" />
+      <DriveButton driveFolderUrl={driveFolderUrl}/>
       <ProgressWrapper>
         <CircularProgress variant="determinate" value={progress} />
         <ProgressText>{Math.round(progress)}% Completed</ProgressText>

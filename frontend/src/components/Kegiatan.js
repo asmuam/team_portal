@@ -9,8 +9,8 @@ import AddIcon from "@mui/icons-material/Add";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import ExploreBreadcrumb from "./common/ExploreBreadcrumb";
 import AddButton from "./common/AddButton";
-import { AddToDrive } from '@mui/icons-material'; // Import the Google Drive icon
 import { useDriveLink } from "../context/DriveContext";
+import DriveButton from "./common/DriveButton";
 
 // Styled Components
 const ModalContent = styled(Box)({
@@ -210,7 +210,7 @@ function Kegiatan() {
   const indexOfFirstTask = indexOfLastTask - tasksPerPage;
   const currentActivities = activities.slice(indexOfFirstTask, indexOfLastTask);
 
-  const totalPages = Math.ceil(activities.length / activitiesPerPage);
+  const totalPages = Math.ceil(activities.length / tasksPerPage);
   const driveFolderUrl = linkDrive;
 
   return (
@@ -250,6 +250,7 @@ function Kegiatan() {
           Back
         </Button>
         <AddButton onClick={() => openModal("add")} text="Tambah Kegiatan" />
+        <DriveButton driveFolderUrl={driveFolderUrl}/>
       </div>
 
       <div className="activity-list">

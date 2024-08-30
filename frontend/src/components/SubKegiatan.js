@@ -9,7 +9,7 @@ import CloseIcon from "@mui/icons-material/Close";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import ExploreBreadcrumb from "./common/ExploreBreadcrumb";
 import AddButton from "./common/AddButton";
-import { AddToDrive } from "@mui/icons-material";
+import DriveButton from "./common/DriveButton";
 import { useDriveLink } from "../context/DriveContext";
 
 // Styled Components
@@ -254,6 +254,7 @@ function SubKegiatan() {
           Back
         </Button>
         <AddButton onClick={() => openModal("add")} text="Tambah Sub Kegiatan" />
+        <DriveButton driveFolderUrl={driveFolderUrl}/>
       </div>
       <div className="sub-activity-list">
         {currentActivities.map((subActivity) => (
