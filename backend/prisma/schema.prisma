@@ -37,6 +37,7 @@ model Timkerja {
   leader    User?      @relation(fields: [leader_id], references: [id], onDelete: SetNull)
   leader_id Int?       @unique
   kegiatan  Kegiatan[]
+  link_drive String
 }
 
 
@@ -48,6 +49,7 @@ model Kegiatan {
   deskripsi           String        @default("")  // Default value added
   timkerja            Timkerja      @relation(fields: [timkerja_id], references: [id], onDelete: Cascade)
   subkegiatan         Subkegiatan[]
+  link_drive String
 }
 
 model Subkegiatan {
@@ -58,6 +60,7 @@ model Subkegiatan {
   deskripsi           String        @default("")  // Default value added
   kegiatan    Kegiatan @relation(fields: [kegiatan_id], references: [id], onDelete: Cascade)
   tugas       Tugas[]
+  link_drive String
 }
 
 model Tugas {
