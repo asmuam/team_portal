@@ -39,7 +39,7 @@ const SubmitButton = styled(Button)(({ theme }) => ({
   },
 }));
 
-function Login({ onLogin }) {
+const Login = ({ onLogin }) => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -67,7 +67,7 @@ function Login({ onLogin }) {
 
       const result = await response.json();
       if (response.ok) {
-        onLogin(result);
+        onLogin(result); // Mengirim data login ke fungsi onLogin
         navigate("/explorer");
       } else {
         setError(result.message || "Login failed");
@@ -118,6 +118,6 @@ function Login({ onLogin }) {
       </StyledPaper>
     </Root>
   );
-}
+};
 
 export default Login;

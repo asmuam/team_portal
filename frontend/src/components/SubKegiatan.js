@@ -82,6 +82,7 @@ function SubKegiatan() {
   const [modalType, setModalType] = useState(""); // Type of the modal ("add" or "edit")
   const [currentSubActivityId, setCurrentSubActivityId] = useState(null);
   const [subActivityName, setSubActivityName] = useState("");
+  const [deskripsi, setDeskripsi] = useState("");
   const [tanggalPelaksanaan, setTanggalPelaksanaan] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [activitiesPerPage] = useState(4);
@@ -89,10 +90,11 @@ function SubKegiatan() {
   const URL = process.env.REACT_APP_API_URL;
   const navigate = useNavigate();
 
-  const openModal = (type, subActivityId = null, name = "", tanggal = "") => {
+  const openModal = (type, subActivityId = null, name = "", tanggal = "", deskripsi = "") => {
     setModalType(type);
     setCurrentSubActivityId(subActivityId);
     setSubActivityName(name);
+    setDeskripsi(deskripsi);
     setTanggalPelaksanaan(tanggal ? new Date(tanggal).toISOString().substr(0, 10) : "");
     setIsModalOpen(true);
   };
@@ -102,6 +104,7 @@ function SubKegiatan() {
     setCurrentSubActivityId(null);
     setSubActivityName("");
     setTanggalPelaksanaan("");
+    setDeskripsi("");
   };
 
   const PaginationControls = styled(Box)({
@@ -151,7 +154,7 @@ function SubKegiatan() {
   const handleAddSubActivity = async () => {
     if (subActivityName) {
       try {
-        await axios.post(`${URL}/teams/${teamId}/activities/${activityId}/sub-activities`, { name: subActivityName, tanggal_pelaksanaan: tanggalPelaksanaan });
+        await axios.post(`${URL}/teams/${teamId}/activities/${activityId}/sub-activities`, { name: subActivityName, tanggal_pelaksanaan: tanggalPelaksanaan, deskripsi: deskripsi });
         refetchSubActivities();
         closeModal();
       } catch (error) {
@@ -163,7 +166,7 @@ function SubKegiatan() {
   const handleEditSubActivity = async () => {
     if (subActivityName) {
       try {
-        await axios.patch(`${URL}/teams/${teamId}/activities/${activityId}/sub-activities/${currentSubActivityId}`, { name: subActivityName, tanggal_pelaksanaan: tanggalPelaksanaan });
+        await axios.patch(`${URL}/teams/${teamId}/activities/${activityId}/sub-activities/${currentSubActivityId}`, { name: subActivityName, tanggal_pelaksanaan: tanggalPelaksanaan, deskripsi: deskripsi });
         refetchSubActivities();
         closeModal();
       } catch (error) {
@@ -284,13 +287,17 @@ function SubKegiatan() {
             <SubActivityBox onClick={() => handleSubActivityClick(subActivity.id)}>
               <SubActivityName>{subActivity.name}</SubActivityName>
               <Typography variant="body2" color="textSecondary">
-                {formatDate(subActivity.tanggal_pelaksanaan)} {/* Format tanggal */}
+                Tanggal : {formatDate(subActivity.tanggal_pelaksanaan)} {/* Format tanggal */}
+              </Typography>
+              <br />
+              <Typography variant="body2" color="textSecondary">
+                Deskripsi : {subActivity.deskripsi} {/* Format tanggal */}
               </Typography>
               <SubActivityActions>
                 <IconButton
                   onClick={(e) => {
                     e.stopPropagation();
-                    openModal("edit", subActivity.id, subActivity.name, subActivity.tanggal_pelaksanaan);
+                    openModal("edit", subActivity.id, subActivity.name, subActivity.tanggal_pelaksanaan, subActivity.deskripsi);
                   }}
                   sx={{
                     backgroundColor: "#ddd",
@@ -386,6 +393,14 @@ function SubKegiatan() {
             InputLabelProps={{
               shrink: true,
             }}
+          />
+          <InputField
+            label="Deskripsi"
+            variant="outlined"
+            value={deskripsi}
+            onChange={(e) => setDeskripsi(e.target.value)}
+            onKeyDown={handleKeyPress} // Handle "Enter" key press
+            required
           />
           <Button variant="contained" color="primary" onClick={modalType === "add" ? handleAddSubActivity : handleEditSubActivity} fullWidth>
             {modalType === "add" ? "Tambah Sub-Kegiatan" : "Update Sub-Kegiatan"}

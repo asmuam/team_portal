@@ -37,14 +37,18 @@ function TeamHierarchy({ teams, setTeams }) {
   const [modalType, setModalType] = useState(""); // Type of the modal ("add" or "edit")
   const [currentTeamId, setCurrentTeamId] = useState(null);
   const [newTeamName, setNewTeamName] = useState("");
+  const [newKetua, setNewKetua] = useState(""); // State for ketua
+  const [newDeskripsi, setNewDeskripsi] = useState(""); // State for deskripsi
   const navigate = useNavigate();
 
   const URL = process.env.REACT_APP_API_URL;
 
-  const openModal = (type, teamId = null, teamName = "") => {
+  const openModal = (type, teamId = null, teamName = "", ketua = "", deskripsi = "") => {
     setModalType(type);
     setCurrentTeamId(teamId);
     setNewTeamName(teamName);
+    setNewKetua(ketua);
+    setNewDeskripsi(deskripsi);
     setIsModalOpen(true);
   };
 
@@ -52,6 +56,8 @@ function TeamHierarchy({ teams, setTeams }) {
     setIsModalOpen(false);
     setCurrentTeamId(null);
     setNewTeamName("");
+    setNewKetua("");
+    setNewDeskripsi("");
   };
 
   const refetchTeams = async () => {
@@ -73,9 +79,13 @@ function TeamHierarchy({ teams, setTeams }) {
   };
 
   const handleAddTeam = async () => {
-    if (newTeamName) {
+    if (newTeamName && newKetua && newDeskripsi) {
       try {
-        await axios.post(`${URL}/teams`, { name: newTeamName });
+        await axios.post(`${URL}/teams`, {
+          name: newTeamName,
+          ketua: newKetua,
+          deskripsi: newDeskripsi,
+        });
         refetchTeams();
         closeModal();
       } catch (error) {
@@ -85,13 +95,17 @@ function TeamHierarchy({ teams, setTeams }) {
   };
 
   const handleEditTeam = async (id) => {
-    if (newTeamName) {
+    if (newTeamName && newKetua && newDeskripsi) {
       try {
-        await axios.patch(`${URL}/teams/${id}`, { name: newTeamName });
+        await axios.patch(`${URL}/teams/${id}`, {
+          name: newTeamName,
+          ketua: newKetua,
+          deskripsi: newDeskripsi,
+        });
         refetchTeams();
         closeModal();
       } catch (error) {
-        console.error("Error renaming team:", error);
+        console.error("Error editing team:", error);
       }
     }
   };
@@ -113,7 +127,6 @@ function TeamHierarchy({ teams, setTeams }) {
 
   const archiveTeam = async (e, id) => {
     e.stopPropagation(); // Prevent unwanted navigation
-    // alert(`Tim Kerja ${teams.find((team) => team.id === id).name} telah diarsipkan.`);
     alert("Fitur arsip belum tersedia"); // You can implement actual archiving logic here if needed
     refetchTeams();
   };
@@ -156,14 +169,15 @@ function TeamHierarchy({ teams, setTeams }) {
         {teams.map((team) => (
           <div className="team-container" key={team.id}>
             <div className="team-box" onClick={(e) => handleTeamClick(e, team.id)}>
-              <div className="team-name">{team.name} </div>
-              <div className="team-name">Ketua : Adib Sulthon </div>
-              <div className="team-name">Deskripsi : Mengelola Data </div>
+              <div className="team-name">{team.name}</div>
+              <div className="team-ketua">Ketua :{team.ketua}</div> {/* Display ketua */}
+              <br />
+              <div className="team-deskripsi">Deskripsi : {team.deskripsi}</div> {/* Display deskripsi */}
               <div className="team-actions">
                 <span
                   onClick={(e) => {
                     e.stopPropagation(); // Prevent unwanted navigation
-                    openModal("edit", team.id, team.name); // Open modal with team details
+                    openModal("edit", team.id, team.name, team.ketua, team.deskripsi); // Pass ketua and deskripsi to modal
                   }}
                 >
                   &#9998;
@@ -205,10 +219,28 @@ function TeamHierarchy({ teams, setTeams }) {
             onKeyDown={handleKeyPress} // Handle "Enter" key press
             required
           />
+          <InputField
+            label="Ketua"
+            variant="outlined"
+            value={newKetua}
+            onChange={(e) => setNewKetua(e.target.value)}
+            onKeyDown={handleKeyPress} // Handle "Enter" key press
+            required
+          />
+          <InputField
+            label="Deskripsi"
+            variant="outlined"
+            value={newDeskripsi}
+            onChange={(e) => setNewDeskripsi(e.target.value)}
+            onKeyDown={handleKeyPress} // Handle "Enter" key press
+            required
+            multiline
+            rows={4}
+          />
           <Button
             variant="contained"
             color="primary"
-            onClick={modalType === "add" ? handleAddTeam : () => handleEditTeam(currentTeamId)} // Pastikan ID tim yang benar dikirim ke fungsi
+            onClick={modalType === "add" ? handleAddTeam : () => handleEditTeam(currentTeamId)} // Ensure correct ID is passed
           >
             {modalType === "add" ? "Tambah" : "Simpan"}
           </Button>

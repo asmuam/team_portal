@@ -214,6 +214,7 @@ router.post("/teams", async (req, res) => {
     const team = await timkerjaService.createTimkerja(req.body);
     res.status(201).json(team);
   } catch (error) {
+    console.error(error); // Log the full error
     res.status(500).json({ error: error.message });
   }
 });
@@ -229,8 +230,7 @@ router.post("/teams", async (req, res) => {
 //   "leader_id": null
 // }
 
-
-router.patch('/teams/:id', async (req, res) => {
+router.patch("/teams/:id", async (req, res) => {
   try {
     const team = await timkerjaService.updateTimkerja(req.params.id, req.body);
     res.json(team);
@@ -294,10 +294,11 @@ router.get("/teams/:teamId/activities", async (req, res) => {
 // Add an Activity
 router.post("/teams/:teamId/activities", async (req, res) => {
   const { teamId } = req.params;
-  const { name, tanggal_pelaksanaan } = req.body;
+  const { name, tanggal_pelaksanaan, deskripsi } = req.body;
   try {
     const activity = await kegiatanService.createKegiatan({
       name,
+      deskripsi,
       tanggal_pelaksanaan: tanggal_pelaksanaan ? new Date(tanggal_pelaksanaan) : new Date(), // Inline default date
       timkerja_id: parseInt(teamId),
     });
@@ -326,15 +327,17 @@ router.post("/teams/:teamId/activities", async (req, res) => {
 //   "name": "pengolahan KSA"
 // }
 
-
 // Edit an Activity (with tanggal_pelaksanaan)
 router.patch("/teams/:teamId/activities/:activityId", async (req, res) => {
   const { activityId } = req.params;
-  const { name, tanggal_pelaksanaan } = req.body;
+  const { name, tanggal_pelaksanaan, deskripsi } = req.body;
   try {
-    const updatedFields = {}
-    if (name){
+    const updatedFields = {};
+    if (name) {
       updatedFields.name = name;
+    }
+    if (deskripsi) {
+      updatedFields.deskripsi = deskripsi;
     }
     if (tanggal_pelaksanaan) {
       updatedFields.tanggal_pelaksanaan = new Date(tanggal_pelaksanaan);
@@ -411,10 +414,11 @@ router.get("/teams/:teamId/activities/:activityId/sub-activities", async (req, r
 
 router.post("/teams/:teamId/activities/:activityId/sub-activities", async (req, res) => {
   const { activityId } = req.params;
-  const { name, tanggal_pelaksanaan } = req.body; // Tambahkan tanggal_pelaksanaan
+  const { name, tanggal_pelaksanaan, deskripsi } = req.body; // Tambahkan tanggal_pelaksanaan
   try {
     const subActivity = await subkegiatanService.createSubkegiatan({
       name,
+      deskripsi,
       tanggal_pelaksanaan: tanggal_pelaksanaan ? new Date(tanggal_pelaksanaan) : new Date(), // Inline default date
       kegiatan_id: parseInt(activityId),
     });
@@ -438,11 +442,14 @@ router.post("/teams/:teamId/activities/:activityId/sub-activities", async (req, 
 // edit a Sub-Activity
 router.patch("/teams/:teamId/activities/:activityId/sub-activities/:subActivityId", async (req, res) => {
   const { subActivityId } = req.params;
-  const { name, tanggal_pelaksanaan } = req.body; // Tambahkan tanggal_pelaksanaan
+  const { name, tanggal_pelaksanaan, deskripsi } = req.body; // Tambahkan tanggal_pelaksanaan
   try {
-    const updatedFields = {}
-    if (name){
+    const updatedFields = {};
+    if (name) {
       updatedFields.name = name;
+    }
+    if (deskripsi) {
+      updatedFields.deskripsi = deskripsi;
     }
     if (tanggal_pelaksanaan) {
       updatedFields.tanggal_pelaksanaan = new Date(tanggal_pelaksanaan);
@@ -473,7 +480,6 @@ router.patch("/teams/:teamId/activities/:activityId/sub-activities/:subActivityI
 //   "name": "sub-kegiatan 111"
 // }
 
-
 // Delete a Sub-Activity
 router.delete("/teams/:teamId/activities/:activityId/sub-activities/:subActivityId", async (req, res) => {
   const { subActivityId } = req.params;
@@ -493,7 +499,6 @@ router.delete("/teams/:teamId/activities/:activityId/sub-activities/:subActivity
 // }
 
 // archive subkeg soon
-
 
 // Get all tasks for a specific sub-activity
 router.get("/teams/:teamId/activities/:activityId/sub-activities/:subActivityId/tasks", async (req, res) => {
@@ -532,13 +537,14 @@ router.get("/teams/:teamId/activities/:activityId/sub-activities/:subActivityId/
 // Add a Task
 router.post("/teams/:teamId/activities/:activityId/sub-activities/:subActivityId/tasks", async (req, res) => {
   const { subActivityId } = req.params;
-  const { name, dueDate, dateCreated, link } = req.body;
+  const { name, dueDate, dateCreated, link, deskripsi } = req.body;
   try {
     const task = await tugasService.createTugas({
       name,
       dateCreated: dateCreated ? new Date(dateCreated) : new Date(),
       dueDate: new Date(dueDate),
       link,
+      deskripsi,
       subkegiatan_id: parseInt(subActivityId),
     });
     res.json(task);
@@ -568,12 +574,13 @@ router.post("/teams/:teamId/activities/:activityId/sub-activities/:subActivityId
 // update
 router.patch("/teams/:teamId/activities/:activityId/sub-activities/:subActivityId/tasks/:taskId", async (req, res) => {
   const { taskId } = req.params;
-  const { name, dueDate, link } = req.body; // Fields to update
+  const { name, dueDate, link, deskripsi } = req.body; // Fields to update
 
   try {
     // Prepare update data
     const updateData = {};
     if (name !== undefined) updateData.name = name;
+    if (deskripsi !== undefined) updateData.deskripsi = deskripsi;
     if (dueDate !== undefined) updateData.dueDate = new Date(dueDate); // Ensure correct date format
     if (link !== undefined) {
       updateData.link = link;
@@ -591,12 +598,10 @@ router.patch("/teams/:teamId/activities/:activityId/sub-activities/:subActivityI
 
     // Handle case where no valid fields are provided
     return res.status(400).json({ error: "No valid fields to update" });
-
   } catch (error) {
     return res.status(500).json({ error: error.message });
   }
 });
-
 
 // req {
 //   "name":"cek kesiapan device mitra"
@@ -626,7 +631,6 @@ router.patch("/teams/:teamId/activities/:activityId/sub-activities/:subActivityI
 //   "link": null,
 //   "completed": true
 // }
-
 
 // req {
 //   "newLink":"bps.go.id"

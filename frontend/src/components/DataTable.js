@@ -133,7 +133,7 @@ const DataTable = () => {
       //   Cell: ({ value }) => formatDate(value),
       // },
       {
-        Header: "Due Date",
+        Header: "Deadline",
         accessor: "dueDate",
         Cell: ({ value }) => formatDate(value),
       },

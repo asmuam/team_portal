@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import useAuth from "./hooks/use-auth.js";
 import { BrowserRouter as Router } from "react-router-dom";
-import { useTeams } from './context/TeamsContext';
+import { useTeams } from "./context/TeamsContext";
 import Header from "./components/common/Header";
 import Footer from "./components/common/Footer";
 import AppRouter from "./components/common/AppRoutes";
@@ -18,10 +18,14 @@ function App() {
     localStorage.setItem("authToken", result.accessToken);
     sessionStorage.setItem("uid", result.uid);
     sessionStorage.setItem("role", result.role);
+    sessionStorage.setItem("username", result.username); // Simpan username ke sessionStorage
+    sessionStorage.setItem("name", result.name); // Simpan username ke sessionStorage
     setAuth({
       uid: result.uid,
       role: result.role,
       token: result.accessToken,
+      username: result.username, // Set username ke state auth
+      name: result.name, // Set username ke state auth
     });
   };
 
@@ -37,22 +41,30 @@ function App() {
       localStorage.removeItem("authToken");
       sessionStorage.removeItem("uid");
       sessionStorage.removeItem("role");
+      sessionStorage.removeItem("username"); // Hapus username dari sessionStorage
+      sessionStorage.removeItem("name"); // Hapus username dari sessionStorage
       setAuth({});
     }
   };
 
   return (
-      <Router>
-        <Box display="flex" flexDirection="column" minHeight="100vh">
-          <Header isAuthenticated={isAuthenticated} handleLogout={handleLogout} />
-          <Box component="main" sx={{ flex: 1, py: 4 }}>
-            <Container maxWidth="xl">
-              <AppRouter isAuthenticated={isAuthenticated} teams={teams} setTeams={setTeams} handleLogin={handleLogin} />
-            </Container>
-          </Box>
-          <Footer />
+    <Router>
+      <Box display="flex" flexDirection="column" minHeight="100vh">
+        <Header
+          isAuthenticated={isAuthenticated}
+          handleLogout={handleLogout}
+          username={auth.username} // Kirim username ke Header sebagai prop
+          name={auth.name} // Kirim username ke Header sebagai prop
+          role={auth.role} // Kirim role ke Header sebagai prop
+        />
+        <Box component="main" sx={{ flex: 1, py: 4 }}>
+          <Container maxWidth="xl">
+            <AppRouter isAuthenticated={isAuthenticated} teams={teams} setTeams={setTeams} handleLogin={handleLogin} />
+          </Container>
         </Box>
-      </Router>
+        <Footer />
+      </Box>
+    </Router>
   );
 }
 

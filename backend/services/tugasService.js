@@ -19,6 +19,7 @@ export const updateTugas = async (id, data) => {
       ...data,
       dueDate: data.dueDate ? new Date(data.dueDate) : null,
       link: data.link, // Menggunakan data.link yang benar
+      deskripsi: data.deskripsi,
     },
   });
 };

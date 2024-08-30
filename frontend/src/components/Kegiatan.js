@@ -87,16 +87,18 @@ function Kegiatan() {
   const [modalType, setModalType] = useState(""); // Type of the modal ("add" or "edit")
   const [currentActivityId, setCurrentActivityId] = useState(null);
   const [newActivityName, setNewActivityName] = useState("");
+  const [newDeskripsi, setNewDeskripsi] = useState("");
   const [tanggalPelaksanaan, setTanggalPelaksanaan] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [activitiesPerPage] = useState(4); // Number of activities per page
   const navigate = useNavigate();
   const URL = process.env.REACT_APP_API_URL;
 
-  const openModal = (type, activityId = null, activityName = "", tanggal = "") => {
+  const openModal = (type, activityId = null, activityName = "", tanggal = "", deskripsi = "") => {
     setModalType(type);
     setCurrentActivityId(activityId);
     setNewActivityName(activityName);
+    setNewDeskripsi(deskripsi);
     setTanggalPelaksanaan(tanggal ? new Date(tanggal).toISOString().substr(0, 10) : ""); // Format to YYYY-MM-DD
     setIsModalOpen(true);
   };
@@ -106,6 +108,7 @@ function Kegiatan() {
     setCurrentActivityId(null);
     setNewActivityName("");
     setTanggalPelaksanaan("");
+    setNewDeskripsi("");
   };
 
   const refetchActivities = async () => {
@@ -134,7 +137,7 @@ function Kegiatan() {
   const handleAddActivity = async () => {
     if (newActivityName) {
       try {
-        await axios.post(`${URL}/teams/${teamId}/activities/`, { name: newActivityName, tanggal_pelaksanaan: tanggalPelaksanaan });
+        await axios.post(`${URL}/teams/${teamId}/activities/`, { name: newActivityName, tanggal_pelaksanaan: tanggalPelaksanaan, deskripsi: newDeskripsi });
         refetchActivities();
         closeModal();
       } catch (error) {
@@ -146,7 +149,7 @@ function Kegiatan() {
   const handleEditActivity = async () => {
     if (newActivityName) {
       try {
-        await axios.patch(`${URL}/teams/${teamId}/activities/${currentActivityId}`, { name: newActivityName, tanggal_pelaksanaan: tanggalPelaksanaan });
+        await axios.patch(`${URL}/teams/${teamId}/activities/${currentActivityId}`, { name: newActivityName, tanggal_pelaksanaan: tanggalPelaksanaan, deskripsi: newDeskripsi });
         refetchActivities();
         closeModal();
       } catch (error) {
@@ -260,13 +263,17 @@ function Kegiatan() {
           <ActivityBox key={activity.id} onClick={() => handleActivityClick(activity.id)} style={{ marginBottom: "20px;" }}>
             <ActivityName>{activity.name}</ActivityName>
             <Typography variant="body2" color="textSecondary">
-              {formatDate(activity.tanggal_pelaksanaan)} {/* Format tanggal */}
+              Tanggal : {formatDate(activity.tanggal_pelaksanaan)} {/* Format tanggal */}
+            </Typography>
+            <br />
+            <Typography variant="body2" color="textSecondary">
+              Deskripsi : {activity.deskripsi} {/* Format tanggal */}
             </Typography>
             <ActivityActions>
               <IconButton
                 onClick={(e) => {
                   e.stopPropagation();
-                  openModal("edit", activity.id, activity.name, activity.tanggal_pelaksanaan);
+                  openModal("edit", activity.id, activity.name, activity.tanggal_pelaksanaan, activity.deskripsi);
                 }}
                 sx={{
                   backgroundColor: "#ddd",
@@ -350,6 +357,7 @@ function Kegiatan() {
             onKeyDown={handleKeyPress} // Handle "Enter" key press
             required
           />
+
           <InputField
             label="Tanggal Pelaksanaan"
             type="date"
@@ -361,6 +369,14 @@ function Kegiatan() {
             InputLabelProps={{
               shrink: true,
             }}
+          />
+          <InputField
+            label="Deskripsi"
+            variant="outlined"
+            value={newDeskripsi}
+            onChange={(e) => setNewDeskripsi(e.target.value)}
+            onKeyDown={handleKeyPress} // Handle "Enter" key press
+            required
           />
           <Button variant="contained" color="primary" onClick={modalType === "add" ? handleAddActivity : handleEditActivity} fullWidth>
             {modalType === "add" ? "Tambah Kegiatan" : "Update Kegiatan"}

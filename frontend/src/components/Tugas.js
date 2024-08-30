@@ -85,6 +85,7 @@ function Tugas() {
   const [currentTaskId, setCurrentTaskId] = useState(null);
   const [taskName, setTaskName] = useState("");
   const [dueDate, setDueDate] = useState("");
+  const [deskripsi, setDeskripsi] = useState("");
   const [link, setLink] = useState("");
   const [teamName, setTeamName] = useState("");
   const [activityName, setActivityName] = useState("");
@@ -162,10 +163,11 @@ function Tugas() {
     refetchTasks();
   }, [teamId, activityId, subActivityId]);
 
-  const openModal = (type, taskId = null, name = "", date = "", link = "") => {
+  const openModal = (type, taskId = null, name = "", date = "", link = "", deskripsi = "") => {
     setModalType(type);
     setCurrentTaskId(taskId);
     setTaskName(name);
+    setDeskripsi(deskripsi);
     setDueDate(date ? new Date(date).toISOString().split("T")[0] : ""); // Converts to "YYYY-MM-DD"
     setLink(link || "");
     setIsModalOpen(true);
@@ -177,6 +179,7 @@ function Tugas() {
     setTaskName("");
     setDueDate("");
     setLink("");
+    setDeskripsi("");
   };
 
   const handleAddTask = async () => {
@@ -190,6 +193,7 @@ function Tugas() {
       dateCreated: new Date().toISOString().split("T")[0],
       dueDate: dueDate || "Tidak ada",
       link: link || "#",
+      deskripsi: deskripsi || "tidak ada",
       completed: false,
     };
 
@@ -213,6 +217,7 @@ function Tugas() {
       name: taskName,
       dueDate: dueDate, // Ensure this is correctly formatted as a string (e.g., "2024-08-27")
       link: link,
+      deskripsi: deskripsi,
     };
 
     try {
@@ -364,6 +369,7 @@ function Tugas() {
           <tr>
             <TableHeader>Task</TableHeader>
             <TableHeader>Due Date</TableHeader>
+            <TableHeader>Deskripsi</TableHeader>
             <TableHeader>Link</TableHeader>
             <TableHeader>Verified</TableHeader>
             <TableHeader>Actions</TableHeader>
@@ -375,6 +381,8 @@ function Tugas() {
               <tr key={task.id}>
                 <TableCell>{task.name}</TableCell>
                 <TableCell>{formatDate(task.dueDate)}</TableCell>
+                <TableCell>{task.deskripsi}</TableCell>
+
                 <TableCell
                   sx={{
                     display: "flex",
@@ -394,7 +402,7 @@ function Tugas() {
                   <ActionButton onClick={() => handleTaskCompletion(task.id)}>{task.completed ? <CheckCircleIcon color="success" /> : <CancelIcon color="error" />}</ActionButton>
                 </TableCell>
                 <TableCell>
-                  <ActionButton onClick={() => openModal("edit", task.id, task.name, task.dueDate, task.link)}>
+                  <ActionButton onClick={() => openModal("edit", task.id, task.name, task.dueDate, task.link, task.deskripsi)}>
                     <EditIcon />
                   </ActionButton>
                   <ActionButton onClick={() => deleteTask(task.id)}>
@@ -410,19 +418,19 @@ function Tugas() {
           )}
         </tbody>
       </TaskTable>
-      {tasks.length > tasksPerPage && (
-        <PaginationControls style={{ display: "flex", justifyContent: "flex-start" }}>
-          <Button disabled={currentPage === 1} onClick={() => setCurrentPage(currentPage - 1)} style={{ fontSize: "25px" }}>
-            &lt;
-          </Button>
-          <Typography style={{ marginTop: "15px" }}>
-            Page {currentPage} of {totalPages}
-          </Typography>
-          <Button disabled={currentPage === totalPages} onClick={() => setCurrentPage(currentPage + 1)} style={{ fontSize: "25px" }}>
-            &gt;
-          </Button>
-        </PaginationControls>
-      )}
+      {/* {tasks.length > tasksPerPage && ( */}
+      <PaginationControls style={{ display: "flex", justifyContent: "flex-start" }}>
+        <Button disabled={currentPage === 1} onClick={() => setCurrentPage(currentPage - 1)} style={{ fontSize: "25px" }}>
+          &lt;
+        </Button>
+        <Typography style={{ marginTop: "15px" }}>
+          Page {currentPage} of {totalPages}
+        </Typography>
+        <Button disabled={currentPage === totalPages} onClick={() => setCurrentPage(currentPage + 1)} style={{ fontSize: "25px" }}>
+          &gt;
+        </Button>
+      </PaginationControls>
+      {/* )} */}
       {/* Modal for Add/Edit Task */}
       <Modal open={isModalOpen} onClose={closeModal}>
         <ModalContent>
@@ -444,6 +452,8 @@ function Tugas() {
               shrink: true, // Ini memastikan label selalu berada di posisi atas
             }}
           />
+          <TextField label="Deskripsi" fullWidth value={deskripsi} onChange={(e) => setDeskripsi(e.target.value)} margin="normal" />
+
           <TextField label="Link" fullWidth value={link} onChange={(e) => setLink(e.target.value)} margin="normal" />
           <Box display="flex" justifyContent="flex-end" marginTop="16px">
             {modalType === "add" ? (
