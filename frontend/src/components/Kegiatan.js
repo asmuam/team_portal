@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import axios from "axios";
-import { Box, Button, Typography, IconButton, Modal, TextField } from "@mui/material";
+import { Box, Button, Typography, IconButton, Modal, TextField, CircularProgress } from "@mui/material";
 import { styled } from "@mui/system";
 import CloseIcon from "@mui/icons-material/Close";
 import "./Kegiatan.css";
@@ -89,8 +89,10 @@ function Kegiatan() {
   const [newActivityName, setNewActivityName] = useState("");
   const [newDeskripsi, setNewDeskripsi] = useState("");
   const [tanggalPelaksanaan, setTanggalPelaksanaan] = useState("");
+  const [loading, setLoading] = useState(false); // State for loading
+
   const [currentPage, setCurrentPage] = useState(1);
-  const [activitiesPerPage] = useState(4); // Number of activities per page
+  const tasksPerPage = 5;
   const navigate = useNavigate();
   const URL = process.env.REACT_APP_API_URL;
 
@@ -136,10 +138,15 @@ function Kegiatan() {
 
   const handleAddActivity = async () => {
     if (newActivityName) {
+      setLoading(true);
+
       try {
         await axios.post(`${URL}/teams/${teamId}/activities/`, { name: newActivityName, tanggal_pelaksanaan: tanggalPelaksanaan, deskripsi: newDeskripsi });
-        refetchActivities();
-        closeModal();
+        setTimeout(() => {
+          refetchActivities();
+          closeModal();
+          setLoading(false);
+        }, 2000);
       } catch (error) {
         console.error("Error adding activity:", error);
       }
@@ -150,10 +157,14 @@ function Kegiatan() {
     if (newActivityName) {
       try {
         await axios.patch(`${URL}/teams/${teamId}/activities/${currentActivityId}`, { name: newActivityName, tanggal_pelaksanaan: tanggalPelaksanaan, deskripsi: newDeskripsi });
+        setTimeout(() => {
+          setLoading(false);
+        }, 2000);
         refetchActivities();
         closeModal();
       } catch (error) {
         console.error("Error updating activity:", error);
+        setLoading(false);
       }
     }
   };
@@ -184,11 +195,17 @@ function Kegiatan() {
     return new Date(dateString).toLocaleDateString("id-ID", options);
   };
 
-  const indexOfLastActivity = currentPage * activitiesPerPage;
-  const indexOfFirstActivity = indexOfLastActivity - activitiesPerPage;
-  const currentActivities = activities.slice(indexOfFirstActivity, indexOfLastActivity);
+  // const indexOfLastActivity = currentPage * activitiesPerPage;
+  // const indexOfFirstActivity = indexOfLastActivity - activitiesPerPage;
+  // const currentActivities = activities.slice(indexOfFirstActivity, indexOfLastActivity);
 
-  const totalPages = Math.ceil(activities.length / activitiesPerPage);
+  // const totalPages = Math.ceil(activities.length / activitiesPerPage);
+
+  const indexOfLastTask = currentPage * tasksPerPage;
+  const indexOfFirstTask = indexOfLastTask - tasksPerPage;
+  const currentActivities = activities.slice(indexOfFirstTask, indexOfLastTask);
+
+  const totalPages = Math.ceil(activities.length / tasksPerPage);
 
   return (
     <div className="kegiatan">
@@ -322,18 +339,20 @@ function Kegiatan() {
           </ActivityBox>
         ))}
       </div>
+      {activities.length > tasksPerPage && (
+        <PaginationControls style={{ marginTop: "-35px" }}>
+          <Button onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))} disabled={currentPage === 1} style={{ fontSize: "25px" }}>
+            &lt;
+          </Button>
+          <Typography>
+            Page {currentPage} of {totalPages}
+          </Typography>
+          <Button onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))} disabled={currentPage === totalPages} style={{ fontSize: "25px" }}>
+            &gt;
+          </Button>
+        </PaginationControls>
+      )}
 
-      <PaginationControls style={{ marginTop: "-35px" }}>
-        <Button onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))} disabled={currentPage === 1} style={{ fontSize: "25px" }}>
-          &lt;
-        </Button>
-        <Typography>
-          Page {currentPage} of {totalPages}
-        </Typography>
-        <Button onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))} disabled={currentPage === totalPages} style={{ fontSize: "25px" }}>
-          &gt;
-        </Button>
-      </PaginationControls>
       <Modal open={isModalOpen} onClose={closeModal} aria-labelledby="activity-modal-title" aria-describedby="activity-modal-description">
         <ModalContent>
           <Header id="activity-modal-title" variant="h6">
@@ -378,8 +397,9 @@ function Kegiatan() {
             onKeyDown={handleKeyPress} // Handle "Enter" key press
             required
           />
-          <Button variant="contained" color="primary" onClick={modalType === "add" ? handleAddActivity : handleEditActivity} fullWidth>
+          <Button disabled={loading} variant="contained" color="primary" onClick={modalType === "add" ? handleAddActivity : handleEditActivity} fullWidth>
             {modalType === "add" ? "Tambah Kegiatan" : "Update Kegiatan"}
+            {loading ? <CircularProgress size={24} color="inherit" /> : modalType === "" ? "" : ""}
           </Button>
         </ModalContent>
       </Modal>

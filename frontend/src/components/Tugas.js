@@ -418,19 +418,19 @@ function Tugas() {
           )}
         </tbody>
       </TaskTable>
-      {/* {tasks.length > tasksPerPage && ( */}
-      <PaginationControls style={{ display: "flex", justifyContent: "flex-start" }}>
-        <Button disabled={currentPage === 1} onClick={() => setCurrentPage(currentPage - 1)} style={{ fontSize: "25px" }}>
-          &lt;
-        </Button>
-        <Typography style={{ marginTop: "15px" }}>
-          Page {currentPage} of {totalPages}
-        </Typography>
-        <Button disabled={currentPage === totalPages} onClick={() => setCurrentPage(currentPage + 1)} style={{ fontSize: "25px" }}>
-          &gt;
-        </Button>
-      </PaginationControls>
-      {/* )} */}
+      {tasks.length > tasksPerPage && (
+        <PaginationControls style={{ display: "flex", justifyContent: "flex-start" }}>
+          <Button disabled={currentPage === 1} onClick={() => setCurrentPage(currentPage - 1)} style={{ fontSize: "25px" }}>
+            &lt;
+          </Button>
+          <Typography style={{ marginTop: "15px" }}>
+            Page {currentPage} of {totalPages}
+          </Typography>
+          <Button disabled={currentPage === totalPages} onClick={() => setCurrentPage(currentPage + 1)} style={{ fontSize: "25px" }}>
+            &gt;
+          </Button>
+        </PaginationControls>
+      )}
       {/* Modal for Add/Edit Task */}
       <Modal open={isModalOpen} onClose={closeModal}>
         <ModalContent>

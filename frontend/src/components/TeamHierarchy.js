@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import { Modal, Box, Button, TextField, Typography, IconButton, Select, MenuItem, InputLabel, FormControl } from "@mui/material";
+import { Modal, Box, Button, TextField, Typography, IconButton, Select, MenuItem, InputLabel, FormControl, CircularProgress } from "@mui/material";
 import { styled } from "@mui/system";
 import CloseIcon from "@mui/icons-material/Close";
 import "./TeamHierarchy.css";
@@ -45,6 +45,7 @@ function TeamHierarchy({ teams, setTeams }) {
   const [newDeskripsi, setNewDeskripsi] = useState(""); // State for deskripsi
   const [users, setUsers] = useState([]); // State for users
   const [selectedKetua, setSelectedKetua] = useState(""); // State for selected ketua ID
+  const [loading, setLoading] = useState(false); // State for loading
   const navigate = useNavigate();
 
   const URL = process.env.REACT_APP_API_URL;
@@ -99,48 +100,65 @@ function TeamHierarchy({ teams, setTeams }) {
 
   const handleAddTeam = async () => {
     if (newTeamName && selectedKetua && newDeskripsi) {
+      setLoading(true);
       try {
         await axios.post(`${URL}/teams`, {
           name: newTeamName,
           leader_id: selectedKetua, // Use selected ketua ID
           deskripsi: newDeskripsi,
         });
-        refetchTeams();
-        closeModal();
+
+        // Simulasikan durasi loading (misalnya 2 detik)
+        setTimeout(() => {
+          refetchTeams();
+          closeModal();
+          setLoading(false);
+        }, 2000); // 2000ms = 2 detik
       } catch (error) {
         console.error("Error adding team:", error);
+        setLoading(false);
       }
     }
   };
 
   const handleEditTeam = async (id) => {
     if (newTeamName && selectedKetua && newDeskripsi) {
+      setLoading(true);
       try {
         await axios.patch(`${URL}/teams/${id}`, {
           name: newTeamName,
           leader_id: selectedKetua, // Use selected ketua ID
           deskripsi: newDeskripsi,
         });
-        refetchTeams();
-        closeModal();
+
+        // Simulasikan durasi loading (misalnya 2 detik)
+        setTimeout(() => {
+          refetchTeams();
+          closeModal();
+          setLoading(false);
+        }, 2000); // 2000ms = 2 detik
       } catch (error) {
         console.error("Error editing team:", error);
+        setLoading(false);
       }
+    }
+  };
+
+  const deleteTeam = async (id) => {
+    setLoading(true);
+    try {
+      await axios.delete(`${URL}/teams/${id}`);
+      refetchTeams();
+    } catch (error) {
+      console.error("Error deleting team:", error);
+    } finally {
+      setLoading(false);
     }
   };
 
   const handleKeyPress = (e) => {
     if (e.key === "Enter") {
       modalType === "add" ? handleAddTeam() : handleEditTeam(currentTeamId);
-    }
-  };
-
-  const deleteTeam = async (id) => {
-    try {
-      await axios.delete(`${URL}/teams/${id}`);
-      refetchTeams();
-    } catch (error) {
-      console.error("Error deleting team:", error);
     }
   };
 
@@ -268,8 +286,9 @@ function TeamHierarchy({ teams, setTeams }) {
             variant="contained"
             color="primary"
             onClick={modalType === "add" ? handleAddTeam : () => handleEditTeam(currentTeamId)} // Ensure correct ID is passed
+            disabled={loading} // Disable button when loading
           >
-            {modalType === "add" ? "Tambah" : "Simpan"}
+            {loading ? <CircularProgress size={24} color="inherit" /> : modalType === "add" ? "Tambah" : "Simpan"}
           </Button>
         </ModalContent>
       </Modal>

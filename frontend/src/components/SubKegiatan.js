@@ -82,10 +82,10 @@ function SubKegiatan() {
   const [modalType, setModalType] = useState(""); // Type of the modal ("add" or "edit")
   const [currentSubActivityId, setCurrentSubActivityId] = useState(null);
   const [subActivityName, setSubActivityName] = useState("");
+  const tasksPerPage = 5;
   const [deskripsi, setDeskripsi] = useState("");
   const [tanggalPelaksanaan, setTanggalPelaksanaan] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const [activitiesPerPage] = useState(4);
 
   const URL = process.env.REACT_APP_API_URL;
   const navigate = useNavigate();
@@ -205,11 +205,11 @@ function SubKegiatan() {
     return new Date(dateString).toLocaleDateString("id-ID", options);
   };
 
-  const indexOfLastActivity = currentPage * activitiesPerPage;
-  const indexOfFirstActivity = indexOfLastActivity - activitiesPerPage;
+  const indexOfLastActivity = currentPage * tasksPerPage;
+  const indexOfFirstActivity = indexOfLastActivity - tasksPerPage;
   const currentActivities = subActivities.slice(indexOfFirstActivity, indexOfLastActivity);
 
-  const totalPages = Math.ceil(subActivities.length / activitiesPerPage);
+  const totalPages = Math.ceil(subActivities.length / tasksPerPage);
 
   return (
     <div className="sub-activity-container">
@@ -348,17 +348,19 @@ function SubKegiatan() {
           </div>
         ))}
       </div>
-      <PaginationControls style={{ display: "flex", justifyContent: "flex-start" }}>
-        <Button onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))} disabled={currentPage === 1} style={{ fontSize: "25px" }}>
-          &lt;
-        </Button>
-        <Typography>
-          Page {currentPage} of {totalPages}
-        </Typography>
-        <Button onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))} disabled={currentPage === totalPages} style={{ fontSize: "25px" }}>
-          &gt;
-        </Button>
-      </PaginationControls>
+      {subActivities.length > tasksPerPage && (
+        <PaginationControls style={{ display: "flex", justifyContent: "flex-start" }}>
+          <Button onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))} disabled={currentPage === 1} style={{ fontSize: "25px" }}>
+            &lt;
+          </Button>
+          <Typography>
+            Page {currentPage} of {totalPages}
+          </Typography>
+          <Button onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))} disabled={currentPage === totalPages} style={{ fontSize: "25px" }}>
+            &gt;
+          </Button>
+        </PaginationControls>
+      )}
       <Modal open={isModalOpen} onClose={closeModal}>
         <ModalContent>
           <Header>
