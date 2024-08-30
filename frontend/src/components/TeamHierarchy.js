@@ -1,7 +1,7 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import { Modal, Box, Button, TextField, Typography, IconButton } from "@mui/material";
+import { Modal, Box, Button, TextField, Typography, IconButton, Select, MenuItem, InputLabel, FormControl } from "@mui/material";
 import { styled } from "@mui/system";
 import CloseIcon from "@mui/icons-material/Close";
 import "./TeamHierarchy.css";
@@ -32,22 +32,41 @@ const InputField = styled(TextField)({
   marginBottom: "16px",
 });
 
+const FormControlStyled = styled(FormControl)({
+  width: "100%",
+  marginBottom: "16px",
+});
+
 function TeamHierarchy({ teams, setTeams }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalType, setModalType] = useState(""); // Type of the modal ("add" or "edit")
   const [currentTeamId, setCurrentTeamId] = useState(null);
   const [newTeamName, setNewTeamName] = useState("");
-  const [newKetua, setNewKetua] = useState(""); // State for ketua
   const [newDeskripsi, setNewDeskripsi] = useState(""); // State for deskripsi
+  const [users, setUsers] = useState([]); // State for users
+  const [selectedKetua, setSelectedKetua] = useState(""); // State for selected ketua ID
   const navigate = useNavigate();
 
   const URL = process.env.REACT_APP_API_URL;
+
+  // Fetch users on component mount
+  useEffect(() => {
+    const fetchUsers = async () => {
+      try {
+        const response = await axios.get(`${URL}/users/pegawai`);
+        setUsers(response.data);
+      } catch (error) {
+        console.error("Failed to fetch users:", error);
+      }
+    };
+    fetchUsers();
+  }, [URL]);
 
   const openModal = (type, teamId = null, teamName = "", ketua = "", deskripsi = "") => {
     setModalType(type);
     setCurrentTeamId(teamId);
     setNewTeamName(teamName);
-    setNewKetua(ketua);
+    setSelectedKetua(ketua); // Set selected ketua
     setNewDeskripsi(deskripsi);
     setIsModalOpen(true);
   };
@@ -56,7 +75,7 @@ function TeamHierarchy({ teams, setTeams }) {
     setIsModalOpen(false);
     setCurrentTeamId(null);
     setNewTeamName("");
-    setNewKetua("");
+    setSelectedKetua(""); // Clear selected ketua
     setNewDeskripsi("");
   };
 
@@ -79,11 +98,11 @@ function TeamHierarchy({ teams, setTeams }) {
   };
 
   const handleAddTeam = async () => {
-    if (newTeamName && newKetua && newDeskripsi) {
+    if (newTeamName && selectedKetua && newDeskripsi) {
       try {
         await axios.post(`${URL}/teams`, {
           name: newTeamName,
-          ketua: newKetua,
+          leader_id: selectedKetua, // Use selected ketua ID
           deskripsi: newDeskripsi,
         });
         refetchTeams();
@@ -95,11 +114,11 @@ function TeamHierarchy({ teams, setTeams }) {
   };
 
   const handleEditTeam = async (id) => {
-    if (newTeamName && newKetua && newDeskripsi) {
+    if (newTeamName && selectedKetua && newDeskripsi) {
       try {
         await axios.patch(`${URL}/teams/${id}`, {
           name: newTeamName,
-          ketua: newKetua,
+          leader_id: selectedKetua, // Use selected ketua ID
           deskripsi: newDeskripsi,
         });
         refetchTeams();
@@ -170,7 +189,7 @@ function TeamHierarchy({ teams, setTeams }) {
           <div className="team-container" key={team.id}>
             <div className="team-box" onClick={(e) => handleTeamClick(e, team.id)}>
               <div className="team-name">{team.name}</div>
-              <div className="team-ketua">Ketua :{team.ketua}</div> {/* Display ketua */}
+              <div className="team-ketua">Ketua :{team.leader.name}</div> {/* Display ketua */}
               <br />
               <div className="team-deskripsi">Deskripsi : {team.deskripsi}</div> {/* Display deskripsi */}
               <div className="team-actions">
@@ -219,14 +238,22 @@ function TeamHierarchy({ teams, setTeams }) {
             onKeyDown={handleKeyPress} // Handle "Enter" key press
             required
           />
-          <InputField
-            label="Ketua"
-            variant="outlined"
-            value={newKetua}
-            onChange={(e) => setNewKetua(e.target.value)}
-            onKeyDown={handleKeyPress} // Handle "Enter" key press
-            required
-          />
+          <FormControlStyled variant="outlined">
+            <InputLabel id="ketua-select-label">Ketua</InputLabel>
+            <Select
+              labelId="ketua-select-label"
+              value={selectedKetua}
+              onChange={(e) => setSelectedKetua(e.target.value)}
+              onKeyDown={handleKeyPress} // Handle "Enter" key press
+              label="Ketua" // Ensure the label matches the InputLabel
+            >
+              {users.map((user) => (
+                <MenuItem key={user.id} value={user.id}>
+                  {user.name}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControlStyled>
           <InputField
             label="Deskripsi"
             variant="outlined"

@@ -176,7 +176,11 @@ router.get("/teams", async (req, res) => {
 //       "id": 1,
 //       "name": "IPDS",
 //       "links": [],
-//       "leader_id": null
+//       "leader_id": 2,
+//       "leader": {
+//             "id": 2,
+//             "name": "Himawan Wahid Ikhwansyah"
+//                }
 //   },
 //   {
 //       "id": 3,
@@ -198,13 +202,21 @@ router.get("/teams", async (req, res) => {
 //               "description": "akses dengan vpn web zi byl bps"
 //           }
 //       ],
-//       "leader_id": null
+//       "leader_id": 2,
+//       "leader": {
+//             "id": 2,
+//             "name": "Himawan Wahid Ikhwansyah"
+//                }
 //   },
 //   {
 //       "id": 5,
 //       "name": "tim kerja 88",
 //       "links": null,
-//       "leader_id": null
+//       "leader_id": 2,
+//       "leader": {
+//             "id": 2,
+//             "name": "Himawan Wahid Ikhwansyah"
+//                }
 //   }
 // ]
 
@@ -692,5 +704,40 @@ router.patch("/teams/:teamId/activities/:activityId/sub-activities/:subActivityI
 // }
 
 // archive tugas soon
+
+// Get all pegawai incl admins
+router.get("/users/pegawai", async (req, res) => {
+  try {
+    const pegawai = await prisma.user.findMany({
+      where: {
+        role: {
+          in: ["pegawai", "admin"], // Use 'in' to specify multiple roles
+        },
+      },
+    });
+    res.json(pegawai);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// resp [ belum di dokumentasikan
+//   {
+//       "id": 1,
+//       "username": "adib",
+//       "name": "Adib Sulthon Asmuamal",
+//       "password": "$2a$12$d8xzHE5UOU8QgM4BE5G.YeOGDyXyu7mDeYxOvt620CQkuRHC4iugK",
+//       "role": "pegawai",
+//       "refresh_token": null
+//   },
+//   {
+//       "id": 2,
+//       "username": "hima",
+//       "name": "Himawan Wahid Ikhwansyah",
+//       "password": "$2a$12$d8xzHE5UOU8QgM4BE5G.YeOGDyXyu7mDeYxOvt620CQkuRHC4iugK",
+//       "role": "pegawai",
+//       "refresh_token": null
+//   }
+// ]
 
 export default router;

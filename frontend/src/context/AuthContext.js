@@ -18,6 +18,8 @@ export const AuthProvider = ({ children }) => {
   const [auth, setAuth] = useState({
     uid: sessionStorage.getItem("uid"),
     role: sessionStorage.getItem("role"),
+    name: sessionStorage.getItem("name"),
+    username: sessionStorage.getItem("username"),
     token: localStorage.getItem("authToken"),
   });
   const [loading, setLoading] = useState(true);
@@ -26,9 +28,11 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     const uid = sessionStorage.getItem("uid");
     const role = sessionStorage.getItem("role");
+    const name = sessionStorage.getItem("name");
+    const username = sessionStorage.getItem("username");
     const token = localStorage.getItem("authToken");
     
-    setAuth({ uid, role, token });
+    setAuth({ uid, role, token, name, username });
     setLoading(false);
   }, []);
 

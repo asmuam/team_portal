@@ -25,14 +25,13 @@ model User {
   name     String    @unique
   password String
   role     Role?  
-  refresh_token String?
+  refresh_token  String? @db.VarChar(255) // Adjust length as needed
   Timkerja Timkerja?
 }
 
 model Timkerja {
   id        Int        @id @default(autoincrement())
   name      String
-  ketua     String    // Now make required
   links     Json?
   deskripsi String    // Now make required
   leader    User?      @relation(fields: [leader_id], references: [id], onDelete: SetNull)

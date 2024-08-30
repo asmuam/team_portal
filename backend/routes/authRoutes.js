@@ -77,6 +77,8 @@ router.post("/login", async (req, res) => {
 //   "uid": 1,
 //   "accessToken": "accessToken",
 //   "role": "role"
+//   "name": "name"
+//   "username": "username"
 // }
 // {
 //   "success": false,

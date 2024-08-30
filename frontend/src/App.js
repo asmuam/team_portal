@@ -54,7 +54,7 @@ function App() {
           isAuthenticated={isAuthenticated}
           handleLogout={handleLogout}
           username={auth.username} // Kirim username ke Header sebagai prop
-          name={auth.name} // Kirim username ke Header sebagai prop
+          name={auth.name} // Kirim nama ke Header sebagai prop
           role={auth.role} // Kirim role ke Header sebagai prop
         />
         <Box component="main" sx={{ flex: 1, py: 4 }}>

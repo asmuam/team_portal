@@ -1,8 +1,16 @@
 import prisma from "../prisma/config.js"; // Sesuaikan dengan path dan format ESM
 
 export const getAllTimkerja = async () => {
-  return prisma.timkerja.findMany();
-};
+  return prisma.timkerja.findMany({
+    include: {
+      leader: {
+        select: {
+          id: true,
+          name: true,
+        },
+      },
+    },
+  });};
 
 export const getTimkerjaById = async (id) => {
   return prisma.timkerja.findUnique({
@@ -14,7 +22,7 @@ export const createTimkerja = async (data) => {
   return prisma.timkerja.create({
     data: {
       name: data.name, // Save the team name
-      ketua: data.ketua, // Save the ketua (leader)
+      leader_id: data.leader_id, // Save the ketua (leader_id)
       deskripsi: data.deskripsi, // Save the deskripsi (description)
       links: data.links || [], //
     },
