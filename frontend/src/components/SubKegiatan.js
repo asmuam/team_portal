@@ -8,6 +8,7 @@ import { styled } from "@mui/system";
 import CloseIcon from "@mui/icons-material/Close";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import ExploreBreadcrumb from "./common/ExploreBreadcrumb";
+import AddButton from "./common/AddButton";
 import { AddToDrive } from "@mui/icons-material";
 import { useDriveLink } from "../context/DriveContext";
 
@@ -84,6 +85,7 @@ function SubKegiatan() {
   const [modalType, setModalType] = useState(""); // Type of the modal ("add" or "edit")
   const [currentSubActivityId, setCurrentSubActivityId] = useState(null);
   const [subActivityName, setSubActivityName] = useState("");
+  const tasksPerPage = 5;
   const [deskripsi, setDeskripsi] = useState("");
   const [tanggalPelaksanaan, setTanggalPelaksanaan] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
@@ -209,8 +211,8 @@ function SubKegiatan() {
     return new Date(dateString).toLocaleDateString("id-ID", options);
   };
 
-  const indexOfLastActivity = currentPage * activitiesPerPage;
-  const indexOfFirstActivity = indexOfLastActivity - activitiesPerPage;
+  const indexOfLastActivity = currentPage * tasksPerPage;
+  const indexOfFirstActivity = indexOfLastActivity - tasksPerPage;
   const currentActivities = subActivities.slice(indexOfFirstActivity, indexOfLastActivity);
 
   const totalPages = Math.ceil(subActivities.length / activitiesPerPage);
@@ -251,70 +253,7 @@ function SubKegiatan() {
         >
           Back
         </Button>
-        <Button
-          variant="contained"
-          color="primary"
-          onClick={() => openModal("add")}
-          sx={{
-            borderRadius: "6px",
-            fontSize: "16px",
-            fontWeight: 600,
-            padding: "10px 20px",
-            textTransform: "none",
-            boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
-            transition: "all 0.3s ease",
-            backgroundColor: "#007bff", // Set a primary color for consistency
-            color: "#ffffff", // Ensure text color is visible on the background
-            "&:hover": {
-              backgroundColor: "#0056b3",
-              boxShadow: "0 6px 10px rgba(0, 0, 0, 0.15)",
-            },
-            "&:active": {
-              backgroundColor: "#004494",
-              transform: "scale(0.98)",
-            },
-            "&:focus": {
-              outline: "none",
-              boxShadow: "0 0 0 3px rgba(38, 143, 255, 0.5)",
-            },
-            marginRight: "10px", // Add margin to the right for spacing
-          }}
-        >
-          Tambah Sub-Kegiatan
-        </Button>
-        <Button
-          variant="contained"
-          color="primary"
-          href={driveFolderUrl}
-          target="_blank" // Opens the link in a new tab
-          rel="noopener noreferrer" // Security best practice
-          sx={{
-            borderRadius: "6px",
-            fontSize: "16px",
-            fontWeight: 600,
-            padding: "10px 20px",
-            textTransform: "none",
-            boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
-            transition: "all 0.3s ease",
-            backgroundColor: "#007bff", // Set a primary color for consistency
-            color: "#ffffff", // Ensure text color is visible on the background
-            "&:hover": {
-              backgroundColor: "#0056b3",
-              boxShadow: "0 6px 10px rgba(0, 0, 0, 0.15)",
-            },
-            "&:active": {
-              backgroundColor: "#004494",
-              transform: "scale(0.98)",
-            },
-            "&:focus": {
-              outline: "none",
-              boxShadow: "0 0 0 3px rgba(38, 143, 255, 0.5)",
-            },
-          }}
-          startIcon={<AddToDrive />} // Add the icon here
-        >
-          Lihat Drive Kegiatan
-        </Button>
+        <AddButton onClick={() => openModal("add")} text="Tambah Sub Kegiatan" />
       </div>
       <div className="sub-activity-list">
         {currentActivities.map((subActivity) => (
@@ -383,17 +322,19 @@ function SubKegiatan() {
           </div>
         ))}
       </div>
-      <PaginationControls style={{ display: "flex", justifyContent: "flex-start" }}>
-        <Button onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))} disabled={currentPage === 1} style={{ fontSize: "25px" }}>
-          &lt;
-        </Button>
-        <Typography>
-          Page {currentPage} of {totalPages}
-        </Typography>
-        <Button onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))} disabled={currentPage === totalPages} style={{ fontSize: "25px" }}>
-          &gt;
-        </Button>
-      </PaginationControls>
+      {subActivities.length > tasksPerPage && (
+        <PaginationControls style={{ display: "flex", justifyContent: "flex-start" }}>
+          <Button onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))} disabled={currentPage === 1} style={{ fontSize: "25px" }}>
+            &lt;
+          </Button>
+          <Typography>
+            Page {currentPage} of {totalPages}
+          </Typography>
+          <Button onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))} disabled={currentPage === totalPages} style={{ fontSize: "25px" }}>
+            &gt;
+          </Button>
+        </PaginationControls>
+      )}
       <Modal open={isModalOpen} onClose={closeModal}>
         <ModalContent>
           <Header>

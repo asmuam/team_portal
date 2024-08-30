@@ -14,6 +14,7 @@ import { styled } from "@mui/system";
 import CircularProgress from "@mui/material/CircularProgress";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import ExploreBreadcrumb from "./common/ExploreBreadcrumb";
+import AddButton from "./common/AddButton";
 import { AddToDrive } from "@mui/icons-material";
 import { useDriveLink } from "../context/DriveContext";
 
@@ -335,69 +336,7 @@ function Tugas() {
       >
         Back
       </Button>
-      <Button
-        variant="contained"
-        color="primary"
-        onClick={() => openModal("add")}
-        startIcon={<AddIcon />}
-        sx={{
-          borderRadius: "6px",
-          fontSize: "16px",
-          fontWeight: 600,
-          padding: "10px 20px",
-          textTransform: "none",
-          boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
-          transition: "all 0.3s ease",
-          "&:hover": {
-            backgroundColor: "#0056b3",
-            boxShadow: "0 6px 10px rgba(0, 0, 0, 0.15)",
-          },
-          "&:active": {
-            backgroundColor: "#004494",
-            transform: "scale(0.98)",
-          },
-          "&:focus": {
-            outline: "none",
-            boxShadow: "0 0 0 3px rgba(38, 143, 255, 0.5)",
-          },
-          marginRight: "10px", // Add margin to the right for spacing
-        }}
-      >
-        Tambah Tugas Baru
-      </Button>
-      <Button
-          variant="contained"
-          color="primary"
-          href={driveFolderUrl}
-          target="_blank" // Opens the link in a new tab
-          rel="noopener noreferrer" // Security best practice
-          sx={{
-            borderRadius: "6px",
-            fontSize: "16px",
-            fontWeight: 600,
-            padding: "10px 20px",
-            textTransform: "none",
-            boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
-            transition: "all 0.3s ease",
-            backgroundColor: "#007bff", // Set a primary color for consistency
-            color: "#ffffff", // Ensure text color is visible on the background
-            "&:hover": {
-              backgroundColor: "#0056b3",
-              boxShadow: "0 6px 10px rgba(0, 0, 0, 0.15)",
-            },
-            "&:active": {
-              backgroundColor: "#004494",
-              transform: "scale(0.98)",
-            },
-            "&:focus": {
-              outline: "none",
-              boxShadow: "0 0 0 3px rgba(38, 143, 255, 0.5)",
-            },
-          }}
-          startIcon={<AddToDrive />} // Add the icon here
-        >
-          Lihat Drive Sub-Kegiatan
-        </Button>
+      <AddButton onClick={() => openModal("add")} text="Tambah Tugas Baru" />
       <ProgressWrapper>
         <CircularProgress variant="determinate" value={progress} />
         <ProgressText>{Math.round(progress)}% Completed</ProgressText>
@@ -456,19 +395,19 @@ function Tugas() {
           )}
         </tbody>
       </TaskTable>
-      {/* {tasks.length > tasksPerPage && ( */}
-      <PaginationControls style={{ display: "flex", justifyContent: "flex-start" }}>
-        <Button disabled={currentPage === 1} onClick={() => setCurrentPage(currentPage - 1)} style={{ fontSize: "25px" }}>
-          &lt;
-        </Button>
-        <Typography style={{ marginTop: "15px" }}>
-          Page {currentPage} of {totalPages}
-        </Typography>
-        <Button disabled={currentPage === totalPages} onClick={() => setCurrentPage(currentPage + 1)} style={{ fontSize: "25px" }}>
-          &gt;
-        </Button>
-      </PaginationControls>
-      {/* )} */}
+      {tasks.length > tasksPerPage && (
+        <PaginationControls style={{ display: "flex", justifyContent: "flex-start" }}>
+          <Button disabled={currentPage === 1} onClick={() => setCurrentPage(currentPage - 1)} style={{ fontSize: "25px" }}>
+            &lt;
+          </Button>
+          <Typography style={{ marginTop: "15px" }}>
+            Page {currentPage} of {totalPages}
+          </Typography>
+          <Button disabled={currentPage === totalPages} onClick={() => setCurrentPage(currentPage + 1)} style={{ fontSize: "25px" }}>
+            &gt;
+          </Button>
+        </PaginationControls>
+      )}
       {/* Modal for Add/Edit Task */}
       <Modal open={isModalOpen} onClose={closeModal}>
         <ModalContent>

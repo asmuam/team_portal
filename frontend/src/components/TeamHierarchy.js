@@ -1,13 +1,14 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import { Modal, Box, Button, TextField, Typography, IconButton, Select, MenuItem, InputLabel, FormControl } from "@mui/material";
+import { Modal, Box, Button, TextField, Typography, IconButton, Select, MenuItem, InputLabel, FormControl, CircularProgress } from "@mui/material";
 import { styled } from "@mui/system";
 import CloseIcon from "@mui/icons-material/Close";
 import "./TeamHierarchy.css";
 import AddIcon from "@mui/icons-material/Add";
 import Breadcrumbs from "@mui/material/Breadcrumbs";
 import ExploreBreadcrumb from "./common/ExploreBreadcrumb";
+import AddButton from "./common/AddButton";
 import { AddToDrive } from '@mui/icons-material'; // Import the Google Drive icon
 import { useDriveLink } from "../context/DriveContext";
 
@@ -47,6 +48,7 @@ function TeamHierarchy({ teams, setTeams }) {
   const [newDeskripsi, setNewDeskripsi] = useState(""); // State for deskripsi
   const [users, setUsers] = useState([]); // State for users
   const [selectedKetua, setSelectedKetua] = useState(""); // State for selected ketua ID
+  const [loading, setLoading] = useState(false); // State for loading
   const navigate = useNavigate();
   const { setLinkDrive } = useDriveLink(); // Access the context setter
 
@@ -103,48 +105,65 @@ function TeamHierarchy({ teams, setTeams }) {
 
   const handleAddTeam = async () => {
     if (newTeamName && selectedKetua && newDeskripsi) {
+      setLoading(true);
       try {
         await axios.post(`${URL}/teams`, {
           name: newTeamName,
           leader_id: selectedKetua, // Use selected ketua ID
           deskripsi: newDeskripsi,
         });
-        refetchTeams();
-        closeModal();
+
+        // Simulasikan durasi loading (misalnya 2 detik)
+        setTimeout(() => {
+          refetchTeams();
+          closeModal();
+          setLoading(false);
+        }, 2000); // 2000ms = 2 detik
       } catch (error) {
         console.error("Error adding team:", error);
+        setLoading(false);
       }
     }
   };
 
   const handleEditTeam = async (id) => {
     if (newTeamName && selectedKetua && newDeskripsi) {
+      setLoading(true);
       try {
         await axios.patch(`${URL}/teams/${id}`, {
           name: newTeamName,
           leader_id: selectedKetua, // Use selected ketua ID
           deskripsi: newDeskripsi,
         });
-        refetchTeams();
-        closeModal();
+
+        // Simulasikan durasi loading (misalnya 2 detik)
+        setTimeout(() => {
+          refetchTeams();
+          closeModal();
+          setLoading(false);
+        }, 2000); // 2000ms = 2 detik
       } catch (error) {
         console.error("Error editing team:", error);
+        setLoading(false);
       }
+    }
+  };
+
+  const deleteTeam = async (id) => {
+    setLoading(true);
+    try {
+      await axios.delete(`${URL}/teams/${id}`);
+      refetchTeams();
+    } catch (error) {
+      console.error("Error deleting team:", error);
+    } finally {
+      setLoading(false);
     }
   };
 
   const handleKeyPress = (e) => {
     if (e.key === "Enter") {
       modalType === "add" ? handleAddTeam() : handleEditTeam(currentTeamId);
-    }
-  };
-
-  const deleteTeam = async (id) => {
-    try {
-      await axios.delete(`${URL}/teams/${id}`);
-      refetchTeams();
-    } catch (error) {
-      console.error("Error deleting team:", error);
     }
   };
 
@@ -160,71 +179,7 @@ function TeamHierarchy({ teams, setTeams }) {
     <div className="team-hierarchy">
       <div className="header">
         <ExploreBreadcrumb />
-        <Button
-          variant="contained"
-          color="primary"
-          onClick={() => openModal("add")}
-          startIcon={<AddIcon />}
-          sx={{
-            borderRadius: "6px",
-            fontSize: "16px",
-            fontWeight: 600,
-            padding: "10px 20px",
-            textTransform: "none",
-            boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
-            transition: "all 0.3s ease",
-            backgroundColor: "#007bff", // Set a primary color for consistency
-            color: "#ffffff", // Ensure text color is visible on the background
-            "&:hover": {
-              backgroundColor: "#0056b3",
-              boxShadow: "0 6px 10px rgba(0, 0, 0, 0.15)",
-            },
-            "&:active": {
-              backgroundColor: "#004494",
-              transform: "scale(0.98)",
-            },
-            "&:focus": {
-              outline: "none",
-              boxShadow: "0 0 0 3px rgba(38, 143, 255, 0.5)",
-            },
-            marginRight: "10px", // Add margin to the right for spacing
-          }}
-        >
-          Tambah Tim Baru
-        </Button>
-        <Button
-          variant="contained"
-          color="primary"
-          href={driveFolderUrl}
-          target="_blank" // Opens the link in a new tab
-          rel="noopener noreferrer" // Security best practice
-          sx={{
-            borderRadius: "6px",
-            fontSize: "16px",
-            fontWeight: 600,
-            padding: "10px 20px",
-            textTransform: "none",
-            boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
-            transition: "all 0.3s ease",
-            backgroundColor: "#007bff", // Set a primary color for consistency
-            color: "#ffffff", // Ensure text color is visible on the background
-            "&:hover": {
-              backgroundColor: "#0056b3",
-              boxShadow: "0 6px 10px rgba(0, 0, 0, 0.15)",
-            },
-            "&:active": {
-              backgroundColor: "#004494",
-              transform: "scale(0.98)",
-            },
-            "&:focus": {
-              outline: "none",
-              boxShadow: "0 0 0 3px rgba(38, 143, 255, 0.5)",
-            },
-          }}
-          startIcon={<AddToDrive />} // Add the icon here
-        >
-          Lihat Drive INOVEAZY
-        </Button>
+        <AddButton onClick={() => openModal("add")} text="Tambah Tim Baru" />
       </div>
       <div className="team-list">
         {teams.map((team) => (
@@ -310,8 +265,9 @@ function TeamHierarchy({ teams, setTeams }) {
             variant="contained"
             color="primary"
             onClick={modalType === "add" ? handleAddTeam : () => handleEditTeam(currentTeamId)} // Ensure correct ID is passed
+            disabled={loading} // Disable button when loading
           >
-            {modalType === "add" ? "Tambah" : "Simpan"}
+            {loading ? <CircularProgress size={24} color="inherit" /> : modalType === "add" ? "Tambah" : "Simpan"}
           </Button>
         </ModalContent>
       </Modal>

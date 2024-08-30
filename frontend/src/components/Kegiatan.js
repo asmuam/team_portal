@@ -1,13 +1,14 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import axios from "axios";
-import { Box, Button, Typography, IconButton, Modal, TextField } from "@mui/material";
+import { Box, Button, Typography, IconButton, Modal, TextField, CircularProgress } from "@mui/material";
 import { styled } from "@mui/system";
 import CloseIcon from "@mui/icons-material/Close";
 import "./Kegiatan.css";
 import AddIcon from "@mui/icons-material/Add";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import ExploreBreadcrumb from "./common/ExploreBreadcrumb";
+import AddButton from "./common/AddButton";
 import { AddToDrive } from '@mui/icons-material'; // Import the Google Drive icon
 import { useDriveLink } from "../context/DriveContext";
 
@@ -91,8 +92,10 @@ function Kegiatan() {
   const [newActivityName, setNewActivityName] = useState("");
   const [newDeskripsi, setNewDeskripsi] = useState("");
   const [tanggalPelaksanaan, setTanggalPelaksanaan] = useState("");
+  const [loading, setLoading] = useState(false); // State for loading
+
   const [currentPage, setCurrentPage] = useState(1);
-  const [activitiesPerPage] = useState(4); // Number of activities per page
+  const tasksPerPage = 5;
   const navigate = useNavigate();
   const URL = process.env.REACT_APP_API_URL;
   const { setLinkDrive, linkDrive } = useDriveLink(); // Access the link_drive from context
@@ -140,10 +143,15 @@ function Kegiatan() {
 
   const handleAddActivity = async () => {
     if (newActivityName) {
+      setLoading(true);
+
       try {
         await axios.post(`${URL}/teams/${teamId}/activities/`, { name: newActivityName, tanggal_pelaksanaan: tanggalPelaksanaan, deskripsi: newDeskripsi });
-        refetchActivities();
-        closeModal();
+        setTimeout(() => {
+          refetchActivities();
+          closeModal();
+          setLoading(false);
+        }, 2000);
       } catch (error) {
         console.error("Error adding activity:", error);
       }
@@ -154,10 +162,14 @@ function Kegiatan() {
     if (newActivityName) {
       try {
         await axios.patch(`${URL}/teams/${teamId}/activities/${currentActivityId}`, { name: newActivityName, tanggal_pelaksanaan: tanggalPelaksanaan, deskripsi: newDeskripsi });
+        setTimeout(() => {
+          setLoading(false);
+        }, 2000);
         refetchActivities();
         closeModal();
       } catch (error) {
         console.error("Error updating activity:", error);
+        setLoading(false);
       }
     }
   };
@@ -188,10 +200,17 @@ function Kegiatan() {
     return new Date(dateString).toLocaleDateString("id-ID", options);
   };
 
-  const indexOfLastActivity = currentPage * activitiesPerPage;
-  const indexOfFirstActivity = indexOfLastActivity - activitiesPerPage;
-  const currentActivities = activities.slice(indexOfFirstActivity, indexOfLastActivity);
+  // const indexOfLastActivity = currentPage * activitiesPerPage;
+  // const indexOfFirstActivity = indexOfLastActivity - activitiesPerPage;
+  // const currentActivities = activities.slice(indexOfFirstActivity, indexOfLastActivity);
 
+  // const totalPages = Math.ceil(activities.length / activitiesPerPage);
+
+  const indexOfLastTask = currentPage * tasksPerPage;
+  const indexOfFirstTask = indexOfLastTask - tasksPerPage;
+  const currentActivities = activities.slice(indexOfFirstTask, indexOfLastTask);
+
+  const totalPages = Math.ceil(activities.length / tasksPerPage);
   const totalPages = Math.ceil(activities.length / activitiesPerPage);
   const driveFolderUrl = linkDrive;
 
@@ -231,71 +250,7 @@ function Kegiatan() {
         >
           Back
         </Button>
-        <Button
-          variant="contained"
-          color="primary"
-          onClick={() => openModal("add")}
-          startIcon={<AddIcon />}
-          sx={{
-            borderRadius: "6px",
-            fontSize: "16px",
-            fontWeight: 600,
-            padding: "10px 20px",
-            textTransform: "none",
-            boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
-            transition: "all 0.3s ease",
-            backgroundColor: "#007bff", // Set a primary color for consistency
-            color: "#ffffff", // Ensure text color is visible on the background
-            "&:hover": {
-              backgroundColor: "#0056b3",
-              boxShadow: "0 6px 10px rgba(0, 0, 0, 0.15)",
-            },
-            "&:active": {
-              backgroundColor: "#004494",
-              transform: "scale(0.98)",
-            },
-            "&:focus": {
-              outline: "none",
-              boxShadow: "0 0 0 3px rgba(38, 143, 255, 0.5)",
-            },
-            marginRight: "10px", // Add margin to the right for spacing
-          }}
-        >
-          Tambah Kegiatan Baru
-        </Button>
-        <Button
-          variant="contained"
-          color="primary"
-          href={driveFolderUrl}
-          target="_blank" // Opens the link in a new tab
-          rel="noopener noreferrer" // Security best practice
-          sx={{
-            borderRadius: "6px",
-            fontSize: "16px",
-            fontWeight: 600,
-            padding: "10px 20px",
-            textTransform: "none",
-            boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
-            transition: "all 0.3s ease",
-            backgroundColor: "#007bff", // Set a primary color for consistency
-            color: "#ffffff", // Ensure text color is visible on the background
-            "&:hover": {
-              backgroundColor: "#0056b3",
-              boxShadow: "0 6px 10px rgba(0, 0, 0, 0.15)",
-            },
-            "&:active": {
-              backgroundColor: "#004494",
-              transform: "scale(0.98)",
-            },
-            "&:focus": {
-              outline: "none",
-              boxShadow: "0 0 0 3px rgba(38, 143, 255, 0.5)",
-            },
-          }}
-          startIcon={<AddToDrive />} // Add the icon here
-        >
-          Lihat Drive Tim
-        </Button>
+        <AddButton onClick={() => openModal("add")} text="Tambah Kegiatan" />
       </div>
 
       <div className="activity-list">
@@ -362,18 +317,20 @@ function Kegiatan() {
           </ActivityBox>
         ))}
       </div>
+      {activities.length > tasksPerPage && (
+        <PaginationControls style={{ marginTop: "-35px" }}>
+          <Button onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))} disabled={currentPage === 1} style={{ fontSize: "25px" }}>
+            &lt;
+          </Button>
+          <Typography>
+            Page {currentPage} of {totalPages}
+          </Typography>
+          <Button onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))} disabled={currentPage === totalPages} style={{ fontSize: "25px" }}>
+            &gt;
+          </Button>
+        </PaginationControls>
+      )}
 
-      <PaginationControls style={{ marginTop: "-35px" }}>
-        <Button onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))} disabled={currentPage === 1} style={{ fontSize: "25px" }}>
-          &lt;
-        </Button>
-        <Typography>
-          Page {currentPage} of {totalPages}
-        </Typography>
-        <Button onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))} disabled={currentPage === totalPages} style={{ fontSize: "25px" }}>
-          &gt;
-        </Button>
-      </PaginationControls>
       <Modal open={isModalOpen} onClose={closeModal} aria-labelledby="activity-modal-title" aria-describedby="activity-modal-description">
         <ModalContent>
           <Header id="activity-modal-title" variant="h6">
@@ -418,8 +375,9 @@ function Kegiatan() {
             onKeyDown={handleKeyPress} // Handle "Enter" key press
             required
           />
-          <Button variant="contained" color="primary" onClick={modalType === "add" ? handleAddActivity : handleEditActivity} fullWidth>
+          <Button disabled={loading} variant="contained" color="primary" onClick={modalType === "add" ? handleAddActivity : handleEditActivity} fullWidth>
             {modalType === "add" ? "Tambah Kegiatan" : "Update Kegiatan"}
+            {loading ? <CircularProgress size={24} color="inherit" /> : modalType === "" ? "" : ""}
           </Button>
         </ModalContent>
       </Modal>
