@@ -196,7 +196,7 @@ function TeamHierarchy({ teams, setTeams }) {
                 <span
                   onClick={(e) => {
                     e.stopPropagation(); // Prevent unwanted navigation
-                    openModal("edit", team.id, team.name, team.ketua, team.deskripsi); // Pass ketua and deskripsi to modal
+                    openModal("edit", team.id, team.name, team.leader.id, team.deskripsi); // Pass ketua and deskripsi to modal
                   }}
                 >
                   &#9998;
