@@ -3,7 +3,7 @@ import { useTable, useSortBy } from "react-table";
 import Select from "react-select";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-
+import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Button } from "@mui/material";
 const formatDate = (dateString) => {
   const date = new Date(dateString);
   return new Intl.DateTimeFormat("en-GB", {
@@ -121,7 +121,7 @@ const DataTable = () => {
       { Header: "Tim", accessor: "team" },
       { Header: "Kegiatan", accessor: "activity" },
       {
-        Header: "Tanggal Pelaksanaan Kegiatan",
+        Header: "Tanggal Pelaksanaan ",
         accessor: "tanggal_pelaksanaan",
         Cell: ({ value }) => formatDate(value),
       },
@@ -218,10 +218,11 @@ const DataTable = () => {
               isDisabled={!filter.activity}
             />
           </div>
-          <div className="search-inputs" style={{ marginTop: "10px", marginBottom: "10px", display: "flex", gap: "10px" }}>
+          <div className="search-inputs" style={{ marginTop: "10px", marginBottom: "60px", display: "flex", gap: "10px" }}>
             <input type="text" style={{ width: "400px" }} className="search-bar" value={filter.taskSearch} onChange={(e) => setFilter({ ...filter, taskSearch: e.target.value })} placeholder="Search tugas" />
             <input type="text" style={{ width: "400px" }} className="search-bar" value={filter.activitySearch} onChange={(e) => setFilter({ ...filter, activitySearch: e.target.value })} placeholder="Search kegiatan" />
-            <div>
+
+            <div style={{ marginLeft: "300px" }}>
               <DatePicker
                 placeholderText=" Tanggal Pelaksanaan"
                 selected={pelaksanaanStartDate}
@@ -240,33 +241,52 @@ const DataTable = () => {
         </div>
       </div>
 
-      <table {...getTableProps()} className="data-table">
-        <thead>
-          {headerGroups.map((headerGroup) => (
-            <tr {...headerGroup.getHeaderGroupProps()}>
-              {headerGroup.headers.map((column) => (
-                <th {...column.getHeaderProps(column.getSortByToggleProps())}>
-                  {column.render("Header")}
-                  <span>{column.isSorted ? (column.isSortedDesc ? " 🔽" : " 🔼") : ""}</span>
-                </th>
-              ))}
-            </tr>
-          ))}
-        </thead>
-        <tbody {...getTableBodyProps()}>
-          {paginatedRows.map((row) => {
-            prepareRow(row);
-            return (
-              <tr {...row.getRowProps()}>
-                {row.cells.map((cell) => (
-                  <td {...cell.getCellProps()}>{cell.render("Cell")}</td>
+      <TableContainer component={Paper}>
+        <Table {...getTableProps()} sx={{ minWidth: 650, border: "1px solid #ddd" }}>
+          <TableHead>
+            {headerGroups.map((headerGroup) => (
+              <TableRow {...headerGroup.getHeaderGroupProps()}>
+                {headerGroup.headers.map((column) => (
+                  <TableCell
+                    {...column.getHeaderProps(column.getSortByToggleProps())}
+                    sx={{
+                      borderBottom: "1px solid #ddd",
+                      padding: "10px",
+                      backgroundColor: "#f2f2f2",
+                      fontWeight: "bold",
+                      cursor: "pointer",
+                    }}
+                  >
+                    {column.render("Header")}
+                    <span>{column.isSorted ? (column.isSortedDesc ? " 🔽" : " 🔼") : ""}</span>
+                  </TableCell>
                 ))}
-              </tr>
-            );
-          })}
-        </tbody>
-      </table>
-
+              </TableRow>
+            ))}
+          </TableHead>
+          <TableBody {...getTableBodyProps()}>
+            {paginatedRows.map((row) => {
+              prepareRow(row);
+              return (
+                <TableRow {...row.getRowProps()}>
+                  {row.cells.map((cell) => (
+                    <TableCell
+                      {...cell.getCellProps()}
+                      sx={{
+                        borderBottom: "1px solid #ddd",
+                        padding: "10px",
+                        textAlign: "left",
+                      }}
+                    >
+                      {cell.render("Cell")}
+                    </TableCell>
+                  ))}
+                </TableRow>
+              );
+            })}
+          </TableBody>
+        </Table>
+      </TableContainer>
       <div className="pagination-controls" style={{ display: "flex", justifyContent: "flex-start", marginTop: "20px", gap: "10px" }}>
         <button onClick={() => handlePageChange(currentPage - 1)} disabled={currentPage === 0}>
           &lt;
