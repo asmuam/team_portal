@@ -94,8 +94,12 @@ const DataTable = () => {
         const taskPelaksanaanDate = new Date(row.tanggal_pelaksanaan);
         const taskdueDate = new Date(row.dueDate);
 
-        const matchesPelaksanaanDateRange = !pelaksanaanStartDate || (taskPelaksanaanDate >= pelaksanaanStartDate && taskPelaksanaanDate <= (pelaksanaanEndDate || new Date()));
-        const matchesdueDateRange = !dueStartDate || (taskdueDate >= dueStartDate && taskdueDate <= (dueEndDate || new Date()));
+        // Adding one day to the end dates to include the entire end date
+        const adjustedPelaksanaanEndDate = pelaksanaanEndDate ? new Date(pelaksanaanEndDate.getTime() + 86400000) : null;
+        const adjustedDueEndDate = dueEndDate ? new Date(dueEndDate.getTime() + 86400000) : null;
+
+        const matchesPelaksanaanDateRange = !pelaksanaanStartDate || (taskPelaksanaanDate >= pelaksanaanStartDate && taskPelaksanaanDate < (adjustedPelaksanaanEndDate || new Date()));
+        const matchesdueDateRange = !dueStartDate || (taskdueDate >= dueStartDate && taskdueDate < (adjustedDueEndDate || new Date()));
 
         return (
           matchesTaskSearch &&
@@ -218,16 +222,23 @@ const DataTable = () => {
             <input type="text" className="search-bar" value={filter.taskSearch} onChange={(e) => setFilter({ ...filter, taskSearch: e.target.value })} placeholder="Search tugas" />
             <input type="text" className="search-bar" value={filter.activitySearch} onChange={(e) => setFilter({ ...filter, activitySearch: e.target.value })} placeholder="Search kegiatan" />
           </div>
-        </div>
 
-        <div className="date-filters" style={{ display: "flex", justifyContent: "flex-end", gap: "10px" }}>
-          <div>
-            <label>Filter By Tanggal Pelaksanaan: </label>
-            <DatePicker selected={pelaksanaanStartDate} onChange={(dates) => setPelaksanaanDateRange(dates)} startDate={pelaksanaanStartDate} endDate={pelaksanaanEndDate} selectsRange isClearable dateFormat="yyyy-MM-dd" />
-          </div>
-          <div>
-            <label>Filter by Deadline </label>
-            <DatePicker selected={dueStartDate} onChange={(dates) => setdueDateRange(dates)} startDate={dueStartDate} endDate={dueEndDate} selectsRange isClearable dateFormat="yyyy-MM-dd" />
+          <div className="date-filters" style={{ display: "flex", justifyContent: "flex-start", gap: "10px", marginTop: "-10px", marginLeft: "20px" }}>
+            <div>
+              <DatePicker
+                placeholderText=" Tanggal Pelaksanaan"
+                selected={pelaksanaanStartDate}
+                onChange={(dates) => setPelaksanaanDateRange(dates)}
+                startDate={pelaksanaanStartDate}
+                endDate={pelaksanaanEndDate}
+                selectsRange
+                isClearable
+                dateFormat="yyyy-MM-dd"
+              />
+            </div>
+            <div>
+              <DatePicker placeholderText=" Deadline" selected={dueStartDate} onChange={(dates) => setdueDateRange(dates)} startDate={dueStartDate} endDate={dueEndDate} selectsRange isClearable dateFormat="yyyy-MM-dd" />
+            </div>
           </div>
         </div>
       </div>
@@ -259,7 +270,7 @@ const DataTable = () => {
         </tbody>
       </table>
 
-      <div className="pagination-controls" style={{ display: "flex", justifyContent: "space-between", marginTop: "20px" }}>
+      <div className="pagination-controls" style={{ display: "flex", justifyContent: "flex-start", marginTop: "20px", gap: "10px" }}>
         <button onClick={() => handlePageChange(currentPage - 1)} disabled={currentPage === 0}>
           &lt;
         </button>
