@@ -4,7 +4,12 @@ import * as timkerjaService from "../services/timKerjaService.js";
 import * as kegiatanService from "../services/kegiatanService.js";
 import * as subkegiatanService from "../services/subkegiatanService.js";
 import * as tugasService from "../services/tugasService.js";
+import { createFolder, extractFolderIdFromUrl } from "../utils/googleDriveUtils.js";
 
+import dotenv from "dotenv";
+dotenv.config();
+
+const ROOT_DRIVE_FOLDER_ID = process.env.ROOT_DRIVE_FOLDER_ID
 const router = express.Router();
 
 // full direct
@@ -223,7 +228,17 @@ router.get("/teams", async (req, res) => {
 // add team
 router.post("/teams", async (req, res) => {
   try {
-    const team = await timkerjaService.createTimkerja(req.body);
+    const link_drive = await createFolder(req.body.name, ROOT_DRIVE_FOLDER_ID);
+    // Add the link_drive to the request body before calling createTimkerja
+    const teamData = {
+      name: req.body.name,
+      leader_id: req.body.leader_id,
+      deskripsi: req.body.deskripsi,
+      links: req.body.links, // Existing links or an empty array
+      link_drive: link_drive // New link_drive
+    };
+
+    const team = await timkerjaService.createTimkerja(teamData);
     res.status(201).json(team);
   } catch (error) {
     console.error(error); // Log the full error
@@ -308,11 +323,24 @@ router.post("/teams/:teamId/activities", async (req, res) => {
   const { teamId } = req.params;
   const { name, tanggal_pelaksanaan, deskripsi } = req.body;
   try {
+    const result = await prisma.timkerja.findMany(
+      {
+        where: {
+          id: parseInt(teamId), // Filter by teamId
+        },
+        select: {
+          link_drive: true, // Select only the link_drive column
+        },
+      }
+    )
+    
+    const link_drive = await createFolder(req.body.name, extractFolderIdFromUrl(result[0].link_drive));
     const activity = await kegiatanService.createKegiatan({
       name,
       deskripsi,
       tanggal_pelaksanaan: tanggal_pelaksanaan ? new Date(tanggal_pelaksanaan) : new Date(), // Inline default date
       timkerja_id: parseInt(teamId),
+      link_drive
     });
     res.json(activity);
   } catch (error) {
@@ -428,11 +456,24 @@ router.post("/teams/:teamId/activities/:activityId/sub-activities", async (req, 
   const { activityId } = req.params;
   const { name, tanggal_pelaksanaan, deskripsi } = req.body; // Tambahkan tanggal_pelaksanaan
   try {
+    const result = await prisma.kegiatan.findMany(
+      {
+        where: {
+          id: parseInt(activityId), // Filter by teamId
+        },
+        select: {
+          link_drive: true, // Select only the link_drive column
+        },
+      }
+    )
+
+    const link_drive = await createFolder(req.body.name, extractFolderIdFromUrl(result[0].link_drive));
     const subActivity = await subkegiatanService.createSubkegiatan({
       name,
       deskripsi,
       tanggal_pelaksanaan: tanggal_pelaksanaan ? new Date(tanggal_pelaksanaan) : new Date(), // Inline default date
       kegiatan_id: parseInt(activityId),
+      link_drive
     });
     res.json(subActivity);
   } catch (error) {
@@ -551,6 +592,18 @@ router.post("/teams/:teamId/activities/:activityId/sub-activities/:subActivityId
   const { subActivityId } = req.params;
   const { name, dueDate, dateCreated, link, deskripsi } = req.body;
   try {
+    const result = await prisma.kegiatan.findMany(
+      {
+        where: {
+          id: subActivityId, // Filter by teamId
+        },
+        select: {
+          link_drive: true, // Select only the link_drive column
+        },
+      }
+    )
+
+    const link_drive = await createFolder(req.body.name, extractFolderIdFromUrl(result[0].link_drive));
     const task = await tugasService.createTugas({
       name,
       dateCreated: dateCreated ? new Date(dateCreated) : new Date(),
@@ -558,6 +611,7 @@ router.post("/teams/:teamId/activities/:activityId/sub-activities/:subActivityId
       link,
       deskripsi,
       subkegiatan_id: parseInt(subActivityId),
+      link_drive
     });
     res.json(task);
   } catch (error) {
