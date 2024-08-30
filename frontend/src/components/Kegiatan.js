@@ -210,7 +210,6 @@ function Kegiatan() {
   const indexOfFirstTask = indexOfLastTask - tasksPerPage;
   const currentActivities = activities.slice(indexOfFirstTask, indexOfLastTask);
 
-  const totalPages = Math.ceil(activities.length / tasksPerPage);
   const totalPages = Math.ceil(activities.length / activitiesPerPage);
   const driveFolderUrl = linkDrive;
 
