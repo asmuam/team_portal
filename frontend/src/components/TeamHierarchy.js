@@ -114,7 +114,7 @@ function TeamHierarchy({ teams, setTeams }) {
   const archiveTeam = async (e, id) => {
     e.stopPropagation(); // Prevent unwanted navigation
     // alert(`Tim Kerja ${teams.find((team) => team.id === id).name} telah diarsipkan.`);
-    alert("Fitur arsip belum tersedia")// You can implement actual archiving logic here if needed
+    alert("Fitur arsip belum tersedia"); // You can implement actual archiving logic here if needed
     refetchTeams();
   };
 
@@ -123,31 +123,31 @@ function TeamHierarchy({ teams, setTeams }) {
       <div className="header">
         <ExploreBreadcrumb />
         <Button
-            variant="contained"
-            color="primary"
-            onClick={() => openModal("add")}
-            startIcon={<AddIcon />}
-            sx={{
-              borderRadius: '6px',
-              fontSize: '16px',
-              fontWeight: 600,
-              padding: '10px 20px',
-              textTransform: 'none',
-              boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
-              transition: 'all 0.3s ease',
-              '&:hover': {
-                backgroundColor: '#0056b3',
-                boxShadow: '0 6px 10px rgba(0, 0, 0, 0.15)',
-              },
-              '&:active': {
-                backgroundColor: '#004494',
-                transform: 'scale(0.98)',
-              },
-              '&:focus': {
-                outline: 'none',
-                boxShadow: '0 0 0 3px rgba(38, 143, 255, 0.5)',
-              },
-            }}
+          variant="contained"
+          color="primary"
+          onClick={() => openModal("add")}
+          startIcon={<AddIcon />}
+          sx={{
+            borderRadius: "6px",
+            fontSize: "16px",
+            fontWeight: 600,
+            padding: "10px 20px",
+            textTransform: "none",
+            boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
+            transition: "all 0.3s ease",
+            "&:hover": {
+              backgroundColor: "#0056b3",
+              boxShadow: "0 6px 10px rgba(0, 0, 0, 0.15)",
+            },
+            "&:active": {
+              backgroundColor: "#004494",
+              transform: "scale(0.98)",
+            },
+            "&:focus": {
+              outline: "none",
+              boxShadow: "0 0 0 3px rgba(38, 143, 255, 0.5)",
+            },
+          }}
         >
           Tambah Tim Baru
         </Button>
@@ -156,7 +156,9 @@ function TeamHierarchy({ teams, setTeams }) {
         {teams.map((team) => (
           <div className="team-container" key={team.id}>
             <div className="team-box" onClick={(e) => handleTeamClick(e, team.id)}>
-              <div className="team-name">{team.name}</div>
+              <div className="team-name">{team.name} </div>
+              <div className="team-name">Ketua : Adib Sulthon </div>
+              <div className="team-name">Deskripsi : Mengelola Data </div>
               <div className="team-actions">
                 <span
                   onClick={(e) => {

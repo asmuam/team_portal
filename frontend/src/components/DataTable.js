@@ -80,7 +80,7 @@ const DataTable = () => {
               tanggal_pelaksanaan: activity.tanggal_pelaksanaan,
               subActivity: subActivity.name,
               task: task.name,
-              dateCreated: task.dateCreated,
+              // dateCreated: task.dateCreated,
               dueDate: task.dueDate,
               completed: task.completed,
             }))
@@ -127,11 +127,11 @@ const DataTable = () => {
       },
       { Header: "Sub Kegiatan", accessor: "subActivity" },
       { Header: "Tugas", accessor: "task" },
-      {
-        Header: "Created Date",
-        accessor: "dateCreated",
-        Cell: ({ value }) => formatDate(value),
-      },
+      // {
+      //   Header: "Created Date",
+      //   accessor: "dateCreated",
+      //   Cell: ({ value }) => formatDate(value),
+      // },
       {
         Header: "Due Date",
         accessor: "dueDate",
@@ -218,12 +218,9 @@ const DataTable = () => {
               isDisabled={!filter.activity}
             />
           </div>
-          <div className="search-inputs">
-            <input type="text" className="search-bar" value={filter.taskSearch} onChange={(e) => setFilter({ ...filter, taskSearch: e.target.value })} placeholder="Search tugas" />
-            <input type="text" className="search-bar" value={filter.activitySearch} onChange={(e) => setFilter({ ...filter, activitySearch: e.target.value })} placeholder="Search kegiatan" />
-          </div>
-
-          <div className="date-filters" style={{ display: "flex", justifyContent: "flex-start", gap: "10px", marginTop: "-10px", marginLeft: "20px" }}>
+          <div className="search-inputs" style={{ marginTop: "10px", marginBottom: "10px", display: "flex", gap: "10px" }}>
+            <input type="text" style={{ width: "400px" }} className="search-bar" value={filter.taskSearch} onChange={(e) => setFilter({ ...filter, taskSearch: e.target.value })} placeholder="Search tugas" />
+            <input type="text" style={{ width: "400px" }} className="search-bar" value={filter.activitySearch} onChange={(e) => setFilter({ ...filter, activitySearch: e.target.value })} placeholder="Search kegiatan" />
             <div>
               <DatePicker
                 placeholderText=" Tanggal Pelaksanaan"
