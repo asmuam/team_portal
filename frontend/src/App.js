@@ -1,15 +1,12 @@
-import "./App.css";
-import TeamHierarchy from "./components/TeamHierarchy.js";
-import DataTable from "./components/DataTable.js";
-import React, { useState, useEffect } from "react";
-import LinkPenting from "./components/LinkPenting.js";
-import Login from "./components/Login.js";
+import React, { useState } from "react";
 import useAuth from "./hooks/use-auth.js";
-import { BrowserRouter as Router, Routes, Route, Navigate, Link } from "react-router-dom";
-import Kegiatan from "./components/Kegiatan";
-import SubKegiatan from "./components/SubKegiatan";
-import Tugas from "./components/Tugas";
-import { useTeams } from './context/TeamsContext'; // Adjust path as needed
+import { BrowserRouter as Router } from "react-router-dom";
+import { useTeams } from './context/TeamsContext';
+import Header from "./components/common/Header";
+import Footer from "./components/common/Footer";
+import AppRouter from "./components/common/AppRoutes";
+import Box from "@mui/material/Box";
+import Container from "@mui/material/Container";
 
 function App() {
   const { teams, setTeams } = useTeams();
@@ -45,46 +42,17 @@ function App() {
   };
 
   return (
-    <Router>
-      <div className="App">
-        <header className="App-header">
-          <h1>INOVEAZY</h1>
-          {isAuthenticated && (
-            <div className="tabs">
-              <Link to="/explorer">
-                <button>Explorer</button>
-              </Link>
-              <Link to="/table">
-                <button>Tabel</button>
-              </Link>
-              <Link to="/links">
-                <button>Link Penting</button>
-              </Link>
-            </div>
-          )}
-          {isAuthenticated && (
-            <button className="logout-button" onClick={handleLogout}>
-              <i className="fas fa-power-off"></i> Log Out
-            </button>
-          )}
-        </header>
-        <main className="App-main">
-          <Routes>
-            <Route path="/" element={<Navigate to={isAuthenticated ? "/explorer" : "/login"} />} />
-            <Route path="/login" element={!isAuthenticated ? <Login onLogin={handleLogin} /> : <Navigate to="/explorer" />} />
-            <Route path="/explorer" element={isAuthenticated ? <TeamHierarchy teams={teams} setTeams={setTeams} /> : <Navigate to="/login" />} />
-            <Route path="/table" element={isAuthenticated ? <DataTable /> : <Navigate to="/login" />} />
-            <Route path="/links" element={isAuthenticated ? <LinkPenting /> : <Navigate to="/login" />} />
-            <Route path="/explorer/kegiatan/:teamId" element={isAuthenticated ? <Kegiatan /> : <Navigate to="/login" />} />
-            <Route path="/explorer/kegiatan/:teamId/subkegiatan/:activityId" element={isAuthenticated ? <SubKegiatan /> : <Navigate to="/login" />} />
-            <Route path="/explorer/kegiatan/:teamId/subkegiatan/:activityId/tugas/:subActivityId" element={isAuthenticated ? <Tugas /> : <Navigate to="/login" />} />
-          </Routes>
-        </main>
-        <footer className="App-footer">
-          <p>&copy; 2024 Your Company</p>
-        </footer>
-      </div>
-    </Router>
+      <Router>
+        <Box display="flex" flexDirection="column" minHeight="100vh">
+          <Header isAuthenticated={isAuthenticated} handleLogout={handleLogout} />
+          <Box component="main" sx={{ flex: 1, py: 4 }}>
+            <Container maxWidth="xl">
+              <AppRouter isAuthenticated={isAuthenticated} teams={teams} setTeams={setTeams} handleLogin={handleLogin} />
+            </Container>
+          </Box>
+          <Footer />
+        </Box>
+      </Router>
   );
 }
 
