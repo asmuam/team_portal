@@ -161,9 +161,6 @@ function Tugas() {
   };
 
   useEffect(() => {
-    fetchTeamDetails();
-    fetchActivityDetails();
-    fetchSubActivityDetails();
     refetchTasks();
   }, [teamId, activityId, subActivityId]);
 

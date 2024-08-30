@@ -134,7 +134,7 @@ function SubKegiatan() {
 
   const refetchActivityDetails = async () => {
     try {
-      const response = await fetch(`${URL}/teams/${teamId}/activities/${activityId}`);
+      const response = await fetch(`${URL}/teams/${teamId}/activities/${activityId}/sub-activities`);
       if (!response.ok) {
         throw new Error("Network response was not ok");
       }

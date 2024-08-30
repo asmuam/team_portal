@@ -187,7 +187,7 @@ function TeamHierarchy({ teams, setTeams }) {
           <div className="team-container" key={team.id}>
             <div className="team-box" onClick={(e) => handleTeamClick(e, team.id, team.link_drive)}>
               <div className="team-name">{team.name}</div>
-              <div className="team-ketua">Ketua :{team.leader.name}</div> {/* Display ketua */}
+              <div className="team-ketua">Ketua : {team.leader.name}</div> {/* Display ketua */}
               <br />
               <div className="team-deskripsi">Deskripsi : {team.deskripsi}</div> {/* Display deskripsi */}
               <div className="team-actions">

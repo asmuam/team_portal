@@ -592,10 +592,10 @@ router.post("/teams/:teamId/activities/:activityId/sub-activities/:subActivityId
   const { subActivityId } = req.params;
   const { name, dueDate, dateCreated, link, deskripsi } = req.body;
   try {
-    const result = await prisma.kegiatan.findMany(
+    const result = await prisma.subkegiatan.findMany(
       {
         where: {
-          id: subActivityId, // Filter by teamId
+          id: parseInt(subActivityId), // Filter by teamId
         },
         select: {
           link_drive: true, // Select only the link_drive column
@@ -603,7 +603,6 @@ router.post("/teams/:teamId/activities/:activityId/sub-activities/:subActivityId
       }
     )
 
-    const link_drive = await createFolder(req.body.name, extractFolderIdFromUrl(result[0].link_drive));
     const task = await tugasService.createTugas({
       name,
       dateCreated: dateCreated ? new Date(dateCreated) : new Date(),
@@ -611,7 +610,6 @@ router.post("/teams/:teamId/activities/:activityId/sub-activities/:subActivityId
       link,
       deskripsi,
       subkegiatan_id: parseInt(subActivityId),
-      link_drive
     });
     res.json(task);
   } catch (error) {
