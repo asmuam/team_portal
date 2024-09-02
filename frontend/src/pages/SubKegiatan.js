@@ -5,11 +5,15 @@ import Tugas from "./Tugas";
 import { Box, Button, Typography, IconButton, Modal, TextField } from "@mui/material";
 import { styled } from "@mui/system";
 import CloseIcon from "@mui/icons-material/Close";
+import EditIcon from "@mui/icons-material/Edit";
+import DeleteIcon from "@mui/icons-material/Delete";
+import ArchiveIcon from "@mui/icons-material/Archive";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import ExploreBreadcrumb from "../components/common/navigation/ExploreBreadcrumb";
 import DriveButton from "../components/common/button/DriveButton";
 import { useDriveLink } from "../context/DriveContext";
 import AddButton from "../components/common/button/AddButton";
+import useMediaQuery from "@mui/material/useMediaQuery";
 
 // Styled Components
 const ModalContent = styled(Box)({
@@ -57,7 +61,7 @@ const SubActivityName = styled(Typography)({
 
 const SubActivityActions = styled(Box)({
   position: "absolute",
-  top: "10px",
+  bottom: "10px",
   right: "10px",
   display: "flex",
   gap: "10px",
@@ -104,6 +108,8 @@ function SubKegiatan() {
     setCurrentSubActivityId(subActivityId);
     setIsDeleteModalOpen(true);
   };
+
+  const isMobile = useMediaQuery("(max-width:600px)");
 
   const closeDeleteModal = () => {
     setIsDeleteModalOpen(false);
@@ -219,31 +225,57 @@ function SubKegiatan() {
 
   return (
     <div className="sub-activity-container">
-      <ExploreBreadcrumb />
-      <div className="header" style={{ marginBottom: "10px" }}>
-        <Button
-          variant="contained"
-          color="primary"
-          onClick={() => navigate(`/explorer/team/${teamId}/kegiatan`)}
-          startIcon={<ArrowBackIcon />}
-          sx={{
-            borderRadius: "6px",
-            fontSize: "16px",
-            fontWeight: 600,
-            padding: "10px 20px",
-            textTransform: "none",
-            boxShadow: "0 4px 8px rgba(0, 0, 0, 0.2)",
-            transition: "all 0.3s ease",
-            backgroundColor: "#1976d2",
-            "&:hover": {
-              backgroundColor: "#115293",
-            },
-          }}
-        >
-          Back
-        </Button>
-        <AddButton onClick={() => openModal("add")} text="Tambah Sub Kegiatan" />
-        <DriveButton driveFolderUrl={linkDrive} />
+      <div className="header" style={{ marginBottom: "10px", position: "relative" }}>
+        {/* Bagian Back dan Tambah */}
+        <ExploreBreadcrumb />
+
+        <div style={{ display: "flex", alignItems: "center" }}>
+          {isMobile ? (
+            <IconButton onClick={() => navigate(`/explorer/team/${teamId}/kegiatan`)} style={{ backgroundColor: "#007bff", color: "#ffffff", marginRight: "10px" }}>
+              <ArrowBackIcon />
+            </IconButton>
+          ) : (
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={() => navigate("/explorer")}
+              startIcon={<ArrowBackIcon />}
+              sx={{
+                borderRadius: "6px",
+                fontSize: "16px",
+                fontWeight: 600,
+                padding: "10px 20px",
+                textTransform: "none",
+                boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
+                transition: "all 0.3s ease",
+                backgroundColor: "#007bff",
+                color: "#ffffff",
+                "&:hover": {
+                  backgroundColor: "#0056b3",
+                  boxShadow: "0 6px 10px rgba(0, 0, 0, 0.15)",
+                },
+                "&:active": {
+                  backgroundColor: "#004494",
+                  transform: "scale(0.98)",
+                },
+                "&:focus": {
+                  outline: "none",
+                  boxShadow: "0 0 0 3px rgba(38, 143, 255, 0.5)",
+                },
+                marginRight: "10px",
+              }}
+            >
+              Back
+            </Button>
+          )}
+
+          <AddButton onClick={() => openModal("add")} text="Tambah " />
+        </div>
+
+        {/* Bagian Drive */}
+        <div style={{ position: "absolute", right: 0, top: "28px" }}>
+          <DriveButton driveFolderUrl={driveFolderUrl} />
+        </div>
       </div>
       <div className="sub-activity-list">
         {currentActivities.map((subActivity) => (
@@ -263,54 +295,24 @@ function SubKegiatan() {
                     e.stopPropagation();
                     openModal("edit", subActivity.id, subActivity.name, subActivity.tanggal_pelaksanaan, subActivity.deskripsi);
                   }}
-                  sx={{
-                    backgroundColor: "#ddd",
-                    padding: "8px",
-                    borderRadius: "4px",
-                    cursor: "pointer",
-                    transition: "background-color 0.3s ease",
-                    "&:hover": {
-                      backgroundColor: "#bbb",
-                    },
-                  }}
                 >
-                  <span>&#9998;</span>
+                  <EditIcon />
                 </IconButton>
                 <IconButton
                   onClick={(e) => {
                     e.stopPropagation();
                     openDeleteModal(subActivity.id);
                   }}
-                  sx={{
-                    backgroundColor: "#ddd",
-                    padding: "8px",
-                    borderRadius: "4px",
-                    cursor: "pointer",
-                    transition: "background-color 0.3s ease",
-                    "&:hover": {
-                      backgroundColor: "#bbb",
-                    },
-                  }}
                 >
-                  <span>&#10006;</span>
+                  <DeleteIcon />
                 </IconButton>
                 <IconButton
                   onClick={(e) => {
                     e.stopPropagation();
                     archiveSubActivity(subActivity.id);
                   }}
-                  sx={{
-                    backgroundColor: "#ddd",
-                    padding: "8px",
-                    borderRadius: "4px",
-                    cursor: "pointer",
-                    transition: "background-color 0.3s ease",
-                    "&:hover": {
-                      backgroundColor: "#bbb",
-                    },
-                  }}
                 >
-                  <span>&#128229;</span>
+                  <ArchiveIcon />
                 </IconButton>
               </SubActivityActions>
             </SubActivityBox>

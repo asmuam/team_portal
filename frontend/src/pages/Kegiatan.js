@@ -6,7 +6,11 @@ import { styled } from "@mui/system";
 import CloseIcon from "@mui/icons-material/Close";
 import AddIcon from "@mui/icons-material/Add";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+import EditIcon from "@mui/icons-material/Edit";
+import DeleteIcon from "@mui/icons-material/Delete";
+import ArchiveIcon from "@mui/icons-material/Archive";
 import ExploreBreadcrumb from "../components/common/navigation/ExploreBreadcrumb";
+import useMediaQuery from "@mui/material/useMediaQuery";
 import { useDriveLink } from "../context/DriveContext";
 import DriveButton from "../components/common/button/DriveButton";
 import AddButton from "../components/common/button/AddButton";
@@ -57,7 +61,7 @@ const ActivityName = styled(Typography)({
 
 const ActivityActions = styled(Box)({
   position: "absolute",
-  top: "10px",
+  bottom: "10px",
   right: "10px",
   display: "flex",
   gap: "10px",
@@ -197,6 +201,7 @@ function Kegiatan() {
     const options = { day: "numeric", month: "long", year: "numeric" };
     return new Date(dateString).toLocaleDateString("id-ID", options);
   };
+  const isMobile = useMediaQuery("(max-width:600px)");
 
   // const indexOfLastActivity = currentPage * activitiesPerPage;
   // const indexOfFirstActivity = indexOfLastActivity - activitiesPerPage;
@@ -214,42 +219,57 @@ function Kegiatan() {
 
   return (
     <div className="kegiatan">
-      <div className="header">
+      <div className="header" style={{ marginBottom: "10px", position: "relative" }}>
+        {/* Bagian Back dan Tambah */}
         <ExploreBreadcrumb />
-        <Button
-          variant="contained"
-          color="primary"
-          onClick={() => navigate("/explorer")}
-          startIcon={<ArrowBackIcon />}
-          sx={{
-            borderRadius: "6px",
-            fontSize: "16px",
-            fontWeight: 600,
-            padding: "10px 20px",
-            textTransform: "none",
-            boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
-            transition: "all 0.3s ease",
-            backgroundColor: "#007bff", // Set a primary color for consistency
-            color: "#ffffff", // Ensure text color is visible on the background
-            "&:hover": {
-              backgroundColor: "#0056b3",
-              boxShadow: "0 6px 10px rgba(0, 0, 0, 0.15)",
-            },
-            "&:active": {
-              backgroundColor: "#004494",
-              transform: "scale(0.98)",
-            },
-            "&:focus": {
-              outline: "none",
-              boxShadow: "0 0 0 3px rgba(38, 143, 255, 0.5)",
-            },
-            marginRight: "10px", // Add margin to the right for spacing
-          }}
-        >
-          Back
-        </Button>
-        <AddButton onClick={() => openModal("add")} text="Tambah Kegiatan" />
-        <DriveButton driveFolderUrl={driveFolderUrl} />
+
+        <div style={{ display: "flex", alignItems: "center" }}>
+          {isMobile ? (
+            <IconButton onClick={() => navigate("/explorer")} style={{ backgroundColor: "#007bff", color: "#ffffff", marginRight: "10px" }}>
+              <ArrowBackIcon />
+            </IconButton>
+          ) : (
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={() => navigate("/explorer")}
+              startIcon={<ArrowBackIcon />}
+              sx={{
+                borderRadius: "6px",
+                fontSize: "16px",
+                fontWeight: 600,
+                padding: "10px 20px",
+                textTransform: "none",
+                boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
+                transition: "all 0.3s ease",
+                backgroundColor: "#007bff",
+                color: "#ffffff",
+                "&:hover": {
+                  backgroundColor: "#0056b3",
+                  boxShadow: "0 6px 10px rgba(0, 0, 0, 0.15)",
+                },
+                "&:active": {
+                  backgroundColor: "#004494",
+                  transform: "scale(0.98)",
+                },
+                "&:focus": {
+                  outline: "none",
+                  boxShadow: "0 0 0 3px rgba(38, 143, 255, 0.5)",
+                },
+                marginRight: "10px",
+              }}
+            >
+              Back
+            </Button>
+          )}
+
+          <AddButton onClick={() => openModal("add")} text="Tambah " />
+        </div>
+
+        {/* Bagian Drive */}
+        <div style={{ position: "absolute", right: 0, top: "28px" }}>
+          <DriveButton driveFolderUrl={driveFolderUrl} />
+        </div>
       </div>
 
       <div className="activity-list">
@@ -269,52 +289,24 @@ function Kegiatan() {
                   e.stopPropagation();
                   openModal("edit", activity.id, activity.name, activity.tanggal_pelaksanaan, activity.deskripsi);
                 }}
-                sx={{
-                  backgroundColor: "#ddd",
-                  padding: "8px",
-                  borderRadius: "4px",
-                  "&:hover": {
-                    backgroundColor: "#bbb",
-                  },
-                }}
               >
-                <span>&#9998;</span> {/* Edit icon */}
+                <EditIcon />
               </IconButton>
               <IconButton
                 onClick={(e) => {
                   e.stopPropagation();
                   openDeleteModal(activity.id);
                 }}
-                sx={{
-                  backgroundColor: "#ddd",
-                  padding: "8px",
-                  borderRadius: "4px",
-                  cursor: "pointer",
-                  transition: "background-color 0.3s ease",
-                  "&:hover": {
-                    backgroundColor: "#bbb",
-                  },
-                }}
               >
-                <span>&#10006;</span> {/* Delete icon */}
+                <DeleteIcon />
               </IconButton>
               <IconButton
                 onClick={(e) => {
                   e.stopPropagation();
-                  archiveActivity(activity.id); // Ensure this is a separate action if needed
-                }}
-                sx={{
-                  backgroundColor: "#ddd",
-                  padding: "8px",
-                  borderRadius: "4px",
-                  cursor: "pointer",
-                  transition: "background-color 0.3s ease",
-                  "&:hover": {
-                    backgroundColor: "#bbb",
-                  },
+                  archiveActivity(activity.id);
                 }}
               >
-                <span>&#128229;</span> {/* Archive icon */}
+                <ArchiveIcon />
               </IconButton>
             </ActivityActions>
           </ActivityBox>
@@ -387,9 +379,9 @@ function Kegiatan() {
 
       <Modal open={isDeleteModalOpen} onClose={closeDeleteModal}>
         <ModalContent>
-          <Header>Konfirmasi Hapus-Kegiatan</Header>
+          <Header>Konfirmasi Hapus Sub-Kegiatan</Header>
           <Typography variant="body1" sx={{ marginBottom: "16px" }}>
-            Apakah Anda yakin ingin menghapus-Kegiatan ini?
+            Apakah Anda yakin ingin menghapus Sub-Kegiatan ini?
           </Typography>
           <Box sx={{ display: "flex", justifyContent: "space-between" }}>
             <Button variant="contained" color="error" onClick={deleteActivity}>

@@ -11,6 +11,8 @@ import CancelIcon from "@mui/icons-material/Cancel";
 
 import DeleteIcon from "@mui/icons-material/Delete";
 import AddIcon from "@mui/icons-material/Add";
+import useMediaQuery from "@mui/material/useMediaQuery";
+
 import { styled } from "@mui/system";
 import CircularProgress from "@mui/material/CircularProgress";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
@@ -32,16 +34,19 @@ const ModalContent = styled(Box)({
   boxShadow: "0 4px 8px rgba(0, 0, 0, 0.2)",
 });
 
+const TableContainer = styled(Box)({
+  width: "100%",
+  overflowX: "auto", // Menambahkan overflow horizontal
+});
+
 const TaskTable = styled("table")({
   width: "100%",
   borderCollapse: "collapse",
   marginBottom: "20px",
+  overflowX: "auto",
+  minWidth: "600px", // Menambahkan minimum width agar tabel tidak terlalu mengecil
 });
-const Header = styled(Typography)({
-  marginBottom: "16px",
-  position: "relative",
-  paddingRight: "32px",
-});
+
 const TableHeader = styled("th")({
   borderBottom: "2px solid #333",
   padding: "10px",
@@ -51,6 +56,11 @@ const TableHeader = styled("th")({
 const TableCell = styled("td")({
   borderBottom: "1px solid #ddd",
   padding: "10px",
+});
+const Header = styled(Typography)({
+  marginBottom: "16px",
+  position: "relative",
+  paddingRight: "32px",
 });
 
 const ActionButton = styled(IconButton)({
@@ -81,6 +91,10 @@ const PaginationControls = styled(Box)({
   justifyContent: "center",
   marginTop: "20px",
   gap: "10px",
+  "@media (max-width: 600px)": {
+    flexDirection: "column",
+    alignItems: "center",
+  },
 });
 
 const FileList = styled("ul")({
@@ -144,6 +158,7 @@ function Tugas() {
     const year = date.getFullYear();
     return `${day} ${month} ${year}`;
   };
+  const isMobile = useMediaQuery("(max-width:600px)");
 
   // Fetch team details
   const fetchTeamDetails = async () => {
@@ -360,104 +375,125 @@ function Tugas() {
 
   return (
     <div className="task-container">
-      <ExploreBreadcrumb />
-      <Button
-        variant="contained"
-        color="primary"
-        onClick={() => navigate(`/explorer/team/${teamId}/kegiatan/${activityId}/subkegiatan`)}
-        startIcon={<ArrowBackIcon />}
-        sx={{
-          borderRadius: "6px",
-          fontSize: "16px",
-          fontWeight: 600,
-          padding: "10px 20px",
-          textTransform: "none",
-          boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
-          transition: "all 0.3s ease",
-          backgroundColor: "#007bff", // Set a primary color for consistency
-          color: "#ffffff", // Ensure text color is visible on the background
-          "&:hover": {
-            backgroundColor: "#0056b3",
-            boxShadow: "0 6px 10px rgba(0, 0, 0, 0.15)",
-          },
-          "&:active": {
-            backgroundColor: "#004494",
-            transform: "scale(0.98)",
-          },
-          "&:focus": {
-            outline: "none",
-            boxShadow: "0 0 0 3px rgba(38, 143, 255, 0.5)",
-          },
-          marginRight: "10px", // Add margin to the right for spacing
-        }}
-      >
-        Back
-      </Button>
-      <AddButton onClick={() => openModal("add")} text="Tambah Tugas Baru" />
-      <DriveButton driveFolderUrl={driveFolderUrl} />
+      <div className="header" style={{ marginBottom: "10px", position: "relative" }}>
+        {/* Bagian Back dan Tambah */}
+        <ExploreBreadcrumb />
+
+        <div style={{ display: "flex", alignItems: "center" }}>
+          {isMobile ? (
+            <IconButton onClick={() => navigate(`/explorer/team/${teamId}/kegiatan/${activityId}/subkegiatan`)} style={{ backgroundColor: "#007bff", color: "#ffffff", marginRight: "10px" }}>
+              <ArrowBackIcon />
+            </IconButton>
+          ) : (
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={() => navigate("/explorer")}
+              startIcon={<ArrowBackIcon />}
+              sx={{
+                borderRadius: "6px",
+                fontSize: "16px",
+                fontWeight: 600,
+                padding: "10px 20px",
+                textTransform: "none",
+                boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
+                transition: "all 0.3s ease",
+                backgroundColor: "#007bff",
+                color: "#ffffff",
+                "&:hover": {
+                  backgroundColor: "#0056b3",
+                  boxShadow: "0 6px 10px rgba(0, 0, 0, 0.15)",
+                },
+                "&:active": {
+                  backgroundColor: "#004494",
+                  transform: "scale(0.98)",
+                },
+                "&:focus": {
+                  outline: "none",
+                  boxShadow: "0 0 0 3px rgba(38, 143, 255, 0.5)",
+                },
+                marginRight: "10px",
+              }}
+            >
+              Back
+            </Button>
+          )}
+
+          <AddButton onClick={() => openModal("add")} text="Tambah " />
+        </div>
+
+        {/* Bagian Drive */}
+        <div style={{ position: "absolute", right: 0, top: "28px" }}>
+          <DriveButton driveFolderUrl={driveFolderUrl} />
+        </div>
+      </div>
+
       <ProgressWrapper>
         <CircularProgress variant="determinate" value={progress} />
         <ProgressText>{Math.round(progress)}% Completed</ProgressText>
       </ProgressWrapper>
-      <TaskTable>
-        <thead>
-          <tr>
-            <TableHeader>Task</TableHeader>
-            <TableHeader>Due Date</TableHeader>
-            <TableHeader>Deskripsi</TableHeader>
-            <TableHeader>File</TableHeader>
-            <TableHeader>Verified</TableHeader>
-            <TableHeader>Actions</TableHeader>
-          </tr>
-        </thead>
-        <tbody>
-          {currentTasks.length ? (
-            currentTasks.map((task) => (
-              <tr key={task.id}>
-                <TableCell>{task.name}</TableCell>
-                <TableCell>{formatDate(task.dueDate)}</TableCell>
-                <TableCell>{task.deskripsi}</TableCell>
+      <div style={{ overflowX: "auto" }}>
+        <TaskTable>
+          <thead>
+            <tr>
+              <TableHeader>Task</TableHeader>
+              <TableHeader>Due Date</TableHeader>
+              <TableHeader>Deskripsi</TableHeader>
+              <TableHeader>File</TableHeader>
+              <TableHeader>Verified</TableHeader>
+              <TableHeader>Actions</TableHeader>
+            </tr>
+          </thead>
+          <tbody style={{ overflowX: "auto" }}>
+            {currentTasks.length ? (
+              currentTasks.map((task) => (
+                <tr key={task.id}>
+                  <TableCell>{task.name}</TableCell>
+                  <TableCell>{formatDate(task.dueDate)}</TableCell>
+                  <TableCell>{task.deskripsi}</TableCell>
 
-                <TableCell
-                  sx={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: 1,
-                  }}
-                >
-                  {/* <TextField type="text" value={task.link} /> */}
-                  <a href={formatLink(task.link)} target="_blank" rel="noopener noreferrer" style={{ textDecoration: "none", color: "blue", cursor: "pointer" }}>
-                    {task.link}
-                  </a>
-                  <ActionButton onClick={() => copyToClipboard(task.link)}>
-                    <ContentCopyIcon />
-                  </ActionButton>
-                </TableCell>
-                <TableCell>
-                  <ActionButton onClick={() => handleTaskCompletion(task.id)}>{task.completed ? <CheckCircleIcon color="success" /> : <CancelIcon color="error" />}</ActionButton>
-                </TableCell>
-                <TableCell>
-                  <ActionButton onClick={() => openModal("edit", task.id, task.name, task.dueDate, task.link, task.deskripsi)}>
-                    <EditIcon />
-                  </ActionButton>
-                  <ActionButton
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      openDeleteModal(task.id);
+                  <TableCell
+                    sx={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 1,
                     }}
                   >
-                    <DeleteIcon color="error" />
-                  </ActionButton>
-                </TableCell>
+                    {/* <TextField type="text" value={task.link} /> */}
+                    <a href={formatLink(task.link)} target="_blank" rel="noopener noreferrer" style={{ textDecoration: "none", color: "blue", cursor: "pointer" }}>
+                      {task.link}
+                    </a>
+                    <ActionButton onClick={() => copyToClipboard(task.link)}>
+                      <ContentCopyIcon />
+                    </ActionButton>
+                  </TableCell>
+                  <TableCell>
+                    <ActionButton onClick={() => handleTaskCompletion(task.id)}>{task.completed ? <CheckCircleIcon color="success" /> : <CancelIcon color="error" />}</ActionButton>
+                  </TableCell>
+                  <TableCell>
+                    <ActionButton onClick={() => openModal("edit", task.id, task.name, task.dueDate, task.link, task.deskripsi)}>
+                      <EditIcon />
+                    </ActionButton>
+                    <ActionButton
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        openDeleteModal(task.id);
+                      }}
+                    >
+                      <DeleteIcon color="error" />
+                    </ActionButton>
+                  </TableCell>
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <TableCell colSpan="4">No tasks available</TableCell>
               </tr>
-            ))
-          ) : (
-            <tr>
-              <TableCell colSpan="4">No tasks available</TableCell>
-            </tr>
-          )}
-        </tbody>
-      </TaskTable>
+            )}
+          </tbody>
+        </TaskTable>
+      </div>
+
       {tasks.length > tasksPerPage && (
         <PaginationControls style={{ display: "flex", justifyContent: "flex-start" }}>
           <Button disabled={currentPage === 1} onClick={() => setCurrentPage(currentPage - 1)} style={{ fontSize: "25px" }}>

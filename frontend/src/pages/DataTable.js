@@ -2,6 +2,7 @@ import React, { useState, useMemo, useEffect } from "react";
 import { useTable, useSortBy } from "react-table";
 import Select from "react-select";
 import DatePicker from "react-datepicker";
+import useMediaQuery from "@mui/material/useMediaQuery";
 import "react-datepicker/dist/react-datepicker.css";
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Button } from "@mui/material";
 const formatDate = (dateString) => {
@@ -162,6 +163,7 @@ const DataTable = () => {
   const tableInstance = useTable({ columns, data: filteredData, initialState: { sortBy: [{ id: "team", desc: false }] } }, useSortBy);
 
   const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } = tableInstance;
+  const isMobile = useMediaQuery("(max-width:600px)");
 
   // Pagination Logic
   const startRow = currentPage * rowsPerPage;
@@ -218,26 +220,50 @@ const DataTable = () => {
               isDisabled={!filter.activity}
             />
           </div>
-          <div className="search-inputs" style={{ marginTop: "10px", marginBottom: "60px", display: "flex", gap: "10px" }}>
-            <input type="text" style={{ width: "400px" }} className="search-bar" value={filter.taskSearch} onChange={(e) => setFilter({ ...filter, taskSearch: e.target.value })} placeholder="Search tugas" />
-            <input type="text" style={{ width: "400px" }} className="search-bar" value={filter.activitySearch} onChange={(e) => setFilter({ ...filter, activitySearch: e.target.value })} placeholder="Search kegiatan" />
 
-            <div style={{ marginLeft: "300px" }}>
-              <DatePicker
-                placeholderText=" Tanggal Pelaksanaan"
-                selected={pelaksanaanStartDate}
-                onChange={(dates) => setPelaksanaanDateRange(dates)}
-                startDate={pelaksanaanStartDate}
-                endDate={pelaksanaanEndDate}
-                selectsRange
-                isClearable
-                dateFormat="yyyy-MM-dd"
-              />
+          {isMobile ? (
+            <div className="search-inputs" style={{ marginTop: "10px", marginBottom: "40px", display: "flex", gap: "10px", flexDirection: "column" }}>
+              <input type="text" style={{ width: "170px" }} className="search-bar" value={filter.taskSearch} onChange={(e) => setFilter({ ...filter, taskSearch: e.target.value })} placeholder="Search tugas" />
+              <input type="text" style={{ width: "170px" }} className="search-bar" value={filter.activitySearch} onChange={(e) => setFilter({ ...filter, activitySearch: e.target.value })} placeholder="Search kegiatan" />
+
+              <div>
+                <DatePicker
+                  placeholderText=" Tanggal Pelaksanaan"
+                  selected={pelaksanaanStartDate}
+                  onChange={(dates) => setPelaksanaanDateRange(dates)}
+                  startDate={pelaksanaanStartDate}
+                  endDate={pelaksanaanEndDate}
+                  selectsRange
+                  isClearable
+                  dateFormat="yyyy-MM-dd"
+                />
+              </div>
+              <div>
+                <DatePicker placeholderText=" Deadline" selected={dueStartDate} onChange={(dates) => setdueDateRange(dates)} startDate={dueStartDate} endDate={dueEndDate} selectsRange isClearable dateFormat="yyyy-MM-dd" />
+              </div>
             </div>
-            <div>
-              <DatePicker placeholderText=" Deadline" selected={dueStartDate} onChange={(dates) => setdueDateRange(dates)} startDate={dueStartDate} endDate={dueEndDate} selectsRange isClearable dateFormat="yyyy-MM-dd" />
+          ) : (
+            <div className="search-inputs" style={{ marginTop: "10px", marginBottom: "60px", display: "flex", gap: "10px" }}>
+              <input type="text" style={{ width: "400px" }} className="search-bar" value={filter.taskSearch} onChange={(e) => setFilter({ ...filter, taskSearch: e.target.value })} placeholder="Search tugas" />
+              <input type="text" style={{ width: "400px" }} className="search-bar" value={filter.activitySearch} onChange={(e) => setFilter({ ...filter, activitySearch: e.target.value })} placeholder="Search kegiatan" />
+
+              <div style={{ marginLeft: "300px" }}>
+                <DatePicker
+                  placeholderText=" Tanggal Pelaksanaan"
+                  selected={pelaksanaanStartDate}
+                  onChange={(dates) => setPelaksanaanDateRange(dates)}
+                  startDate={pelaksanaanStartDate}
+                  endDate={pelaksanaanEndDate}
+                  selectsRange
+                  isClearable
+                  dateFormat="yyyy-MM-dd"
+                />
+              </div>
+              <div>
+                <DatePicker placeholderText=" Deadline" selected={dueStartDate} onChange={(dates) => setdueDateRange(dates)} startDate={dueStartDate} endDate={dueEndDate} selectsRange isClearable dateFormat="yyyy-MM-dd" />
+              </div>
             </div>
-          </div>
+          )}
         </div>
       </div>
 
