@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useNavigate, useParams } from "react-router-dom";
-import { Box, Button, Modal, TextField, IconButton, Typography } from "@mui/material";
+import { Box, Button, Modal, TextField, IconButton, Typography, RadioGroup, FormControlLabel, Radio, Tooltip } from "@mui/material";
+
 import CloseIcon from "@mui/icons-material/Close";
 import EditIcon from "@mui/icons-material/Edit";
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
@@ -76,6 +77,29 @@ const PaginationControls = styled(Box)({
   justifyContent: "center",
   marginTop: "20px",
   gap: "10px",
+});
+
+const FileList = styled("ul")({
+  listStyleType: "none",
+  padding: 0,
+});
+
+const FileListItem = styled("li")({
+  display: "flex",
+  justifyContent: "space-between",
+  alignItems: "center",
+  marginTop: "8px",
+  padding: "8px",
+  backgroundColor: "#f1f1f1",
+  borderRadius: "4px",
+  wordWrap: "break-word",
+});
+
+const FileName = styled("span")({
+  maxWidth: "200px",
+  whiteSpace: "nowrap",
+  overflow: "hidden",
+  textOverflow: "ellipsis",
 });
 
 function Tugas() {
@@ -301,6 +325,22 @@ function Tugas() {
   const totalPages = Math.ceil(tasks.length / tasksPerPage);
   const driveFolderUrl = linkDrive;
 
+  const [uploadType, setUploadType] = useState("link");
+  const [files, setFiles] = useState([]);
+
+  const handleUploadTypeChange = (event) => {
+    setUploadType(event.target.value);
+  };
+
+  const handleFileUpload = (event) => {
+    const newFiles = Array.from(event.target.files);
+    setFiles((prevFiles) => [...prevFiles, ...newFiles]);
+  };
+
+  const handleFileRemove = (index) => {
+    setFiles((prevFiles) => prevFiles.filter((_, i) => i !== index));
+  };
+
   return (
     <div className="task-container">
       <ExploreBreadcrumb />
@@ -420,28 +460,56 @@ function Tugas() {
           </Box>
           <TextField label="Task Name" fullWidth value={taskName} onChange={(e) => setTaskName(e.target.value)} margin="normal" />
           <TextField
-            label="Due Date"
-            type="date"
-            fullWidth
-            value={dueDate}
-            onChange={(e) => setDueDate(e.target.value)}
-            margin="normal"
-            InputLabelProps={{
-              shrink: true, // Ini memastikan label selalu berada di posisi atas
-            }}
+              label="Due Date"
+              type="date"
+              fullWidth
+              value={dueDate}
+              onChange={(e) => setDueDate(e.target.value)}
+              margin="normal"
+              InputLabelProps={{
+                shrink: true,
+              }}
           />
           <TextField label="Deskripsi" fullWidth value={deskripsi} onChange={(e) => setDeskripsi(e.target.value)} margin="normal" />
 
-          <TextField label="Link" fullWidth value={link} onChange={(e) => setLink(e.target.value)} margin="normal" />
+          <Typography variant="h6" marginTop="16px">Upload Type</Typography>
+          <RadioGroup value={uploadType} onChange={handleUploadTypeChange}>
+            <FormControlLabel value="link" control={<Radio />} label="Link (Google Sheets, Google Docs, etc.)" />
+            <FormControlLabel value="file" control={<Radio />} label="File (PDF, Image, Video, etc.)" />
+          </RadioGroup>
+
+          {uploadType === "link" ? (
+              <TextField label="Link" fullWidth value={link} onChange={(e) => setLink(e.target.value)} margin="normal" />
+          ) : (
+              <>
+                <Button variant="contained" component="label" fullWidth sx={{ marginTop: "16px" }}>
+                  Tambah File
+                  <input type="file" hidden onChange={handleFileUpload} multiple />
+                </Button>
+                <FileList>
+                  {files.map((file, index) => (
+                      <FileListItem key={index}>
+                        <Tooltip title={file.name}>
+                          <FileName>{file.name}</FileName>
+                        </Tooltip>
+                        <IconButton onClick={() => handleFileRemove(index)}>
+                          <DeleteIcon color="error" />
+                        </IconButton>
+                      </FileListItem>
+                  ))}
+                </FileList>
+              </>
+          )}
+
           <Box display="flex" justifyContent="flex-end" marginTop="16px">
             {modalType === "add" ? (
-              <Button onClick={handleAddTask} variant="contained" color="primary">
-                Add Task
-              </Button>
+                <Button variant="contained" color="primary">
+                  Add Task
+                </Button>
             ) : (
-              <Button onClick={handleEditTask} variant="contained" color="primary">
-                Update Task
-              </Button>
+                <Button variant="contained" color="primary">
+                  Update Task
+                </Button>
             )}
           </Box>
         </ModalContent>
