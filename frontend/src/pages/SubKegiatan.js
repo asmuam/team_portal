@@ -16,17 +16,17 @@ import AddButton from "../components/common/button/AddButton";
 import useMediaQuery from "@mui/material/useMediaQuery";
 
 // Styled Components
-const ModalContent = styled(Box)({
+const ModalContent = styled(Box)(({ isMobile }) => ({
   position: "absolute",
   top: "50%",
   left: "50%",
   transform: "translate(-50%, -50%)",
-  width: 400,
+  width: isMobile ? 300 : 400,
   backgroundColor: "white",
   padding: "20px",
   borderRadius: "8px",
   boxShadow: "0 4px 8px rgba(0, 0, 0, 0.2)",
-});
+}));
 
 const Header = styled(Typography)({
   marginBottom: "16px",
@@ -238,7 +238,7 @@ function SubKegiatan() {
             <Button
               variant="contained"
               color="primary"
-              onClick={() => navigate("/explorer")}
+              onClick={() => navigate(`/explorer/team/${teamId}/kegiatan`)}
               startIcon={<ArrowBackIcon />}
               sx={{
                 borderRadius: "6px",
@@ -334,7 +334,7 @@ function SubKegiatan() {
         </PaginationControls>
       )}
       <Modal open={isModalOpen} onClose={closeModal}>
-        <ModalContent>
+        <ModalContent isMobile={isMobile}>
           <Header>
             {modalType === "add" ? "Tambah Sub-Kegiatan" : "Edit Sub-Kegiatan"}
             <IconButton
@@ -368,7 +368,7 @@ function SubKegiatan() {
         </ModalContent>
       </Modal>
       <Modal open={isDeleteModalOpen} onClose={closeDeleteModal}>
-        <ModalContent>
+        <ModalContent isMobile={isMobile}>
           <Header>Konfirmasi Hapus Sub-Kegiatan</Header>
           <Typography variant="body1" sx={{ marginBottom: "16px" }}>
             Apakah Anda yakin ingin menghapus Sub-Kegiatan ini?

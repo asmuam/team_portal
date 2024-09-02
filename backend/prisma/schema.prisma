@@ -74,7 +74,7 @@ model Tugas {
   link           String?
   completed      Boolean     @default(false)
   subkegiatan    Subkegiatan @relation(fields: [subkegiatan_id], references: [id], onDelete: Cascade)
-  created_by    String?
+  created_by    String
 }
 
 // hapus dahulu tabel pada mysql dibawah ini lalu ganti dengan query pada view.sql

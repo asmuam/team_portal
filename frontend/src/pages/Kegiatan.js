@@ -16,17 +16,17 @@ import DriveButton from "../components/common/button/DriveButton";
 import AddButton from "../components/common/button/AddButton";
 
 // Styled Components
-const ModalContent = styled(Box)({
+const ModalContent = styled(Box)(({ isMobile }) => ({
   position: "absolute",
   top: "50%",
   left: "50%",
   transform: "translate(-50%, -50%)",
-  width: 400,
+  width: isMobile ? 300 : 400,
   backgroundColor: "white",
   padding: "20px",
   borderRadius: "8px",
   boxShadow: "0 4px 8px rgba(0, 0, 0, 0.2)",
-});
+}));
 
 const Header = styled(Typography)({
   marginBottom: "16px",
@@ -327,7 +327,7 @@ function Kegiatan() {
       )}
 
       <Modal open={isModalOpen} onClose={closeModal} aria-labelledby="activity-modal-title" aria-describedby="activity-modal-description">
-        <ModalContent>
+        <ModalContent isMobile={isMobile}>
           <Header id="activity-modal-title" variant="h6">
             {modalType === "add" ? "Tambah Kegiatan Baru" : "Edit Kegiatan"}
             <IconButton
@@ -378,7 +378,7 @@ function Kegiatan() {
       </Modal>
 
       <Modal open={isDeleteModalOpen} onClose={closeDeleteModal}>
-        <ModalContent>
+        <ModalContent isMobile={isMobile}>
           <Header>Konfirmasi Hapus Sub-Kegiatan</Header>
           <Typography variant="body1" sx={{ marginBottom: "16px" }}>
             Apakah Anda yakin ingin menghapus Sub-Kegiatan ini?

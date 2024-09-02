@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import axios from "axios";
+import AuthContext from "../context/AuthContext.js";
 import { useNavigate, useParams } from "react-router-dom";
 import { Box, Button, Modal, TextField, IconButton, Typography, RadioGroup, FormControlLabel, Radio, Tooltip } from "@mui/material";
 
@@ -22,17 +23,17 @@ import { useDriveLink } from "../context/DriveContext";
 import AddButton from "../components/common/button/AddButton";
 
 // Styled Components
-const ModalContent = styled(Box)({
+const ModalContent = styled(Box)(({ isMobile }) => ({
   position: "absolute",
   top: "50%",
   left: "50%",
   transform: "translate(-50%, -50%)",
-  width: 400,
+  width: isMobile ? 300 : 400,
   backgroundColor: "white",
   padding: "20px",
   borderRadius: "8px",
   boxShadow: "0 4px 8px rgba(0, 0, 0, 0.2)",
-});
+}));
 
 const TableContainer = styled(Box)({
   width: "100%",
@@ -122,6 +123,7 @@ const FileName = styled("span")({
 
 function Tugas() {
   const { teamId, activityId, subActivityId } = useParams();
+
   const [tasks, setTasks] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalType, setModalType] = useState("");
@@ -133,6 +135,7 @@ function Tugas() {
   const [deskripsi, setDeskripsi] = useState("");
   const [link, setLink] = useState("");
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const { auth } = useContext(AuthContext);
 
   const [teamName, setTeamName] = useState("");
   const [activityName, setActivityName] = useState("");
@@ -254,6 +257,7 @@ function Tugas() {
       link: link || "#",
       deskripsi: deskripsi || "tidak ada",
       completed: false,
+      created_by: auth.name, // Menggunakan nama pengguna yang sedang login
     };
 
     try {
@@ -388,7 +392,7 @@ function Tugas() {
             <Button
               variant="contained"
               color="primary"
-              onClick={() => navigate("/explorer")}
+              onClick={() => navigate(`/explorer/team/${teamId}/kegiatan/${activityId}/subkegiatan`)}
               startIcon={<ArrowBackIcon />}
               sx={{
                 borderRadius: "6px",
@@ -442,6 +446,7 @@ function Tugas() {
               <TableHeader>File</TableHeader>
               <TableHeader>Verified</TableHeader>
               <TableHeader>Actions</TableHeader>
+              <TableHeader>Created By</TableHeader>
             </tr>
           </thead>
           <tbody style={{ overflowX: "auto" }}>
@@ -483,6 +488,7 @@ function Tugas() {
                       <DeleteIcon color="error" />
                     </ActionButton>
                   </TableCell>
+                  <TableCell>{task.created_by}</TableCell>
                 </tr>
               ))
             ) : (
@@ -509,7 +515,7 @@ function Tugas() {
       )}
       {/* Modal for Add/Edit Task */}
       <Modal open={isModalOpen} onClose={closeModal}>
-        <ModalContent>
+        <ModalContent isMobile={isMobile}>
           <Box display="flex" justifyContent="space-between" alignItems="center">
             <h2>{modalType === "add" ? "Add Task" : "Edit Task"}</h2>
             <IconButton onClick={closeModal}>
@@ -575,7 +581,7 @@ function Tugas() {
         </ModalContent>
       </Modal>
       <Modal open={isDeleteModalOpen} onClose={closeDeleteModal}>
-        <ModalContent>
+        <ModalContent isMobile={isMobile}>
           <Header>Konfirmasi Hapus Sub-Kegiatan</Header>
           <Typography variant="body1" sx={{ marginBottom: "16px" }}>
             Apakah Anda yakin ingin menghapus Sub-Kegiatan ini?
