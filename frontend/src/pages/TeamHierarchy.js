@@ -11,7 +11,7 @@ import DriveButton from "../components/common/button/DriveButton";
 import { useDriveLink } from "../context/DriveContext";
 import AddButton from "../components/common/button/AddButton";
 import TambahTeamModal from "../components/explorer/team/TambahTeamModal";
-import {Archive, Delete, Edit} from "@mui/icons-material";
+import { Archive, Delete, Edit } from "@mui/icons-material";
 import TeamList from "../components/explorer/team/TeamList";
 
 const ModalContent = styled(Box)({
@@ -176,41 +176,35 @@ function TeamHierarchy({ teams, setTeams }) {
   };
 
   const driveFolderUrl = `https://drive.google.com/drive/folders/${process.env.REACT_APP_ROOT_DRIVE_FOLDER_ID}`;
-  setLinkDrive(driveFolderUrl)
+  setLinkDrive(driveFolderUrl);
   return (
-      <div className="team-hierarchy">
-        <div className="header">
-          <ExploreBreadcrumb/>
-          <AddButton onClick={() => openModal("add")} text="Tambah Tim"/>
-          <DriveButton driveFolderUrl={driveFolderUrl}/>
-        </div>
-
-        <TeamList
-            teams={teams}
-            handleTeamClick={handleTeamClick}
-            deleteTeam={deleteTeam}
-            archiveTeam={archiveTeam}
-            openModal={openModal}
-        />
-
-        <TambahTeamModal
-            open={isModalOpen}
-            onClose={closeModal}
-            modalType={modalType}
-            newTeamName={newTeamName}
-            setNewTeamName={setNewTeamName}
-            selectedKetua={selectedKetua}
-            setSelectedKetua={setSelectedKetua}
-            newDeskripsi={newDeskripsi}
-            setNewDeskripsi={setNewDeskripsi}
-            users={users}
-            handleKeyPress={handleKeyPress}
-            handleAddTeam={handleAddTeam}
-            handleEditTeam={handleEditTeam}
-            currentTeamId={currentTeamId}
-            loading={loading}
-        />
+    <div className="team-hierarchy">
+      <div className="header">
+        <ExploreBreadcrumb />
+        <AddButton onClick={() => openModal("add")} text="Tambah Tim" />
+        <DriveButton driveFolderUrl={driveFolderUrl} />
       </div>
+
+      <TeamList teams={teams} handleTeamClick={handleTeamClick} deleteTeam={deleteTeam} archiveTeam={archiveTeam} openModal={openModal} />
+
+      <TambahTeamModal
+        open={isModalOpen}
+        onClose={closeModal}
+        modalType={modalType}
+        newTeamName={newTeamName}
+        setNewTeamName={setNewTeamName}
+        selectedKetua={selectedKetua}
+        setSelectedKetua={setSelectedKetua}
+        newDeskripsi={newDeskripsi}
+        setNewDeskripsi={setNewDeskripsi}
+        users={users}
+        handleKeyPress={handleKeyPress}
+        handleAddTeam={handleAddTeam}
+        handleEditTeam={handleEditTeam}
+        currentTeamId={currentTeamId}
+        loading={loading}
+      />
+    </div>
   );
 }
 

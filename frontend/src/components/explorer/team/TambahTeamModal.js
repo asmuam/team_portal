@@ -11,24 +11,11 @@ import Select from "@mui/material/Select";
 import MenuItem from "@mui/material/MenuItem";
 import Button from "@mui/material/Button";
 import CircularProgress from "@mui/material/CircularProgress";
+import useMediaQuery from "@mui/material/useMediaQuery";
 
-const TambahTeamModal = ({
-  open,
-  onClose,
-  modalType,
-  newTeamName,
-  setNewTeamName,
-  selectedKetua,
-  setSelectedKetua,
-  newDeskripsi,
-  setNewDeskripsi,
-  users,
-  handleKeyPress,
-  handleAddTeam,
-  handleEditTeam,
-  currentTeamId,
-  loading, // New prop for loading state
-}) => {
+const TambahTeamModal = ({ open, onClose, modalType, newTeamName, setNewTeamName, selectedKetua, setSelectedKetua, newDeskripsi, setNewDeskripsi, users, handleKeyPress, handleAddTeam, handleEditTeam, currentTeamId, loading }) => {
+  const isMobile = useMediaQuery("(max-width:600px)");
+
   return (
     <Modal open={open} onClose={onClose} aria-labelledby="team-modal-title" aria-describedby="team-modal-description">
       <Box
@@ -37,7 +24,7 @@ const TambahTeamModal = ({
           top: "50%",
           left: "50%",
           transform: "translate(-50%, -50%)",
-          width: 400,
+          width: isMobile ? 300 : 400,
           bgcolor: "background.paper",
           borderRadius: "8px",
           boxShadow: 24,
@@ -69,14 +56,7 @@ const TambahTeamModal = ({
           </Select>
         </FormControl>
         <TextField label="Deskripsi" variant="outlined" value={newDeskripsi} onChange={(e) => setNewDeskripsi(e.target.value)} onKeyDown={handleKeyPress} fullWidth required multiline rows={4} margin="normal" />
-        <Button
-          variant="contained"
-          color="primary"
-          onClick={modalType === "add" ? handleAddTeam : () => handleEditTeam(currentTeamId)}
-          fullWidth
-          sx={{ mt: 2 }}
-          disabled={loading} // Disable button when loading
-        >
+        <Button variant="contained" color="primary" onClick={modalType === "add" ? handleAddTeam : () => handleEditTeam(currentTeamId)} fullWidth sx={{ mt: 2 }} disabled={loading}>
           {loading ? <CircularProgress size={24} color="inherit" /> : modalType === "add" ? "Tambah" : "Simpan"}
         </Button>
       </Box>
