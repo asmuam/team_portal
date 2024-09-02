@@ -15,19 +15,21 @@ import { useDriveLink } from "../context/DriveContext";
 import DriveButton from "../components/common/button/DriveButton";
 import AddButton from "../components/common/button/AddButton";
 import DeleteConfirmationModal from "../components/common/alert/deleteModal";
+import TambahKegiatanModal from "../components/explorer/kegiatan/TambahKegiatanModal";
+import ActivityList from "../components/explorer/kegiatan/KegiatanList";
 
 // Styled Components
-const ModalContent = styled(Box)(({ isMobile }) => ({
+const ModalContent = styled(Box)({
   position: "absolute",
   top: "50%",
   left: "50%",
   transform: "translate(-50%, -50%)",
-  width: isMobile ? 300 : 400,
+  width: 400,
   backgroundColor: "white",
   padding: "20px",
   borderRadius: "8px",
   boxShadow: "0 4px 8px rgba(0, 0, 0, 0.2)",
-}));
+});
 
 const Header = styled(Typography)({
   marginBottom: "16px",
@@ -273,112 +275,35 @@ function Kegiatan() {
         </div>
       </div>
 
-      <div className="activity-list">
-        {currentActivities.map((activity) => (
-          <ActivityBox key={activity.id} onClick={() => handleActivityClick(activity.id, activity.link_drive)} style={{ marginBottom: "20px;" }}>
-            <ActivityName>{activity.name}</ActivityName>
-            <Typography variant="body2" color="textSecondary">
-              Tanggal : {formatDate(activity.tanggal_pelaksanaan)} {/* Format tanggal */}
-            </Typography>
-            <br />
-            <Typography variant="body2" color="textSecondary">
-              Deskripsi : {activity.deskripsi} {/* Format tanggal */}
-            </Typography>
-            <ActivityActions>
-              <IconButton
-                onClick={(e) => {
-                  e.stopPropagation();
-                  openModal("edit", activity.id, activity.name, activity.tanggal_pelaksanaan, activity.deskripsi);
-                }}
-              >
-                <EditIcon />
-              </IconButton>
-              <IconButton
-                onClick={(e) => {
-                  e.stopPropagation();
-                  openDeleteModal(activity.id);
-                }}
-              >
-                <DeleteIcon />
-              </IconButton>
-              <IconButton
-                onClick={(e) => {
-                  e.stopPropagation();
-                  archiveActivity(activity.id);
-                }}
-              >
-                <ArchiveIcon />
-              </IconButton>
-            </ActivityActions>
-          </ActivityBox>
-        ))}
-      </div>
-      {activities.length > tasksPerPage && (
-        <PaginationControls style={{ marginTop: "-35px" }}>
-          <Button onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))} disabled={currentPage === 1} style={{ fontSize: "25px" }}>
-            &lt;
-          </Button>
-          <Typography>
-            Page {currentPage} of {totalPages}
-          </Typography>
-          <Button onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))} disabled={currentPage === totalPages} style={{ fontSize: "25px" }}>
-            &gt;
-          </Button>
-        </PaginationControls>
-      )}
+      <ActivityList
+          activities={currentActivities}
+          onActivityClick={handleActivityClick}
+          onEditClick={(id, name, tanggal, deskripsi) => openModal("edit", id, name, tanggal, deskripsi)}
+          onDeleteClick={openDeleteModal}
+          onArchiveClick={archiveActivity}
+      />
 
-      <Modal open={isModalOpen} onClose={closeModal} aria-labelledby="activity-modal-title" aria-describedby="activity-modal-description">
-        <ModalContent isMobile={isMobile}>
-          <Header id="activity-modal-title" variant="h6">
-            {modalType === "add" ? "Tambah Kegiatan Baru" : "Edit Kegiatan"}
-            <IconButton
-              onClick={closeModal}
-              sx={{
-                position: "absolute",
-                top: "10px",
-                right: "10px",
-              }}
-            >
-              <CloseIcon />
-            </IconButton>
-          </Header>
-          <InputField
-            label="Nama Kegiatan"
-            variant="outlined"
-            value={newActivityName}
-            onChange={(e) => setNewActivityName(e.target.value)}
-            onKeyDown={handleKeyPress} // Handle "Enter" key press
-            required
-          />
+      <TambahKegiatanModal
+          isModalOpen={isModalOpen}
+          closeModal={closeModal}
+          modalType={modalType}
+          newActivityName={newActivityName}
+          setNewActivityName={setNewActivityName}
+          tanggalPelaksanaan={tanggalPelaksanaan}
+          setTanggalPelaksanaan={setTanggalPelaksanaan}
+          newDeskripsi={newDeskripsi}
+          setNewDeskripsi={setNewDeskripsi}
+          handleAddActivity={handleAddActivity}
+          handleEditActivity={handleEditActivity}
+          loading={loading}
+      />
 
-          <InputField
-            label="Tanggal Pelaksanaan"
-            type="date"
-            variant="outlined"
-            value={tanggalPelaksanaan}
-            onChange={(e) => setTanggalPelaksanaan(e.target.value)}
-            onKeyDown={handleKeyPress}
-            required
-            InputLabelProps={{
-              shrink: true,
-            }}
-          />
-          <InputField
-            label="Deskripsi"
-            variant="outlined"
-            value={newDeskripsi}
-            onChange={(e) => setNewDeskripsi(e.target.value)}
-            onKeyDown={handleKeyPress} // Handle "Enter" key press
-            required
-          />
-          <Button disabled={loading} variant="contained" color="primary" onClick={modalType === "add" ? handleAddActivity : handleEditActivity} fullWidth>
-            {modalType === "add" ? "Tambah Kegiatan" : "Update Kegiatan"}
-            {loading ? <CircularProgress size={24} color="inherit" /> : modalType === "" ? "" : ""}
-          </Button>
-        </ModalContent>
-      </Modal>
-
-      <DeleteConfirmationModal isDeleteModalOpen={isDeleteModalOpen} closeDeleteModal={closeDeleteModal} deleteActivity={deleteActivity} deleteItemName="Kegiatan" />
+      <DeleteConfirmationModal
+        isDeleteModalOpen={isDeleteModalOpen}
+        closeDeleteModal={closeDeleteModal}
+        deleteActivity={deleteActivity}
+        deleteItemName="Kegiatan"
+        />
     </div>
   );
 }
