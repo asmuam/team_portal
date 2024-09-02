@@ -11,8 +11,10 @@ import DriveButton from "../components/common/button/DriveButton";
 import { useDriveLink } from "../context/DriveContext";
 import AddButton from "../components/common/button/AddButton";
 import TambahTeamModal from "../components/explorer/team/TambahTeamModal";
+
 import { Archive, Delete, Edit } from "@mui/icons-material";
 import TeamList from "../components/explorer/team/TeamList";
+import DeleteConfirmationModal from "../components/common/alert/deleteModal";
 
 const ModalContent = styled(Box)({
   position: "absolute",
@@ -51,6 +53,7 @@ function TeamHierarchy({ teams, setTeams }) {
   const [users, setUsers] = useState([]); // State for users
   const [selectedKetua, setSelectedKetua] = useState(""); // State for selected ketua ID
   const [loading, setLoading] = useState(false); // State for loading
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false); // State for delete confirmation modal
   const navigate = useNavigate();
   const { setLinkDrive } = useDriveLink(); // Access the context setter
 
@@ -115,12 +118,12 @@ function TeamHierarchy({ teams, setTeams }) {
           deskripsi: newDeskripsi,
         });
 
-        // Simulasikan durasi loading (misalnya 2 detik)
+        // Simulate loading duration (e.g., 2 seconds)
         setTimeout(() => {
           refetchTeams();
           closeModal();
           setLoading(false);
-        }, 2000); // 2000ms = 2 detik
+        }, 2000); // 2000ms = 2 seconds
       } catch (error) {
         console.error("Error adding team:", error);
         setLoading(false);
@@ -138,12 +141,12 @@ function TeamHierarchy({ teams, setTeams }) {
           deskripsi: newDeskripsi,
         });
 
-        // Simulasikan durasi loading (misalnya 2 detik)
+        // Simulate loading duration (e.g., 2 seconds)
         setTimeout(() => {
           refetchTeams();
           closeModal();
           setLoading(false);
-        }, 2000); // 2000ms = 2 detik
+        }, 2000); // 2000ms = 2 seconds
       } catch (error) {
         console.error("Error editing team:", error);
         setLoading(false);
@@ -151,11 +154,22 @@ function TeamHierarchy({ teams, setTeams }) {
     }
   };
 
-  const deleteTeam = async (id) => {
+  const openDeleteModal = (teamId) => {
+    setCurrentTeamId(teamId);
+    setIsDeleteModalOpen(true);
+  };
+
+  const closeDeleteModal = () => {
+    setIsDeleteModalOpen(false);
+    setCurrentTeamId(null);
+  };
+
+  const confirmDeleteTeam = async () => {
     setLoading(true);
     try {
-      await axios.delete(`${URL}/teams/${id}`);
+      await axios.delete(`${URL}/teams/${currentTeamId}`);
       refetchTeams();
+      closeDeleteModal();
     } catch (error) {
       console.error("Error deleting team:", error);
     } finally {
@@ -177,34 +191,42 @@ function TeamHierarchy({ teams, setTeams }) {
 
   const driveFolderUrl = `https://drive.google.com/drive/folders/${process.env.REACT_APP_ROOT_DRIVE_FOLDER_ID}`;
   setLinkDrive(driveFolderUrl);
+
   return (
-    <div className="team-hierarchy">
-      <div className="header">
-        <ExploreBreadcrumb />
-        <AddButton onClick={() => openModal("add")} text="Tambah Tim" />
-        <DriveButton driveFolderUrl={driveFolderUrl} />
+      <div className="team-hierarchy">
+        <div className="header">
+          <ExploreBreadcrumb />
+          <AddButton onClick={() => openModal("add")} text="Tambah Tim" />
+          <DriveButton driveFolderUrl={driveFolderUrl} />
+        </div>
+
+        <TeamList teams={teams} handleTeamClick={handleTeamClick} deleteTeam={openDeleteModal} archiveTeam={archiveTeam} openModal={openModal} />
+
+        <TambahTeamModal
+            open={isModalOpen}
+            onClose={closeModal}
+            modalType={modalType}
+            newTeamName={newTeamName}
+            setNewTeamName={setNewTeamName}
+            selectedKetua={selectedKetua}
+            setSelectedKetua={setSelectedKetua}
+            newDeskripsi={newDeskripsi}
+            setNewDeskripsi={setNewDeskripsi}
+            users={users}
+            handleKeyPress={handleKeyPress}
+            handleAddTeam={handleAddTeam}
+            handleEditTeam={handleEditTeam}
+            currentTeamId={currentTeamId}
+            loading={loading}
+        />
+
+        <DeleteConfirmationModal
+            isDeleteModalOpen={isDeleteModalOpen}
+            closeDeleteModal={closeDeleteModal}
+            deleteActivity={confirmDeleteTeam}
+            deleteItemName="Tim"
+        />
       </div>
-
-      <TeamList teams={teams} handleTeamClick={handleTeamClick} deleteTeam={deleteTeam} archiveTeam={archiveTeam} openModal={openModal} />
-
-      <TambahTeamModal
-        open={isModalOpen}
-        onClose={closeModal}
-        modalType={modalType}
-        newTeamName={newTeamName}
-        setNewTeamName={setNewTeamName}
-        selectedKetua={selectedKetua}
-        setSelectedKetua={setSelectedKetua}
-        newDeskripsi={newDeskripsi}
-        setNewDeskripsi={setNewDeskripsi}
-        users={users}
-        handleKeyPress={handleKeyPress}
-        handleAddTeam={handleAddTeam}
-        handleEditTeam={handleEditTeam}
-        currentTeamId={currentTeamId}
-        loading={loading}
-      />
-    </div>
   );
 }
 

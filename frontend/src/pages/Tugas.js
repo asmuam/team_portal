@@ -20,6 +20,7 @@ import ExploreBreadcrumb from "../components/common/navigation/ExploreBreadcrumb
 import DriveButton from "../components/common/button/DriveButton";
 import { useDriveLink } from "../context/DriveContext";
 import AddButton from "../components/common/button/AddButton";
+import DeleteConfirmationModal from "../components/common/alert/deleteModal";
 
 // Styled Components
 const ModalContent = styled(Box)({
@@ -574,22 +575,13 @@ function Tugas() {
           </Box>
         </ModalContent>
       </Modal>
-      <Modal open={isDeleteModalOpen} onClose={closeDeleteModal}>
-        <ModalContent>
-          <Header>Konfirmasi Hapus Sub-Kegiatan</Header>
-          <Typography variant="body1" sx={{ marginBottom: "16px" }}>
-            Apakah Anda yakin ingin menghapus Sub-Kegiatan ini?
-          </Typography>
-          <Box sx={{ display: "flex", justifyContent: "space-between" }}>
-            <Button variant="contained" color="error" onClick={deleteTask}>
-              Hapus
-            </Button>
-            <Button variant="contained" onClick={closeDeleteModal}>
-              Batal
-            </Button>
-          </Box>
-        </ModalContent>
-      </Modal>
+
+      <DeleteConfirmationModal
+          isDeleteModalOpen={isDeleteModalOpen}
+          closeDeleteModal={closeDeleteModal}
+          deleteActivity={deleteTask}
+          deleteItemName="Tugas"
+      />
     </div>
   );
 }
