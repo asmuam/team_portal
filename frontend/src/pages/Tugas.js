@@ -153,8 +153,10 @@ function Tugas() {
   const [link, setLink] = useState("");
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
+  const [createdByFilter, setCreatedByFilter] = useState("");
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
+
   const { auth } = useContext(AuthContext);
 
   const [teamName, setTeamName] = useState("");
@@ -397,16 +399,13 @@ function Tugas() {
     setFiles((prevFiles) => prevFiles.filter((_, i) => i !== index));
   };
 
-  const filteredTasks = tasks
-    .filter((task) => {
-      return task.name.toLowerCase().includes(searchTerm.toLowerCase()) || task.created_by.toLowerCase().includes(searchTerm.toLowerCase());
-    })
-    .filter((task) => {
-      const taskDate = new Date(task.dueDate);
-      const start = new Date(startDate);
-      const end = new Date(endDate);
-      return (!startDate || taskDate >= start) && (!endDate || taskDate <= end);
-    });
+  const filteredTasks = tasks.filter((task) => {
+    const matchesName = task.name.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesCreatedBy = task.created_by.toLowerCase().includes(createdByFilter.toLowerCase());
+    const matchesDueDate = (!startDate || new Date(task.dueDate) >= new Date(startDate)) && (!endDate || new Date(task.dueDate) <= new Date(endDate));
+
+    return matchesName && matchesCreatedBy && matchesDueDate;
+  });
 
   return (
     <div className="task-container">
@@ -414,7 +413,7 @@ function Tugas() {
         {/* Bagian Back dan Tambah */}
         <ExploreBreadcrumb />
 
-        <div style={{ display: "flex", alignItems: "center" }}>
+        <div style={{ display: "flex", alignItems: "center", marginTop: "10px" }}>
           {isMobile ? (
             <IconButton onClick={() => navigate(`/explorer/team/${teamId}/kegiatan/${activityId}/subkegiatan`)} style={{ backgroundColor: "#007bff", color: "#ffffff", marginRight: "10px" }}>
               <ArrowBackIcon />
@@ -458,7 +457,7 @@ function Tugas() {
         </div>
 
         {/* Bagian Drive */}
-        <div style={{ position: "absolute", right: 0, top: "28px" }}>
+        <div style={{ position: "absolute", right: 0, top: "35px" }}>
           <DriveButton driveFolderUrl={driveFolderUrl} />
         </div>
       </div>
@@ -467,17 +466,54 @@ function Tugas() {
         <CircularProgress variant="determinate" value={progress} />
         <ProgressText>{Math.round(progress)}% Completed</ProgressText>
       </ProgressWrapper>
-
-      <Box display="flex" justifyContent="space-between" marginBottom="20px">
-        <TextField label="Cari Tugas atau Pembuat" variant="outlined" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} size="small" />
-        <Box display="flex" gap="10px">
-          <TextField label="Dari Tanggal" type="date" variant="outlined" value={startDate} onChange={(e) => setStartDate(e.target.value)} InputLabelProps={{ shrink: true }} size="small" />
-          <TextField label="Sampai Tanggal" type="date" variant="outlined" value={endDate} onChange={(e) => setEndDate(e.target.value)} InputLabelProps={{ shrink: true }} size="small" />
-          {/* <Button onClick={() => setStartDate("") & setEndDate("")} variant="outlined">
-            Reset Filter
-          </Button> */}
+      {isMobile ? (
+        <Box display="flex" flexDirection="column" gap="16px" mb="16px">
+          <TextField label="Search Task Name" variant="outlined" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
+          <TextField label="Search Created By" variant="outlined" value={createdByFilter} onChange={(e) => setCreatedByFilter(e.target.value)} />
+          <TextField
+            label="Start Date"
+            type="date"
+            InputLabelProps={{
+              shrink: true,
+            }}
+            value={startDate}
+            onChange={(e) => setStartDate(e.target.value)}
+          />
+          <TextField
+            label="End Date"
+            type="date"
+            InputLabelProps={{
+              shrink: true,
+            }}
+            value={endDate}
+            onChange={(e) => setEndDate(e.target.value)}
+          />
         </Box>
-      </Box>
+      ) : (
+        <Box display="flex" gap="16px" mb="16px" mt="10px">
+          <TextField label="Search Task Name" variant="outlined" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
+          <TextField label="Search Created By" variant="outlined" value={createdByFilter} onChange={(e) => setCreatedByFilter(e.target.value)} />
+          <TextField
+            label="Start Date"
+            type="date"
+            InputLabelProps={{
+              shrink: true,
+            }}
+            value={startDate}
+            onChange={(e) => setStartDate(e.target.value)}
+          />
+          <TextField
+            label="End Date"
+            type="date"
+            InputLabelProps={{
+              shrink: true,
+            }}
+            value={endDate}
+            onChange={(e) => setEndDate(e.target.value)}
+          />
+        </Box>
+      )}
+
       <div style={{ overflowX: "auto" }}>
         <TableContainer>
           <TaskTable isMobile={isMobile}>
@@ -500,7 +536,7 @@ function Tugas() {
 
             <tbody>
               {currentTasks.length ? (
-                currentTasks.map((task) => (
+                filteredTasks.map((task) => (
                   <TableRow key={task.id} isMobile={isMobile}>
                     <TableCell>{task.id}</TableCell>
 
