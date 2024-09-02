@@ -157,9 +157,6 @@ const Header = ({ isAuthenticated, handleLogout, name, role }) => {
               horizontal: "right",
             }}
         >
-          <MenuItem component={Link} to="/user-management">
-            <ListItemText primary="User Management" />
-          </MenuItem>
           <MenuItem>
             <ListItemText primary={`Nama: ${name}`} />
           </MenuItem>
