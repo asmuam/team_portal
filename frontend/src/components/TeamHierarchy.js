@@ -4,13 +4,16 @@ import { useNavigate } from "react-router-dom";
 import { Modal, Box, Button, TextField, Typography, IconButton, Select, MenuItem, InputLabel, FormControl, CircularProgress } from "@mui/material";
 import { styled } from "@mui/system";
 import CloseIcon from "@mui/icons-material/Close";
-import "./TeamHierarchy.css";
 import AddIcon from "@mui/icons-material/Add";
 import Breadcrumbs from "@mui/material/Breadcrumbs";
 import ExploreBreadcrumb from "./common/ExploreBreadcrumb";
-import AddButton from "./common/AddButton";
 import DriveButton from "./common/DriveButton";
 import { useDriveLink } from "../context/DriveContext";
+import AddButton from "./common/button/AddButton";
+import "./TeamHierarchy.css";
+import TambahTeamModal from "./explorer/team/TambahTeamModal";
+import {Archive, Delete, Edit} from "@mui/icons-material";
+import TeamList from "./explorer/team/TeamList";
 
 const ModalContent = styled(Box)({
   position: "absolute",
@@ -176,103 +179,39 @@ function TeamHierarchy({ teams, setTeams }) {
   const driveFolderUrl = `https://drive.google.com/drive/folders/${process.env.REACT_APP_ROOT_DRIVE_FOLDER_ID}`;
   setLinkDrive(driveFolderUrl)
   return (
-    <div className="team-hierarchy">
-      <div className="header">
-        <ExploreBreadcrumb />
-        <AddButton onClick={() => openModal("add")} text="Tambah Tim Baru" />
-        <DriveButton driveFolderUrl={driveFolderUrl}/>
+      <div className="team-hierarchy">
+        <div className="header">
+          <ExploreBreadcrumb/>
+          <AddButton onClick={() => openModal("add")} text="Tambah Tim"/>
+          <DriveButton driveFolderUrl={driveFolderUrl}/>
+        </div>
+
+        <TeamList
+            teams={teams}
+            handleTeamClick={handleTeamClick}
+            deleteTeam={deleteTeam}
+            archiveTeam={archiveTeam}
+            openModal={openModal}
+        />
+
+        <TambahTeamModal
+            open={isModalOpen}
+            onClose={closeModal}
+            modalType={modalType}
+            newTeamName={newTeamName}
+            setNewTeamName={setNewTeamName}
+            selectedKetua={selectedKetua}
+            setSelectedKetua={setSelectedKetua}
+            newDeskripsi={newDeskripsi}
+            setNewDeskripsi={setNewDeskripsi}
+            users={users}
+            handleKeyPress={handleKeyPress}
+            handleAddTeam={handleAddTeam}
+            handleEditTeam={handleEditTeam}
+            currentTeamId={currentTeamId}
+            loading={loading}
+        />
       </div>
-      <div className="team-list">
-        {teams.map((team) => (
-          <div className="team-container" key={team.id}>
-            <div className="team-box" onClick={(e) => handleTeamClick(e, team.id, team.link_drive)}>
-              <div className="team-name">{team.name}</div>
-              <div className="team-ketua">Ketua : {team.leader.name}</div> {/* Display ketua */}
-              <br />
-              <div className="team-deskripsi">Deskripsi : {team.deskripsi}</div> {/* Display deskripsi */}
-              <div className="team-actions">
-                <span
-                  onClick={(e) => {
-                    e.stopPropagation(); // Prevent unwanted navigation
-                    openModal("edit", team.id, team.name, team.leader.id, team.deskripsi); // Pass ketua and deskripsi to modal
-                  }}
-                >
-                  &#9998;
-                </span>
-                <span
-                  onClick={(e) => {
-                    e.stopPropagation(); // Prevent unwanted navigation
-                    deleteTeam(team.id);
-                  }}
-                >
-                  &#10006;
-                </span>
-                <span onClick={(e) => archiveTeam(e, team.id)}>&#128229;</span>
-              </div>
-            </div>
-          </div>
-        ))}
-      </div>
-      <Modal open={isModalOpen} onClose={closeModal} aria-labelledby="team-modal-title" aria-describedby="team-modal-description">
-        <ModalContent>
-          <Header id="team-modal-title" variant="h6">
-            {modalType === "add" ? "Tambah Tim Baru" : "Edit Nama Tim"}
-            <IconButton
-              onClick={closeModal}
-              sx={{
-                position: "absolute",
-                top: "10px",
-                right: "10px",
-              }}
-            >
-              <CloseIcon />
-            </IconButton>
-          </Header>
-          <InputField
-            label="Nama Tim"
-            variant="outlined"
-            value={newTeamName}
-            onChange={(e) => setNewTeamName(e.target.value)}
-            onKeyDown={handleKeyPress} // Handle "Enter" key press
-            required
-          />
-          <FormControlStyled variant="outlined">
-            <InputLabel id="ketua-select-label">Ketua</InputLabel>
-            <Select
-              labelId="ketua-select-label"
-              value={selectedKetua}
-              onChange={(e) => setSelectedKetua(e.target.value)}
-              onKeyDown={handleKeyPress} // Handle "Enter" key press
-              label="Ketua" // Ensure the label matches the InputLabel
-            >
-              {users.map((user) => (
-                <MenuItem key={user.id} value={user.id}>
-                  {user.name}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControlStyled>
-          <InputField
-            label="Deskripsi"
-            variant="outlined"
-            value={newDeskripsi}
-            onChange={(e) => setNewDeskripsi(e.target.value)}
-            onKeyDown={handleKeyPress} // Handle "Enter" key press
-            required
-            multiline
-            rows={4}
-          />
-          <Button
-            variant="contained"
-            color="primary"
-            onClick={modalType === "add" ? handleAddTeam : () => handleEditTeam(currentTeamId)} // Ensure correct ID is passed
-            disabled={loading} // Disable button when loading
-          >
-            {loading ? <CircularProgress size={24} color="inherit" /> : modalType === "add" ? "Tambah" : "Simpan"}
-          </Button>
-        </ModalContent>
-      </Modal>
-    </div>
   );
 }
 

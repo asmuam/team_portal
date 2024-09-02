@@ -14,9 +14,9 @@ import { styled } from "@mui/system";
 import CircularProgress from "@mui/material/CircularProgress";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import ExploreBreadcrumb from "./common/ExploreBreadcrumb";
-import AddButton from "./common/AddButton";
 import DriveButton from "./common/DriveButton";
 import { useDriveLink } from "../context/DriveContext";
+import AddButton from "./common/button/AddButton";
 
 // Styled Components
 const ModalContent = styled(Box)({
@@ -161,6 +161,9 @@ function Tugas() {
   };
 
   useEffect(() => {
+    fetchTeamDetails();
+    fetchActivityDetails();
+    fetchSubActivityDetails();
     refetchTasks();
   }, [teamId, activityId, subActivityId]);
 
