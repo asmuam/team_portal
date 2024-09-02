@@ -35,30 +35,46 @@ const ModalContent = styled(Box)(({ isMobile }) => ({
   borderRadius: "8px",
   boxShadow: "0 4px 8px rgba(0, 0, 0, 0.2)",
 }));
-
 const TableContainer = styled(Box)({
   width: "100%",
   overflowX: "auto", // Menambahkan overflow horizontal
 });
 
-const TaskTable = styled("table")({
+const TaskTable = styled("table")(({ isMobile }) => ({
   width: "100%",
   borderCollapse: "collapse",
   marginBottom: "20px",
   overflowX: "auto",
-  minWidth: "600px", // Menambahkan minimum width agar tabel tidak terlalu mengecil
-});
+  minWidth: isMobile ? "100%" : "600px",
+}));
 
-const TableHeader = styled("th")({
-  borderBottom: "2px solid #333",
-  padding: "10px",
-  textAlign: "left",
-});
+const TableRow = styled("tr")(({ isMobile }) => ({
+  display: isMobile ? "block" : "table-row",
+  marginBottom: isMobile ? "10px" : "0",
+}));
 
-const TableCell = styled("td")({
-  borderBottom: "1px solid #ddd",
-  padding: "10px",
-});
+const TableHeader = styled("th")(({ isMobile }) => ({
+  borderBottom: isMobile ? "none" : "2px solid #333",
+  padding: isMobile ? "8px 0" : "10px",
+  textAlign: isMobile ? "left" : "center",
+  display: isMobile ? "block" : "table-cell",
+}));
+
+const TableCell = styled("td")(({ isMobile }) => ({
+  borderBottom: isMobile ? "none" : "1px solid #ddd",
+  padding: isMobile ? "8px 0" : "10px",
+  textAlign: isMobile ? "left" : "center",
+  display: isMobile ? "block" : "table-cell",
+  "&:before": isMobile
+    ? {
+        content: "attr(data-label)",
+        fontWeight: "bold",
+        marginRight: "10px",
+        display: "inline-block",
+        minWidth: "100px",
+      }
+    : {},
+}));
 const Header = styled(Typography)({
   marginBottom: "16px",
   position: "relative",
@@ -136,6 +152,9 @@ function Tugas() {
   const [deskripsi, setDeskripsi] = useState("");
   const [link, setLink] = useState("");
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
   const { auth } = useContext(AuthContext);
 
   const [teamName, setTeamName] = useState("");
@@ -378,6 +397,17 @@ function Tugas() {
     setFiles((prevFiles) => prevFiles.filter((_, i) => i !== index));
   };
 
+  const filteredTasks = tasks
+    .filter((task) => {
+      return task.name.toLowerCase().includes(searchTerm.toLowerCase()) || task.created_by.toLowerCase().includes(searchTerm.toLowerCase());
+    })
+    .filter((task) => {
+      const taskDate = new Date(task.dueDate);
+      const start = new Date(startDate);
+      const end = new Date(endDate);
+      return (!startDate || taskDate >= start) && (!endDate || taskDate <= end);
+    });
+
   return (
     <div className="task-container">
       <div className="header" style={{ marginBottom: "10px", position: "relative" }}>
@@ -437,68 +467,91 @@ function Tugas() {
         <CircularProgress variant="determinate" value={progress} />
         <ProgressText>{Math.round(progress)}% Completed</ProgressText>
       </ProgressWrapper>
-      <div style={{ overflowX: "auto" }}>
-        <TaskTable>
-          <thead>
-            <tr>
-              <TableHeader>Task</TableHeader>
-              <TableHeader>Due Date</TableHeader>
-              <TableHeader>Deskripsi</TableHeader>
-              <TableHeader>File</TableHeader>
-              <TableHeader>Verified</TableHeader>
-              <TableHeader>Actions</TableHeader>
-              <TableHeader>Created By</TableHeader>
-            </tr>
-          </thead>
-          <tbody style={{ overflowX: "auto" }}>
-            {currentTasks.length ? (
-              currentTasks.map((task) => (
-                <tr key={task.id}>
-                  <TableCell>{task.name}</TableCell>
-                  <TableCell>{formatDate(task.dueDate)}</TableCell>
-                  <TableCell>{task.deskripsi}</TableCell>
 
-                  <TableCell
-                    sx={{
-                      display: "flex",
-                      alignItems: "center",
-                      gap: 1,
-                    }}
-                  >
-                    {/* <TextField type="text" value={task.link} /> */}
-                    <a href={formatLink(task.link)} target="_blank" rel="noopener noreferrer" style={{ textDecoration: "none", color: "blue", cursor: "pointer" }}>
-                      {task.link}
-                    </a>
-                    <ActionButton onClick={() => copyToClipboard(task.link)}>
-                      <ContentCopyIcon />
-                    </ActionButton>
-                  </TableCell>
-                  <TableCell>
-                    <ActionButton onClick={() => handleTaskCompletion(task.id)}>{task.completed ? <CheckCircleIcon color="success" /> : <CancelIcon color="error" />}</ActionButton>
-                  </TableCell>
-                  <TableCell>
-                    <ActionButton onClick={() => openModal("edit", task.id, task.name, task.dueDate, task.link, task.deskripsi)}>
-                      <EditIcon />
-                    </ActionButton>
-                    <ActionButton
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        openDeleteModal(task.id);
-                      }}
-                    >
-                      <DeleteIcon color="error" />
-                    </ActionButton>
-                  </TableCell>
-                  <TableCell>{task.created_by}</TableCell>
-                </tr>
-              ))
+      <Box display="flex" justifyContent="space-between" marginBottom="20px">
+        <TextField label="Cari Tugas atau Pembuat" variant="outlined" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} size="small" />
+        <Box display="flex" gap="10px">
+          <TextField label="Dari Tanggal" type="date" variant="outlined" value={startDate} onChange={(e) => setStartDate(e.target.value)} InputLabelProps={{ shrink: true }} size="small" />
+          <TextField label="Sampai Tanggal" type="date" variant="outlined" value={endDate} onChange={(e) => setEndDate(e.target.value)} InputLabelProps={{ shrink: true }} size="small" />
+          {/* <Button onClick={() => setStartDate("") & setEndDate("")} variant="outlined">
+            Reset Filter
+          </Button> */}
+        </Box>
+      </Box>
+      <div style={{ overflowX: "auto" }}>
+        <TableContainer>
+          <TaskTable isMobile={isMobile}>
+            {isMobile ? (
+              <thead></thead>
             ) : (
-              <tr>
-                <TableCell colSpan="4">No tasks available</TableCell>
-              </tr>
+              <thead>
+                <TableRow isMobile={isMobile}>
+                  <TableHeader>No</TableHeader>
+                  <TableHeader isMobile={isMobile}>Task</TableHeader>
+                  <TableHeader isMobile={isMobile}>Deadline</TableHeader>
+                  <TableHeader isMobile={isMobile}>Deskripsi</TableHeader>
+                  <TableHeader isMobile={isMobile}>Link Drive</TableHeader>
+                  <TableHeader isMobile={isMobile}>Verified</TableHeader>
+                  <TableHeader isMobile={isMobile}>Actions</TableHeader>
+                  <TableHeader isMobile={isMobile}>Dibuat Oleh</TableHeader>
+                </TableRow>
+              </thead>
             )}
-          </tbody>
-        </TaskTable>
+
+            <tbody>
+              {currentTasks.length ? (
+                currentTasks.map((task) => (
+                  <TableRow key={task.id} isMobile={isMobile}>
+                    <TableCell>{task.id}</TableCell>
+
+                    <TableCell data-label="Task" isMobile={isMobile}>
+                      {task.name}
+                    </TableCell>
+                    <TableCell data-label="Due Date" isMobile={isMobile}>
+                      {formatDate(task.dueDate)}
+                    </TableCell>
+                    <TableCell data-label="Deskripsi" isMobile={isMobile}>
+                      {task.deskripsi}
+                    </TableCell>
+                    <TableCell data-label="Link Drive" isMobile={isMobile} sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                      <a href={formatLink(task.link)} target="_blank" rel="noopener noreferrer" style={{ textDecoration: "none", color: "blue", cursor: "pointer" }}>
+                        {task.link}
+                      </a>
+                      <ActionButton onClick={() => copyToClipboard(task.link)}>
+                        <ContentCopyIcon />
+                      </ActionButton>
+                    </TableCell>
+                    <TableCell data-label="Verified" isMobile={isMobile}>
+                      <ActionButton onClick={() => handleTaskCompletion(task.id)}>{task.completed ? <CheckCircleIcon color="success" /> : <CancelIcon color="error" />}</ActionButton>
+                    </TableCell>
+                    <TableCell data-label="Actions" isMobile={isMobile}>
+                      <ActionButton onClick={() => openModal("edit", task.id, task.name, task.dueDate, task.link, task.deskripsi)}>
+                        <EditIcon />
+                      </ActionButton>
+                      <ActionButton
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          openDeleteModal(task.id);
+                        }}
+                      >
+                        <DeleteIcon color="error" />
+                      </ActionButton>
+                    </TableCell>
+                    <TableCell data-label="Dibuat Oleh" isMobile={isMobile}>
+                      {task.created_by}
+                    </TableCell>
+                  </TableRow>
+                ))
+              ) : (
+                <TableRow>
+                  <TableCell colSpan="7" isMobile={isMobile}>
+                    No tasks available
+                  </TableCell>
+                </TableRow>
+              )}
+            </tbody>
+          </TaskTable>
+        </TableContainer>
       </div>
 
       {tasks.length > tasksPerPage && (
