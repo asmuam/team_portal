@@ -7,6 +7,9 @@ import LinkPenting from "../../../pages/LinkPenting";
 import Kegiatan from "../../../pages/Kegiatan";
 import SubKegiatan from "../../../pages/SubKegiatan";
 import Tugas from "../../../pages/Tugas";
+import ForbiddenPage from "../../../pages/error/403";
+import ServerErrorPage from "../../../pages/error/500";
+import NotFoundPage from "../../../pages/error/404";
 
 
 function AppRouter({ isAuthenticated, teams, setTeams, handleLogin }) {
@@ -20,6 +23,9 @@ function AppRouter({ isAuthenticated, teams, setTeams, handleLogin }) {
                 <Route path="/explorer/team/:teamId/kegiatan" element={isAuthenticated ? <Kegiatan /> : <Navigate to="/login" />} />
                 <Route path="/explorer/team/:teamId/kegiatan/:activityId/subkegiatan" element={isAuthenticated ? <SubKegiatan /> : <Navigate to="/login" />} />
                 <Route path="/explorer/team/:teamId/kegiatan/:activityId/subkegiatan/:subActivityId/tugas" element={isAuthenticated ? <Tugas /> : <Navigate to="/login" />} />
+                <Route path="/403" element={<ForbiddenPage />} />
+                <Route path="/500" element={<ServerErrorPage />} />
+                <Route path="*" element={<NotFoundPage />} />
             </Routes>
     );
 }

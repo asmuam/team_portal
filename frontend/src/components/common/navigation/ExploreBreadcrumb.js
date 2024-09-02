@@ -58,12 +58,12 @@ const ExploreBreadcrumb = () => {
                 Home
             </Link>
             {data.teamName && (
-                <Link underline="hover" color="inherit" onClick={() => navigate(`/explorer/kegiatan/${teamId}`)}>
+                <Link underline="hover" color="inherit" onClick={() => navigate(`/explorer/team/${teamId}/kegiatan`)}>
                     {data.teamName}
                 </Link>
             )}
             {data.activityName && (
-                <Link underline="hover" color="inherit" onClick={() => navigate(`/explorer/kegiatan/${teamId}/subkegiatan/${activityId}`)}>
+                <Link underline="hover" color="inherit" onClick={() => navigate(`/explorer/team/${teamId}/kegiatan/${activityId}/subkegiatan`)}>
                     {data.activityName}
                 </Link>
             )}
