@@ -14,6 +14,7 @@ import useMediaQuery from "@mui/material/useMediaQuery";
 import { useDriveLink } from "../context/DriveContext";
 import DriveButton from "../components/common/button/DriveButton";
 import AddButton from "../components/common/button/AddButton";
+import DeleteConfirmationModal from "../components/common/alert/deleteModal";
 
 // Styled Components
 const ModalContent = styled(Box)(({ isMobile }) => ({
@@ -377,22 +378,7 @@ function Kegiatan() {
         </ModalContent>
       </Modal>
 
-      <Modal open={isDeleteModalOpen} onClose={closeDeleteModal}>
-        <ModalContent isMobile={isMobile}>
-          <Header>Konfirmasi Hapus Sub-Kegiatan</Header>
-          <Typography variant="body1" sx={{ marginBottom: "16px" }}>
-            Apakah Anda yakin ingin menghapus Sub-Kegiatan ini?
-          </Typography>
-          <Box sx={{ display: "flex", justifyContent: "space-between" }}>
-            <Button variant="contained" color="error" onClick={deleteActivity}>
-              Hapus
-            </Button>
-            <Button variant="contained" onClick={closeDeleteModal}>
-              Batal
-            </Button>
-          </Box>
-        </ModalContent>
-      </Modal>
+      <DeleteConfirmationModal isDeleteModalOpen={isDeleteModalOpen} closeDeleteModal={closeDeleteModal} deleteActivity={deleteActivity} deleteItemName="Kegiatan" />
     </div>
   );
 }
