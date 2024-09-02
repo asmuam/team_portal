@@ -1,14 +1,22 @@
 import React, { useState } from "react";
 import { AppBar, Container, Toolbar, Typography, Button, IconButton, Box, Menu, MenuItem, ListItemText, Drawer, List, ListItem, ListItemIcon } from "@mui/material";
-import { Home as HomeIcon, AccountCircle as AccountCircleIcon, Menu as MenuIcon, TableChart as TableChartIcon, Link as LinkIcon } from "@mui/icons-material"; // Import ikonnya
+import { Home as HomeIcon, AccountCircle as AccountCircleIcon, Menu as MenuIcon, TableChart as TableChartIcon, Link as LinkIcon } from "@mui/icons-material";
 import { Link } from "react-router-dom";
+import useMediaQuery from "@mui/material/useMediaQuery"; // Import untuk media query
 
 const Header = ({ isAuthenticated, handleLogout, name, role }) => {
   const [anchorEl, setAnchorEl] = useState(null);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [accountDrawerOpen, setAccountDrawerOpen] = useState(false); // State untuk drawer akun di mobile
+
+  const isMobile = useMediaQuery("(max-width:600px)"); // Media query untuk mendeteksi mobile
 
   const handleMenuOpen = (event) => {
-    setAnchorEl(event.currentTarget);
+    if (isMobile) {
+      setAccountDrawerOpen(true); // Buka drawer jika di mobile
+    } else {
+      setAnchorEl(event.currentTarget); // Buka menu jika di desktop
+    }
   };
 
   const handleMenuClose = () => {
@@ -17,6 +25,10 @@ const Header = ({ isAuthenticated, handleLogout, name, role }) => {
 
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen);
+  };
+
+  const handleAccountDrawerClose = () => {
+    setAccountDrawerOpen(false);
   };
 
   const drawer = (
@@ -49,35 +61,6 @@ const Header = ({ isAuthenticated, handleLogout, name, role }) => {
           </ListItemIcon>
           <ListItemText primary="Account" />
         </ListItem>
-        <Menu
-          anchorEl={anchorEl}
-          open={Boolean(anchorEl)}
-          onClose={handleMenuClose}
-          keepMounted
-          anchorOrigin={{
-            vertical: "top",
-            horizontal: "right",
-          }}
-          transformOrigin={{
-            vertical: "top",
-            horizontal: "right",
-          }}
-        >
-          <MenuItem>
-            <ListItemText primary={`Nama: ${name}`} />
-          </MenuItem>
-          <MenuItem>
-            <ListItemText primary={`Role: ${role}`} />
-          </MenuItem>
-          <MenuItem
-            onClick={() => {
-              handleLogout();
-              handleMenuClose();
-            }}
-          >
-            <ListItemText primary="Logout" />
-          </MenuItem>
-        </Menu>
       </List>
     </Box>
   );
@@ -126,6 +109,60 @@ const Header = ({ isAuthenticated, handleLogout, name, role }) => {
       >
         {drawer}
       </Drawer>
+
+      {/* Drawer untuk menampilkan info akun secara full page di mobile */}
+      <Drawer anchor="bottom" open={accountDrawerOpen} onClose={handleAccountDrawerClose} sx={{ display: { xs: "block", md: "none" } }}>
+        <Box sx={{ p: 2 }}>
+          <Typography variant="h6" gutterBottom>
+            Account Information
+          </Typography>
+          <Typography variant="body1">Nama: {name}</Typography>
+          <Typography variant="body1">Role: {role}</Typography>
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={() => {
+              handleLogout();
+              handleAccountDrawerClose();
+            }}
+            fullWidth
+            sx={{ mt: 2 }}
+          >
+            Logout
+          </Button>
+        </Box>
+      </Drawer>
+
+      {/* Menu untuk desktop */}
+      <Menu
+        anchorEl={anchorEl}
+        open={Boolean(anchorEl)}
+        onClose={handleMenuClose}
+        keepMounted
+        anchorOrigin={{
+          vertical: "top",
+          horizontal: "right",
+        }}
+        transformOrigin={{
+          vertical: "top",
+          horizontal: "right",
+        }}
+      >
+        <MenuItem>
+          <ListItemText primary={`Nama: ${name}`} />
+        </MenuItem>
+        <MenuItem>
+          <ListItemText primary={`Role: ${role}`} />
+        </MenuItem>
+        <MenuItem
+          onClick={() => {
+            handleLogout();
+            handleMenuClose();
+          }}
+        >
+          <ListItemText primary="Logout" />
+        </MenuItem>
+      </Menu>
     </AppBar>
   );
 };
