@@ -64,17 +64,6 @@ const ActivityActions = styled(Box)({
   padding: "5px",
 });
 
-const ActionIcon = styled("span")({
-  backgroundColor: "#ddd",
-  padding: "8px",
-  borderRadius: "4px",
-  cursor: "pointer",
-  transition: "background-color 0.3s ease",
-  "&:hover": {
-    backgroundColor: "#bbb",
-  },
-});
-
 const PaginationControls = styled(Box)({
   display: "flex",
   justifyContent: "center",
@@ -86,6 +75,7 @@ function Kegiatan() {
   const { teamId } = useParams();
   const [activities, setActivities] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false); // State for delete modal
   const [modalType, setModalType] = useState(""); // Type of the modal ("add" or "edit")
   const [currentActivityId, setCurrentActivityId] = useState(null);
   const [newActivityName, setNewActivityName] = useState("");
@@ -114,6 +104,16 @@ function Kegiatan() {
     setNewActivityName("");
     setTanggalPelaksanaan("");
     setNewDeskripsi("");
+  };
+
+  const openDeleteModal = (activityId) => {
+    setCurrentActivityId(activityId);
+    setIsDeleteModalOpen(true);
+  };
+
+  const closeDeleteModal = () => {
+    setIsDeleteModalOpen(false);
+    setCurrentActivityId(null);
   };
 
   const refetchActivities = async () => {
@@ -178,16 +178,15 @@ function Kegiatan() {
       modalType === "add" ? handleAddActivity() : handleEditActivity();
     }
   };
-
-  const deleteActivity = async (Id) => {
+  const deleteActivity = async () => {
     try {
-      await axios.delete(`${URL}/teams/${teamId}/activities/${Id}`);
+      await axios.delete(`${URL}/teams/${teamId}/activities/${currentActivityId}`);
       refetchActivities();
+      closeDeleteModal();
     } catch (error) {
       console.error("Error deleting activity:", error);
     }
   };
-
   const archiveActivity = async (Id) => {
     alert("Fitur arsip belum tersedia");
     // Implement actual archiving logic here if needed
@@ -211,7 +210,7 @@ function Kegiatan() {
 
   const totalPages = Math.ceil(activities.length / tasksPerPage);
   const driveFolderUrl = linkDrive;
-  setLinkDrive(driveFolderUrl)
+  setLinkDrive(driveFolderUrl);
 
   return (
     <div className="kegiatan">
@@ -250,7 +249,7 @@ function Kegiatan() {
           Back
         </Button>
         <AddButton onClick={() => openModal("add")} text="Tambah Kegiatan" />
-        <DriveButton driveFolderUrl={driveFolderUrl}/>
+        <DriveButton driveFolderUrl={driveFolderUrl} />
       </div>
 
       <div className="activity-list">
@@ -284,12 +283,14 @@ function Kegiatan() {
               <IconButton
                 onClick={(e) => {
                   e.stopPropagation();
-                  deleteActivity(activity.id);
+                  openDeleteModal(activity.id);
                 }}
                 sx={{
                   backgroundColor: "#ddd",
                   padding: "8px",
                   borderRadius: "4px",
+                  cursor: "pointer",
+                  transition: "background-color 0.3s ease",
                   "&:hover": {
                     backgroundColor: "#bbb",
                   },
@@ -300,12 +301,14 @@ function Kegiatan() {
               <IconButton
                 onClick={(e) => {
                   e.stopPropagation();
-                  archiveActivity(activity.id);
+                  archiveActivity(activity.id); // Ensure this is a separate action if needed
                 }}
                 sx={{
                   backgroundColor: "#ddd",
                   padding: "8px",
                   borderRadius: "4px",
+                  cursor: "pointer",
+                  transition: "background-color 0.3s ease",
                   "&:hover": {
                     backgroundColor: "#bbb",
                   },
@@ -379,6 +382,23 @@ function Kegiatan() {
             {modalType === "add" ? "Tambah Kegiatan" : "Update Kegiatan"}
             {loading ? <CircularProgress size={24} color="inherit" /> : modalType === "" ? "" : ""}
           </Button>
+        </ModalContent>
+      </Modal>
+
+      <Modal open={isDeleteModalOpen} onClose={closeDeleteModal}>
+        <ModalContent>
+          <Header>Konfirmasi Hapus-Kegiatan</Header>
+          <Typography variant="body1" sx={{ marginBottom: "16px" }}>
+            Apakah Anda yakin ingin menghapus-Kegiatan ini?
+          </Typography>
+          <Box sx={{ display: "flex", justifyContent: "space-between" }}>
+            <Button variant="contained" color="error" onClick={deleteActivity}>
+              Hapus
+            </Button>
+            <Button variant="contained" onClick={closeDeleteModal}>
+              Batal
+            </Button>
+          </Box>
         </ModalContent>
       </Modal>
     </div>

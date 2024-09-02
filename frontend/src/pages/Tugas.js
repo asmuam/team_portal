@@ -37,7 +37,11 @@ const TaskTable = styled("table")({
   borderCollapse: "collapse",
   marginBottom: "20px",
 });
-
+const Header = styled(Typography)({
+  marginBottom: "16px",
+  position: "relative",
+  paddingRight: "32px",
+});
 const TableHeader = styled("th")({
   borderBottom: "2px solid #333",
   padding: "10px",
@@ -114,6 +118,8 @@ function Tugas() {
   const [dueDate, setDueDate] = useState("");
   const [deskripsi, setDeskripsi] = useState("");
   const [link, setLink] = useState("");
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+
   const [teamName, setTeamName] = useState("");
   const [activityName, setActivityName] = useState("");
   const [subActivityName, setSubActivityName] = useState("");
@@ -201,6 +207,16 @@ function Tugas() {
     setIsModalOpen(true);
   };
 
+  const openDeleteModal = (taskId) => {
+    setCurrentTaskId(taskId);
+    setIsDeleteModalOpen(true);
+  };
+
+  const closeDeleteModal = () => {
+    setIsDeleteModalOpen(false);
+    setCurrentTaskId(null);
+  };
+
   const closeModal = () => {
     setIsModalOpen(false);
     setCurrentTaskId(null);
@@ -267,10 +283,11 @@ function Tugas() {
     }
   };
 
-  const deleteTask = async (taskId) => {
+  const deleteTask = async () => {
     try {
-      await axios.delete(`${URL}/teams/${teamId}/activities/${activityId}/sub-activities/${subActivityId}/tasks/${taskId}`);
+      await axios.delete(`${URL}/teams/${teamId}/activities/${activityId}/sub-activities/${subActivityId}/tasks/${currentTaskId}`);
       refetchTasks();
+      closeDeleteModal();
     } catch (error) {
       console.error("Error deleting task:", error);
     }
@@ -423,7 +440,12 @@ function Tugas() {
                   <ActionButton onClick={() => openModal("edit", task.id, task.name, task.dueDate, task.link, task.deskripsi)}>
                     <EditIcon />
                   </ActionButton>
-                  <ActionButton onClick={() => deleteTask(task.id)}>
+                  <ActionButton
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      openDeleteModal(task.id);
+                    }}
+                  >
                     <DeleteIcon color="error" />
                   </ActionButton>
                 </TableCell>
@@ -505,14 +527,30 @@ function Tugas() {
 
           <Box display="flex" justifyContent="flex-end" marginTop="16px">
             {modalType === "add" ? (
-                <Button onClick={handleAddTask} variant="contained" color="primary">
-                  Add Task
-                </Button>
+              <Button onClick={handleAddTask} variant="contained" color="primary">
+                Add Task
+              </Button>
             ) : (
-                <Button onClick={handleEditTask} variant="contained" color="primary">
-                  Update Task
-                </Button>
+              <Button onClick={handleEditTask} variant="contained" color="primary">
+                Update Task
+              </Button>
             )}
+          </Box>
+        </ModalContent>
+      </Modal>
+      <Modal open={isDeleteModalOpen} onClose={closeDeleteModal}>
+        <ModalContent>
+          <Header>Konfirmasi Hapus Sub-Kegiatan</Header>
+          <Typography variant="body1" sx={{ marginBottom: "16px" }}>
+            Apakah Anda yakin ingin menghapus Sub-Kegiatan ini?
+          </Typography>
+          <Box sx={{ display: "flex", justifyContent: "space-between" }}>
+            <Button variant="contained" color="error" onClick={deleteTask}>
+              Hapus
+            </Button>
+            <Button variant="contained" onClick={closeDeleteModal}>
+              Batal
+            </Button>
           </Box>
         </ModalContent>
       </Modal>
