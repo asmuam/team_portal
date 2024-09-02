@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import { Modal, Box, TextField, Button } from "@mui/material";
-import "./LinkPenting.css"; // Ensure to import your CSS file
 import { useTeams } from '../context/TeamsContext'; // Adjust path as needed
 import axios from "axios";
 

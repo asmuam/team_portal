@@ -4,13 +4,12 @@ import axios from "axios";
 import { Box, Button, Typography, IconButton, Modal, TextField, CircularProgress } from "@mui/material";
 import { styled } from "@mui/system";
 import CloseIcon from "@mui/icons-material/Close";
-import "./Kegiatan.css";
 import AddIcon from "@mui/icons-material/Add";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
-import ExploreBreadcrumb from "./common/ExploreBreadcrumb";
+import ExploreBreadcrumb from "../components/common/ExploreBreadcrumb";
 import { useDriveLink } from "../context/DriveContext";
-import DriveButton from "./common/DriveButton";
-import AddButton from "./common/button/AddButton";
+import DriveButton from "../components/common/DriveButton";
+import AddButton from "../components/common/button/AddButton";
 
 // Styled Components
 const ModalContent = styled(Box)({

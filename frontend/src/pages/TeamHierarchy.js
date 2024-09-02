@@ -6,14 +6,13 @@ import { styled } from "@mui/system";
 import CloseIcon from "@mui/icons-material/Close";
 import AddIcon from "@mui/icons-material/Add";
 import Breadcrumbs from "@mui/material/Breadcrumbs";
-import ExploreBreadcrumb from "./common/ExploreBreadcrumb";
-import DriveButton from "./common/DriveButton";
+import ExploreBreadcrumb from "../components/common/ExploreBreadcrumb";
+import DriveButton from "../components/common/DriveButton";
 import { useDriveLink } from "../context/DriveContext";
-import AddButton from "./common/button/AddButton";
-import "./TeamHierarchy.css";
-import TambahTeamModal from "./explorer/team/TambahTeamModal";
+import AddButton from "../components/common/button/AddButton";
+import TambahTeamModal from "../components/explorer/team/TambahTeamModal";
 import {Archive, Delete, Edit} from "@mui/icons-material";
-import TeamList from "./explorer/team/TeamList";
+import TeamList from "../components/explorer/team/TeamList";
 
 const ModalContent = styled(Box)({
   position: "absolute",

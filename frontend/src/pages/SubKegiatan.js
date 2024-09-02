@@ -2,15 +2,15 @@ import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 import Tugas from "./Tugas";
-import TambahSubActivity from "./modal/TambahSubActivity";
+import TambahSubActivity from "../components/modal/TambahSubActivity";
 import { Box, Button, Typography, IconButton, Modal, TextField } from "@mui/material";
 import { styled } from "@mui/system";
 import CloseIcon from "@mui/icons-material/Close";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
-import ExploreBreadcrumb from "./common/ExploreBreadcrumb";
-import DriveButton from "./common/DriveButton";
+import ExploreBreadcrumb from "../components/common/ExploreBreadcrumb";
+import DriveButton from "../components/common/DriveButton";
 import { useDriveLink } from "../context/DriveContext";
-import AddButton from "./common/button/AddButton";
+import AddButton from "../components/common/button/AddButton";
 
 // Styled Components
 const ModalContent = styled(Box)({
