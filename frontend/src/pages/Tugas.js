@@ -503,11 +503,11 @@ function Tugas() {
 
           <Box display="flex" justifyContent="flex-end" marginTop="16px">
             {modalType === "add" ? (
-                <Button variant="contained" color="primary">
+                <Button onClick={handleAddTask} variant="contained" color="primary">
                   Add Task
                 </Button>
             ) : (
-                <Button variant="contained" color="primary">
+                <Button onClick={handleEditTask} variant="contained" color="primary">
                   Update Task
                 </Button>
             )}

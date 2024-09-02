@@ -9,7 +9,7 @@ const NotFoundPage = () => {
             flexDirection="column"
             alignItems="center"
             justifyContent="center"
-            height="100vh"
+            height="50vh"
             textAlign="center"
             sx={{ backgroundColor: '#f9f9f9' }}
         >
