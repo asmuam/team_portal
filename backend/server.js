@@ -3,6 +3,7 @@ import cors from 'cors';
 import authRoutes from './routes/authRoutes.js'; // Jangan lupa untuk menambahkan ekstensi .js
 import explorerRoutes from './routes/explorerRoutes.js'; // Jangan lupa untuk menambahkan ekstensi .js
 import linkPentingRoutes from './routes/linkPentingRoutes.js'; // Jangan lupa untuk menambahkan ekstensi .js
+import userRoutes from './routes/userRoutes.js'; // Jangan lupa untuk menambahkan ekstensi .js
 import authenticateToken from './middleware/authMiddleware.js'; // Jangan lupa untuk menambahkan ekstensi .js
 import cookieParser from 'cookie-parser';
 
@@ -15,6 +16,7 @@ app.use('/api', authRoutes);  // Add authRoutes to handle authentication
 app.use('/api', explorerRoutes);  
 // app.use('/api', tabelRoutes);  
 app.use('/api', linkPentingRoutes);  
+app.use('/api/user', userRoutes);  
 
 
 app.listen(5000, () => {
