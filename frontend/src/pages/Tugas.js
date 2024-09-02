@@ -13,8 +13,8 @@ import AddIcon from "@mui/icons-material/Add";
 import { styled } from "@mui/system";
 import CircularProgress from "@mui/material/CircularProgress";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
-import ExploreBreadcrumb from "../components/common/ExploreBreadcrumb";
-import DriveButton from "../components/common/DriveButton";
+import ExploreBreadcrumb from "../components/common/navigation/ExploreBreadcrumb";
+import DriveButton from "../components/common/button/DriveButton";
 import { useDriveLink } from "../context/DriveContext";
 import AddButton from "../components/common/button/AddButton";
 

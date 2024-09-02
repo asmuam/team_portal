@@ -6,9 +6,9 @@ import { styled } from "@mui/system";
 import CloseIcon from "@mui/icons-material/Close";
 import AddIcon from "@mui/icons-material/Add";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
-import ExploreBreadcrumb from "../components/common/ExploreBreadcrumb";
+import ExploreBreadcrumb from "../components/common/navigation/ExploreBreadcrumb";
 import { useDriveLink } from "../context/DriveContext";
-import DriveButton from "../components/common/DriveButton";
+import DriveButton from "../components/common/button/DriveButton";
 import AddButton from "../components/common/button/AddButton";
 
 // Styled Components

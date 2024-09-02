@@ -1,12 +1,12 @@
 import React from "react";
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
-import Login from "../../pages/Login";
-import TeamHierarchy from "../../pages/TeamHierarchy";
-import DataTable from "../../pages/DataTable";
-import LinkPenting from "../../pages/LinkPenting";
-import Kegiatan from "../../pages/Kegiatan";
-import SubKegiatan from "../../pages/SubKegiatan";
-import Tugas from "../../pages/Tugas";
+import Login from "../../../pages/Login";
+import TeamHierarchy from "../../../pages/TeamHierarchy";
+import DataTable from "../../../pages/DataTable";
+import LinkPenting from "../../../pages/LinkPenting";
+import Kegiatan from "../../../pages/Kegiatan";
+import SubKegiatan from "../../../pages/SubKegiatan";
+import Tugas from "../../../pages/Tugas";
 
 
 function AppRouter({ isAuthenticated, teams, setTeams, handleLogin }) {
