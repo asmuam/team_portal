@@ -526,7 +526,9 @@ function Tugas() {
                   <TableHeader isMobile={isMobile}>Deadline</TableHeader>
                   <TableHeader isMobile={isMobile}>Deskripsi</TableHeader>
                   <TableHeader isMobile={isMobile}>Link Drive</TableHeader>
-                  <TableHeader isMobile={isMobile}>Verified</TableHeader>
+                  {auth.role === "admin" && (
+                    <TableHeader isMobile={isMobile}>Verified</TableHeader>
+                  )}
                   <TableHeader isMobile={isMobile}>Actions</TableHeader>
                   <TableHeader isMobile={isMobile}>Dibuat Oleh</TableHeader>
                 </TableRow>
@@ -556,9 +558,11 @@ function Tugas() {
                         <ContentCopyIcon />
                       </ActionButton>
                     </TableCell>
+                    {auth.role === "admin" && (
                     <TableCell data-label="Verified" isMobile={isMobile}>
-                      <ActionButton onClick={() => handleTaskCompletion(task.id)}>{task.completed ? <CheckCircleIcon color="success" /> : <CancelIcon color="error" />}</ActionButton>
-                    </TableCell>
+                        <ActionButton onClick={() => handleTaskCompletion(task.id)}>{task.completed ? <CheckCircleIcon color="success" /> : <CancelIcon color="error" />}</ActionButton>
+                      </TableCell>
+                    )}
                     <TableCell data-label="Actions" isMobile={isMobile}>
                       <ActionButton onClick={() => openModal("edit", task.id, task.name, task.dueDate, task.link, task.deskripsi)}>
                         <EditIcon />
