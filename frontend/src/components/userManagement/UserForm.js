@@ -15,7 +15,7 @@ const UserForm = ({ user, onClose, refreshUsers }) => {
     if (user) {
       setUsername(user.username);
       setName(user.name);
-      setPassword(""); // Do not prefill password for security reasons
+      setPassword(user.password); // Do not prefill password for security reasons
       setRole(user.role);
     } else {
       setUsername("");

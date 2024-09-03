@@ -77,7 +77,13 @@ router.get("/", async (req, res) => {
 router.patch("/:id", async (req, res) => {
   try {
     const userId = parseInt(req.params.id, 10);
-    const updateData = req.body;
+    const { password, ...updateData } = req.body;
+
+    // If password is present in the update, hash it
+    if (password) {
+      updateData.password = await bcrypt.hash(password, 10);
+    }
+
     const updatedUser = await updateUser(userId, updateData);
     if (!updatedUser) {
       return res.status(404).json({ message: "User not found" });
