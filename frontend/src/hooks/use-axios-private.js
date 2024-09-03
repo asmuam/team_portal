@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import useAuth from "./use-auth";
 import useRefreshToken from "./use-refresh-token";
-import { api, apiPrivate } from "../utils/axios";
+import { apiPrivate, api } from "../utils/axios";
 import { useNavigate } from "react-router-dom";
 import { toast } from "../components/alert";
 
@@ -10,41 +10,55 @@ import { toast } from "../components/alert";
  * 
  * @returns apiPrivate dengan authorization header
  */
-
 const useAxiosPrivate = () => {
   const navigate = useNavigate();
   const refresh = useRefreshToken();
   const { auth, setAuth } = useAuth();
 
   useEffect(() => {
-    // konfigurasi request header
+    // Konfigurasi request interceptor
     const requestIntercept = apiPrivate.interceptors.request.use(
       (config) => {
-        if (!config.headers["Authorization"]) {
-          config.headers["Authorization"] = `Bearer ${auth?.token}`;
+        if (auth?.token) {
+          config.headers["Authorization"] = `Bearer ${auth.token}`;
         }
         return config;
       },
       (error) => Promise.reject(error)
     );
 
-    // konfigurasi response error
+    // Konfigurasi response interceptor
     const responseIntercept = apiPrivate.interceptors.response.use(
       (response) => response,
       async (error) => {
         const prevRequest = error?.config;
         if (error?.response?.status === 403 && !prevRequest?.sent) {
-          await api.post("logout", {
-            id: auth.user,
-          });
-          setAuth({ user: "", role: "" });
-          sessionStorage.clear();
-          localStorage.clear();
-          toast.fire({
-            icon: "info",
-            text: "Session telah berakhir",
-          });
-          navigate("/");
+          prevRequest.sent = true;
+
+          try {
+            // Refresh token dan mendapatkan token baru
+            const newAccessToken = await refresh();
+            if (newAccessToken) {
+              // Update header Authorization dengan token baru
+              prevRequest.headers["Authorization"] = `Bearer ${newAccessToken}`;
+              // Coba ulang permintaan dengan token baru
+              return apiPrivate(prevRequest);
+            }
+          } catch (err) {
+            // Tangani jika refresh token juga gagal atau tidak ada
+            await api.post("/logout");
+            localStorage.removeItem("authToken");
+            sessionStorage.removeItem("uid");
+            sessionStorage.removeItem("role");
+            sessionStorage.removeItem("username");
+            sessionStorage.removeItem("name");
+            setAuth({});
+            toast.fire({
+              icon: "info",
+              text: "Session telah berakhir",
+            });
+            navigate("/");
+          }
         }
         return Promise.reject(error);
       }
@@ -54,7 +68,7 @@ const useAxiosPrivate = () => {
       apiPrivate.interceptors.request.eject(requestIntercept);
       apiPrivate.interceptors.response.eject(responseIntercept);
     };
-  }, [auth, refresh]);
+  }, [auth, refresh, navigate, setAuth]);
 
   return apiPrivate;
 };

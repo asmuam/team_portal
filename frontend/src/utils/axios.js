@@ -2,7 +2,7 @@ import axios from "axios";
 
 //Konfigurasi Axios
 
-export const baseURL = "http://localhost:5000/api";
+export const baseURL = process.env.REACT_APP_API_URL;
 
 export const api = axios.create({
   baseURL,
@@ -15,4 +15,5 @@ export const apiPrivate = axios.create({
   headers: {
     "Content-Type": "application/json",
   },
+  credentials: 'include'
 });
