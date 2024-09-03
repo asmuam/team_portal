@@ -375,12 +375,19 @@ function Tugas() {
     }
     return link;
   };
+  const filteredTasks = tasks.filter((task) => {
+    const matchesName = task.name.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesCreatedBy = task.created_by.toLowerCase().includes(createdByFilter.toLowerCase());
+    const matchesDueDate = (!startDate || new Date(task.dueDate) >= new Date(startDate)) && (!endDate || new Date(task.dueDate) <= new Date(endDate));
+
+    return matchesName && matchesCreatedBy && matchesDueDate;
+  });
 
   const indexOfLastTask = currentPage * tasksPerPage;
   const indexOfFirstTask = indexOfLastTask - tasksPerPage;
-  const currentTasks = tasks.slice(indexOfFirstTask, indexOfLastTask);
+  const currentTasks = filteredTasks.slice(indexOfFirstTask, indexOfLastTask);
 
-  const totalPages = Math.ceil(tasks.length / tasksPerPage);
+  const totalPages = Math.ceil(filteredTasks.length / tasksPerPage);
   const driveFolderUrl = linkDrive;
 
   const [uploadType, setUploadType] = useState("link");
@@ -398,14 +405,6 @@ function Tugas() {
   const handleFileRemove = (index) => {
     setFiles((prevFiles) => prevFiles.filter((_, i) => i !== index));
   };
-
-  const filteredTasks = tasks.filter((task) => {
-    const matchesName = task.name.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesCreatedBy = task.created_by.toLowerCase().includes(createdByFilter.toLowerCase());
-    const matchesDueDate = (!startDate || new Date(task.dueDate) >= new Date(startDate)) && (!endDate || new Date(task.dueDate) <= new Date(endDate));
-
-    return matchesName && matchesCreatedBy && matchesDueDate;
-  });
 
   return (
     <div className="task-container">
@@ -536,7 +535,7 @@ function Tugas() {
 
             <tbody>
               {currentTasks.length ? (
-                filteredTasks.map((task) => (
+                currentTasks.map((task) => (
                   <TableRow key={task.id} isMobile={isMobile}>
                     <TableCell>{task.id}</TableCell>
 
