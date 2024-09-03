@@ -4,7 +4,7 @@ import * as timkerjaService from "../services/timKerjaService.js";
 import * as kegiatanService from "../services/kegiatanService.js";
 import * as subkegiatanService from "../services/subkegiatanService.js";
 import * as tugasService from "../services/tugasService.js";
-import { createFolder, extractFolderIdFromUrl } from "../utils/googleDriveUtils.js";
+import { createFolder, extractFolderIdFromUrl, deleteFolder, renameFolder } from "../utils/googleDriveUtils.js";
 
 import dotenv from "dotenv";
 dotenv.config();
@@ -268,12 +268,26 @@ router.post("/teams", async (req, res) => {
 
 router.patch("/teams/:id", async (req, res) => {
   try {
-    const team = await timkerjaService.updateTimkerja(req.params.id, req.body);
-    res.json(team);
+    // Fetch the current team data
+    const team = await timkerjaService.getTimkerjaById(req.params.id);
+
+    // Check if name is provided and link_drive exists
+    if (req.body.name && team.link_drive) {
+      // Rename the folder
+      await renameFolder(extractFolderIdFromUrl(team.link_drive), req.body.name);
+    }
+
+    // Update the team data
+    const updatedTeam = await timkerjaService.updateTimkerja(req.params.id, req.body);
+
+    // Send response with the updated team data
+    res.json(updatedTeam);
   } catch (error) {
+    // Handle errors
     res.status(500).json({ error: error.message });
   }
 });
+
 
 // req {
 //   "name":"tim kerja 99"
@@ -289,6 +303,7 @@ router.patch("/teams/:id", async (req, res) => {
 router.delete("/teams/:id", async (req, res) => {
   try {
     const team = await timkerjaService.deleteTimkerja(req.params.id);
+    await deleteFolder(extractFolderIdFromUrl(team.link_drive))
     res.json(team);
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -392,6 +407,13 @@ router.patch("/teams/:teamId/activities/:activityId", async (req, res) => {
     const updatedFields = {};
     if (name) {
       updatedFields.name = name;
+      const activity = await kegiatanService.getKegiatanById(activityId);
+
+      // Check if name is provided and link_drive exists
+      if (activity.link_drive) {
+        // Rename the folder
+        await renameFolder(extractFolderIdFromUrl(activity.link_drive), name);
+      }
     }
     if (deskripsi) {
       updatedFields.deskripsi = deskripsi;
@@ -430,6 +452,7 @@ router.delete("/teams/:teamId/activities/:activityId", async (req, res) => {
   const { activityId } = req.params;
   try {
     const activity = await kegiatanService.deleteKegiatan(activityId);
+    await deleteFolder(extractFolderIdFromUrl(activity.link_drive))
     res.json(activity);
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -443,6 +466,7 @@ router.delete("/teams/:teamId/activities/:activityId", async (req, res) => {
 //   "name": "kegiatan 989"
 // }
 
+
 router.get("/teams/:teamId/activities/:activityId/sub-activities/:id", async (req, res) => {
   try {
     const { id } = req.params;
@@ -452,6 +476,7 @@ router.get("/teams/:teamId/activities/:activityId/sub-activities/:id", async (re
     res.status(500).json({ error: error.message });
   }
 });
+
 
 // Get Sub-Activities by Activity ID
 router.get("/teams/:teamId/activities/:activityId/sub-activities", async (req, res) => {
@@ -525,6 +550,13 @@ router.patch("/teams/:teamId/activities/:activityId/sub-activities/:subActivityI
     const updatedFields = {};
     if (name) {
       updatedFields.name = name;
+      const subActivity = await subkegiatanService.getSubkegiatanById(subActivityId);
+
+      // Check if name is provided and link_drive exists
+      if (subActivity.link_drive) {
+        // Rename the folder
+        await renameFolder(extractFolderIdFromUrl(subActivity.link_drive), name);
+      }
     }
     if (deskripsi) {
       updatedFields.deskripsi = deskripsi;
@@ -563,6 +595,7 @@ router.delete("/teams/:teamId/activities/:activityId/sub-activities/:subActivity
   const { subActivityId } = req.params;
   try {
     const subActivity = await subkegiatanService.deleteSubkegiatan(subActivityId);
+    await deleteFolder(extractFolderIdFromUrl(subActivity.link_drive))
     res.json(subActivity);
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -627,14 +660,16 @@ router.post("/teams/:teamId/activities/:activityId/sub-activities/:subActivityId
   const { subActivityId } = req.params;
   const { name, dueDate, dateCreated, link, deskripsi, created_by } = req.body;
   try {
-    const result = await prisma.subkegiatan.findMany({
-      where: {
-        id: parseInt(subActivityId), // Filter by teamId
-      },
-      select: {
-        link_drive: true, // Select only the link_drive column
-      },
-    });
+    const result = await prisma.subkegiatan.findMany(
+      {
+        where: {
+          id: parseInt(subActivityId), // Filter by teamId
+        },
+        select: {
+          link_drive: true, // Select only the link_drive column
+        },
+      }
+    )
     const folderName = `${created_by}_${name}`;
     const link_drive = await createFolder(folderName, extractFolderIdFromUrl(result[0].link_drive));
     const task = await tugasService.createTugas({
@@ -678,7 +713,16 @@ router.patch("/teams/:teamId/activities/:activityId/sub-activities/:subActivityI
   try {
     // Prepare update data
     const updateData = {};
-    if (name !== undefined) updateData.name = name;
+    if (name !== undefined) {
+      updateData.name = name;
+      const task = await tugasService.getTugasById(taskId);
+      const folderName = `${task.created_by}_${task.name}`;
+      // Check if name is provided and link_drive exists
+      if (task.link) {
+        // Rename the folder
+        await renameFolder(extractFolderIdFromUrl(task.link), folderName);
+      }
+    }
     if (deskripsi !== undefined) updateData.deskripsi = deskripsi;
     if (dueDate !== undefined) updateData.dueDate = new Date(dueDate); // Ensure correct date format
     if (link !== undefined) {
@@ -750,6 +794,7 @@ router.delete("/teams/:teamId/activities/:activityId/sub-activities/:subActivity
   const { taskId } = req.params;
   try {
     const task = await tugasService.deleteTugas(taskId);
+    await deleteFolder(extractFolderIdFromUrl(task.link))
     res.json(task);
   } catch (error) {
     res.status(500).json({ error: error.message });
