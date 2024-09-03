@@ -23,7 +23,7 @@ const authenticateToken = (req, res, next) => {
 const authorizeRole = (roles) => {
   return (req, res, next) => {
     if (!roles.includes(req.user.role)) {
-      return res.status(403).json({ message: "Akses ditolak" }); // Jika peran tidak diizinkan, kirim status 403 (Forbidden)
+      return res.status(401).json({ message: "Akses ditolak" }); // Jika peran tidak diizinkan, kirim status 403 (Forbidden)
     }
     next(); // Lanjutkan ke rute berikutnya
   };

@@ -96,6 +96,7 @@ router.post("/refresh", async (req, res) => {
     const refreshToken = req.cookies.refreshToken;
     const { uid } = req.body;
     console.log("Refresh Token:", refreshToken);
+    console.log("UID:", uid);
     
     if (!refreshToken) return res.status(401).json({ message: "Refresh token tidak ditemukan" });
 
@@ -104,7 +105,7 @@ router.post("/refresh", async (req, res) => {
       if (err) return res.status(403).json({ message: "Refresh token tidak valid" });
 
       const user = await prismaClient.user.findUnique({
-        where: { id: +uid },
+        where: { id: parseInt(uid) },
       });
 
       if (!user || user.refresh_token !== refreshToken) {
@@ -123,6 +124,7 @@ router.post("/refresh", async (req, res) => {
     res.status(500).json({ message: "Internal server error", error: error.message });
   }
 });
+
 
 
 // resp {
