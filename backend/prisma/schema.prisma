@@ -16,7 +16,7 @@ generator client {
 enum Role {
   admin
   pegawai
-  mitra
+  
 }
 
 model User {

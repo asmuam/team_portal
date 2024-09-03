@@ -4,7 +4,9 @@ import * as timkerjaService from "../services/timKerjaService.js";
 import * as kegiatanService from "../services/kegiatanService.js";
 import * as subkegiatanService from "../services/subkegiatanService.js";
 import * as tugasService from "../services/tugasService.js";
+import * as userService from "../services/userServices.js";
 import { createFolder, extractFolderIdFromUrl } from "../utils/googleDriveUtils.js";
+// import { createUser, getUserById, getAllUsers, updateUser, deleteUser } from "../services/userService.js";
 
 import dotenv from "dotenv";
 dotenv.config();
@@ -61,6 +63,7 @@ const getAllData = async () => {
   }));
 };
 
+// Create a new user
 // resp [
 //   {
 //       "id": 1,
@@ -443,7 +446,6 @@ router.delete("/teams/:teamId/activities/:activityId", async (req, res) => {
 //   "name": "kegiatan 989"
 // }
 
-
 router.get("/teams/:teamId/activities/:activityId/sub-activities/:id", async (req, res) => {
   try {
     const { id } = req.params;
@@ -453,7 +455,6 @@ router.get("/teams/:teamId/activities/:activityId/sub-activities/:id", async (re
     res.status(500).json({ error: error.message });
   }
 });
-
 
 // Get Sub-Activities by Activity ID
 router.get("/teams/:teamId/activities/:activityId/sub-activities", async (req, res) => {
@@ -629,16 +630,14 @@ router.post("/teams/:teamId/activities/:activityId/sub-activities/:subActivityId
   const { subActivityId } = req.params;
   const { name, dueDate, dateCreated, link, deskripsi, created_by } = req.body;
   try {
-    const result = await prisma.subkegiatan.findMany(
-      {
-        where: {
-          id: parseInt(subActivityId), // Filter by teamId
-        },
-        select: {
-          link_drive: true, // Select only the link_drive column
-        },
-      }
-    )
+    const result = await prisma.subkegiatan.findMany({
+      where: {
+        id: parseInt(subActivityId), // Filter by teamId
+      },
+      select: {
+        link_drive: true, // Select only the link_drive column
+      },
+    });
     const folderName = `${created_by}_${name}`;
     const link_drive = await createFolder(folderName, extractFolderIdFromUrl(result[0].link_drive));
     const task = await tugasService.createTugas({

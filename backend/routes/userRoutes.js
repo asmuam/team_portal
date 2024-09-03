@@ -1,50 +1,45 @@
 // routes/userRoutes.js
 
 import express from "express";
-import {
-  createUser,
-  getUserById,
-  getAllUsers,
-  updateUser,
-  deleteUser,
-} from "../services/userServices.js";
+import { createUser, getUserById, getAllUsers, updateUser, deleteUser } from "../services/userServices.js";
+import bcrypt from "bcryptjs";
 
 const router = express.Router();
 
 // Create a new user
 router.post("/", async (req, res) => {
-    try {
-      const { username, name, password, role } = req.body;
-  
-      // Validasi input
-      if (!username || !name || !password) {
-        return res.status(400).json({ message: "Username, name, and password are required" });
-      }
-  
-      // Enkripsi kata sandi
-      const hashedPassword = await bcrypt.hash(password, 10);
-  
-      // Buat data pengguna dengan password yang terenkripsi
-      const userData = {
-        username,
-        name,
-        password: hashedPassword,
-        role
-      };
-  
-      // Buat pengguna baru
-      const newUser = await createUser(userData);
-  
-      // Kirim respons dengan data pengguna baru
-      res.status(201).json(newUser);
-    } catch (error) {
-      console.error(error.message);
-      res.status(500).json({
-        message: "Internal server error",
-        error: error.message,
-      });
+  try {
+    const { username, name, password, role } = req.body;
+
+    // Validasi input
+    if (!username || !name || !password) {
+      return res.status(400).json({ message: "Username, name, and password are required" });
     }
-  });
+
+    // Enkripsi kata sandi
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    // Buat data pengguna dengan password yang terenkripsi
+    const userData = {
+      username,
+      name,
+      password: hashedPassword,
+      role,
+    };
+
+    // Buat pengguna baru
+    const newUser = await createUser(userData);
+
+    // Kirim respons dengan data pengguna baru
+    res.status(201).json(newUser);
+  } catch (error) {
+    console.error(error.message);
+    res.status(500).json({
+      message: "Internal server error",
+      error: error.message,
+    });
+  }
+});
 
 // Get a single user by ID
 router.get("/:id", async (req, res) => {
@@ -79,7 +74,7 @@ router.get("/", async (req, res) => {
 });
 
 // Update a user by ID
-router.put("/:id", async (req, res) => {
+router.patch("/:id", async (req, res) => {
   try {
     const userId = parseInt(req.params.id, 10);
     const updateData = req.body;
