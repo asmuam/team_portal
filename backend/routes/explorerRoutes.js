@@ -176,6 +176,15 @@ router.get("/teams", async (req, res) => {
   }
 });
 
+router.get("/teams/:id", async (req, res) => {
+  try {
+    const timkerja = await timkerjaService.getTimkerjaById(req.params.id);
+    res.json(timkerja);
+  } catch (error) {
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+});
+
 // [
 //   {
 //       "id": 1,
@@ -298,6 +307,16 @@ router.delete("/teams/:id", async (req, res) => {
 // }
 
 //archive team soon
+
+router.get("/teams/:teamId/activities/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const activity = await kegiatanService.getKegiatanById(id);
+    res.json(activity);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
 
 router.get("/teams/:teamId/activities", async (req, res) => {
   try {
@@ -426,6 +445,18 @@ router.delete("/teams/:teamId/activities/:activityId", async (req, res) => {
 //   "name": "kegiatan 989"
 // }
 
+
+router.get("/teams/:teamId/activities/:activityId/sub-activities/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const subActivity = await subkegiatanService.getSubkegiatanById(id);
+    res.json(subActivity);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+
 // Get Sub-Activities by Activity ID
 router.get("/teams/:teamId/activities/:activityId/sub-activities", async (req, res) => {
   try {
@@ -553,6 +584,16 @@ router.delete("/teams/:teamId/activities/:activityId/sub-activities/:subActivity
 
 // archive subkeg soon
 
+router.get("/teams/:teamId/activities/:activityId/sub-activities/:subActivityId/tasks/:id", async (req, res) => {
+  const { id } = req.params;
+  try {
+    const task = await tugasService.getTugasById(id);
+    res.json(task);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
 // Get all tasks for a specific sub-activity
 router.get("/teams/:teamId/activities/:activityId/sub-activities/:subActivityId/tasks", async (req, res) => {
   const { subActivityId } = req.params;
@@ -602,12 +643,12 @@ router.post("/teams/:teamId/activities/:activityId/sub-activities/:subActivityId
         },
       }
     )
-
+    const link_drive = await createFolder(req.body.name, extractFolderIdFromUrl(result[0].link_drive));
     const task = await tugasService.createTugas({
       name,
       dateCreated: dateCreated ? new Date(dateCreated) : new Date(),
       dueDate: new Date(dueDate),
-      link,
+      link: link_drive,
       deskripsi,
       subkegiatan_id: parseInt(subActivityId),
     });

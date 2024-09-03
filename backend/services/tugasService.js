@@ -1,5 +1,11 @@
 import prisma from "../prisma/config.js"; // Sesuaikan dengan path dan format ESM
 
+export const getTugasById = async (id) => {
+  return prisma.tugas.findUnique({
+    where: { id: parseInt(id) },
+  });
+};
+
 export const getTugasBySubkegiatanId = async (subkegiatanId) => {
   return prisma.tugas.findMany({
     where: { subkegiatan_id: parseInt(subkegiatanId) },

@@ -6,6 +6,12 @@ export const getKegiatanByTeamId = async (teamId) => {
   });
 };
 
+export const getKegiatanById = async (id) => {
+  return prisma.kegiatan.findUnique({
+    where: { id: parseInt(id) },
+  });
+};
+
 export const createKegiatan = async (data) => {
   return prisma.kegiatan.create({
     data,

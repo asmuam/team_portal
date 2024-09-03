@@ -1,5 +1,11 @@
 import prisma from "../prisma/config.js"; // Sesuaikan dengan path dan format ESM
 
+export const getSubkegiatanById = async (id) => {
+  return prisma.subkegiatan.findUnique({
+    where: { id: parseInt(id) },
+  });
+};
+
 // Ambil semua sub-kegiatan berdasarkan ID kegiatan
 export const getSubkegiatanByActivityId = async (activityId) => {
   return prisma.subkegiatan.findMany({
