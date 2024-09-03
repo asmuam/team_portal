@@ -5,7 +5,8 @@ import App from "./App.js";
 import reportWebVitals from "./reportWebVitals.js";
 import { AuthProvider } from "./context/AuthContext";
 import { DriveLinkProvider } from "./context/DriveContext.js";
-import { TeamsProvider } from './context/TeamsContext.js'; // Adjust path as needed
+import { TeamsProvider } from "./context/TeamsContext.js"; // Adjust path as needed
+import { BrowserRouter as Router } from "react-router-dom";
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
@@ -13,7 +14,9 @@ root.render(
     <AuthProvider>
       <TeamsProvider>
         <DriveLinkProvider>
-          <App />
+          <Router>
+            <App />
+          </Router>
         </DriveLinkProvider>
       </TeamsProvider>
     </AuthProvider>

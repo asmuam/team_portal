@@ -141,4 +141,19 @@ router.post("/logout", (req, res) => {
 //   "message": "Logged out successfully"
 // }
 
+// validate token 
+router.post("/validateToken", (req, res) => {
+  const token = req.headers.authorization?.split(' ')[1]; // Extract token from Authorization header
+
+  if (!token) {
+    return res.status(401).json({ message: 'No token provided' });
+  }
+
+  jwt.verify(token, ACCESS_TOKEN_SECRET, (err, decoded) => {
+    if (err) {
+      return res.status(401).json({ message: 'Invalid or expired token' });
+    }
+    // Optionally: Fetch additional user info or data here
+    res.json({ valid: true, user: decoded });
+  });});
 export default router;

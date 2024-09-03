@@ -1,18 +1,65 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import useAuth from "./hooks/use-auth.js";
-import { BrowserRouter as Router } from "react-router-dom";
+import { useNavigate  } from "react-router-dom";
 import { useTeams } from "./context/TeamsContext";
 import Header from "./components/common/navigation/Header";
 import Footer from "./components/common/navigation/Footer";
 import AppRouter from "./components/common/navigation/AppRoutes";
 import Box from "@mui/material/Box";
 import Container from "@mui/material/Container";
+import {api} from "./utils/axios.js";
 
 function App() {
   const { teams, setTeams } = useTeams();
   const [allData, setAllData] = useState([]);
   const { auth, setAuth } = useAuth();
-  const isAuthenticated = !!auth.token;
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const navigate = useNavigate();
+
+
+  useEffect(() => {
+    const validateAuth = async () => {
+      const token = localStorage.getItem('authToken');
+      if (token) {
+        try {
+          const response = await api.post(
+            `/validateToken`,
+            {},
+            {
+              headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${token}`,
+              },
+            }
+          );
+
+          if (response.status === 200) {
+            // Assuming the response contains user info
+            const { user } = response.data;
+            setAuth({ ...user, token });
+            setIsAuthenticated(true);
+          } else {
+            clearAuth();
+          }
+        } catch (error) {
+          console.error('Token validation error', error);
+          clearAuth();
+        }
+      } else {
+        clearAuth();
+      }
+    };
+
+    validateAuth();
+  }, [setAuth]);
+
+  const clearAuth = () => {
+    localStorage.removeItem("authToken");
+    sessionStorage.clear();
+    setAuth({});
+    setIsAuthenticated(false);
+    navigate("/login");
+  };
 
   const handleLogin = (result) => {
     localStorage.setItem("authToken", result.accessToken);
@@ -27,6 +74,7 @@ function App() {
       username: result.username, // Set username ke state auth
       name: result.name, // Set username ke state auth
     });
+    setIsAuthenticated(true);
   };
 
   const handleLogout = async () => {
@@ -45,10 +93,10 @@ function App() {
       sessionStorage.removeItem("name"); // Hapus username dari sessionStorage
       setAuth({});
     }
+    setIsAuthenticated(false);
   };
 
   return (
-    <Router>
       <Box display="flex" flexDirection="column" minHeight="100vh">
         <Header
           isAuthenticated={isAuthenticated}
@@ -64,7 +112,6 @@ function App() {
         </Box>
         <Footer />
       </Box>
-    </Router>
   );
 }
 
