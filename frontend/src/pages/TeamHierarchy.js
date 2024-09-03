@@ -4,13 +4,17 @@ import { useNavigate } from "react-router-dom";
 import { Modal, Box, Button, TextField, Typography, IconButton, Select, MenuItem, InputLabel, FormControl, CircularProgress } from "@mui/material";
 import { styled } from "@mui/system";
 import CloseIcon from "@mui/icons-material/Close";
-import "./TeamHierarchy.css";
 import AddIcon from "@mui/icons-material/Add";
 import Breadcrumbs from "@mui/material/Breadcrumbs";
-import ExploreBreadcrumb from "./common/ExploreBreadcrumb";
-import AddButton from "./common/AddButton";
-import DriveButton from "./common/DriveButton";
+import ExploreBreadcrumb from "../components/common/navigation/ExploreBreadcrumb";
+import DriveButton from "../components/common/button/DriveButton";
 import { useDriveLink } from "../context/DriveContext";
+import AddButton from "../components/common/button/AddButton";
+import TambahTeamModal from "../components/explorer/team/TambahTeamModal";
+
+import { Archive, Delete, Edit } from "@mui/icons-material";
+import TeamList from "../components/explorer/team/TeamList";
+import DeleteConfirmationModal from "../components/common/alert/deleteModal";
 
 const ModalContent = styled(Box)({
   position: "absolute",
@@ -49,6 +53,7 @@ function TeamHierarchy({ teams, setTeams }) {
   const [users, setUsers] = useState([]); // State for users
   const [selectedKetua, setSelectedKetua] = useState(""); // State for selected ketua ID
   const [loading, setLoading] = useState(false); // State for loading
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false); // State for delete confirmation modal
   const navigate = useNavigate();
   const { setLinkDrive } = useDriveLink(); // Access the context setter
 
@@ -113,12 +118,12 @@ function TeamHierarchy({ teams, setTeams }) {
           deskripsi: newDeskripsi,
         });
 
-        // Simulasikan durasi loading (misalnya 2 detik)
+        // Simulate loading duration (e.g., 2 seconds)
         setTimeout(() => {
           refetchTeams();
           closeModal();
           setLoading(false);
-        }, 2000); // 2000ms = 2 detik
+        }, 2000); // 2000ms = 2 seconds
       } catch (error) {
         console.error("Error adding team:", error);
         setLoading(false);
@@ -136,12 +141,12 @@ function TeamHierarchy({ teams, setTeams }) {
           deskripsi: newDeskripsi,
         });
 
-        // Simulasikan durasi loading (misalnya 2 detik)
+        // Simulate loading duration (e.g., 2 seconds)
         setTimeout(() => {
           refetchTeams();
           closeModal();
           setLoading(false);
-        }, 2000); // 2000ms = 2 detik
+        }, 2000); // 2000ms = 2 seconds
       } catch (error) {
         console.error("Error editing team:", error);
         setLoading(false);
@@ -149,11 +154,22 @@ function TeamHierarchy({ teams, setTeams }) {
     }
   };
 
-  const deleteTeam = async (id) => {
+  const openDeleteModal = (teamId) => {
+    setCurrentTeamId(teamId);
+    setIsDeleteModalOpen(true);
+  };
+
+  const closeDeleteModal = () => {
+    setIsDeleteModalOpen(false);
+    setCurrentTeamId(null);
+  };
+
+  const confirmDeleteTeam = async () => {
     setLoading(true);
     try {
-      await axios.delete(`${URL}/teams/${id}`);
+      await axios.delete(`${URL}/teams/${currentTeamId}`);
       refetchTeams();
+      closeDeleteModal();
     } catch (error) {
       console.error("Error deleting team:", error);
     } finally {
@@ -174,105 +190,43 @@ function TeamHierarchy({ teams, setTeams }) {
   };
 
   const driveFolderUrl = `https://drive.google.com/drive/folders/${process.env.REACT_APP_ROOT_DRIVE_FOLDER_ID}`;
-  setLinkDrive(driveFolderUrl)
+  setLinkDrive(driveFolderUrl);
+
   return (
-    <div className="team-hierarchy">
-      <div className="header">
-        <ExploreBreadcrumb />
-        <AddButton onClick={() => openModal("add")} text="Tambah Tim Baru" />
-        <DriveButton driveFolderUrl={driveFolderUrl}/>
+      <div className="team-hierarchy">
+        <div className="header">
+          <ExploreBreadcrumb />
+          <AddButton onClick={() => openModal("add")} text="Tambah Tim" />
+          <DriveButton driveFolderUrl={driveFolderUrl} />
+        </div>
+
+        <TeamList teams={teams} handleTeamClick={handleTeamClick} deleteTeam={openDeleteModal} archiveTeam={archiveTeam} openModal={openModal} />
+
+        <TambahTeamModal
+            open={isModalOpen}
+            onClose={closeModal}
+            modalType={modalType}
+            newTeamName={newTeamName}
+            setNewTeamName={setNewTeamName}
+            selectedKetua={selectedKetua}
+            setSelectedKetua={setSelectedKetua}
+            newDeskripsi={newDeskripsi}
+            setNewDeskripsi={setNewDeskripsi}
+            users={users}
+            handleKeyPress={handleKeyPress}
+            handleAddTeam={handleAddTeam}
+            handleEditTeam={handleEditTeam}
+            currentTeamId={currentTeamId}
+            loading={loading}
+        />
+
+        <DeleteConfirmationModal
+            isDeleteModalOpen={isDeleteModalOpen}
+            closeDeleteModal={closeDeleteModal}
+            deleteActivity={confirmDeleteTeam}
+            deleteItemName="Tim"
+        />
       </div>
-      <div className="team-list">
-        {teams.map((team) => (
-          <div className="team-container" key={team.id}>
-            <div className="team-box" onClick={(e) => handleTeamClick(e, team.id, team.link_drive)}>
-              <div className="team-name">{team.name}</div>
-              <div className="team-ketua">Ketua : {team.leader.name}</div> {/* Display ketua */}
-              <br />
-              <div className="team-deskripsi">Deskripsi : {team.deskripsi}</div> {/* Display deskripsi */}
-              <div className="team-actions">
-                <span
-                  onClick={(e) => {
-                    e.stopPropagation(); // Prevent unwanted navigation
-                    openModal("edit", team.id, team.name, team.leader.id, team.deskripsi); // Pass ketua and deskripsi to modal
-                  }}
-                >
-                  &#9998;
-                </span>
-                <span
-                  onClick={(e) => {
-                    e.stopPropagation(); // Prevent unwanted navigation
-                    deleteTeam(team.id);
-                  }}
-                >
-                  &#10006;
-                </span>
-                <span onClick={(e) => archiveTeam(e, team.id)}>&#128229;</span>
-              </div>
-            </div>
-          </div>
-        ))}
-      </div>
-      <Modal open={isModalOpen} onClose={closeModal} aria-labelledby="team-modal-title" aria-describedby="team-modal-description">
-        <ModalContent>
-          <Header id="team-modal-title" variant="h6">
-            {modalType === "add" ? "Tambah Tim Baru" : "Edit Nama Tim"}
-            <IconButton
-              onClick={closeModal}
-              sx={{
-                position: "absolute",
-                top: "10px",
-                right: "10px",
-              }}
-            >
-              <CloseIcon />
-            </IconButton>
-          </Header>
-          <InputField
-            label="Nama Tim"
-            variant="outlined"
-            value={newTeamName}
-            onChange={(e) => setNewTeamName(e.target.value)}
-            onKeyDown={handleKeyPress} // Handle "Enter" key press
-            required
-          />
-          <FormControlStyled variant="outlined">
-            <InputLabel id="ketua-select-label">Ketua</InputLabel>
-            <Select
-              labelId="ketua-select-label"
-              value={selectedKetua}
-              onChange={(e) => setSelectedKetua(e.target.value)}
-              onKeyDown={handleKeyPress} // Handle "Enter" key press
-              label="Ketua" // Ensure the label matches the InputLabel
-            >
-              {users.map((user) => (
-                <MenuItem key={user.id} value={user.id}>
-                  {user.name}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControlStyled>
-          <InputField
-            label="Deskripsi"
-            variant="outlined"
-            value={newDeskripsi}
-            onChange={(e) => setNewDeskripsi(e.target.value)}
-            onKeyDown={handleKeyPress} // Handle "Enter" key press
-            required
-            multiline
-            rows={4}
-          />
-          <Button
-            variant="contained"
-            color="primary"
-            onClick={modalType === "add" ? handleAddTeam : () => handleEditTeam(currentTeamId)} // Ensure correct ID is passed
-            disabled={loading} // Disable button when loading
-          >
-            {loading ? <CircularProgress size={24} color="inherit" /> : modalType === "add" ? "Tambah" : "Simpan"}
-          </Button>
-        </ModalContent>
-      </Modal>
-    </div>
   );
 }
 

@@ -9,7 +9,7 @@ import { createFolder, extractFolderIdFromUrl } from "../utils/googleDriveUtils.
 import dotenv from "dotenv";
 dotenv.config();
 
-const ROOT_DRIVE_FOLDER_ID = process.env.ROOT_DRIVE_FOLDER_ID
+const ROOT_DRIVE_FOLDER_ID = process.env.ROOT_DRIVE_FOLDER_ID;
 const router = express.Router();
 
 // full direct
@@ -244,7 +244,7 @@ router.post("/teams", async (req, res) => {
       leader_id: req.body.leader_id,
       deskripsi: req.body.deskripsi,
       links: req.body.links, // Existing links or an empty array
-      link_drive: link_drive // New link_drive
+      link_drive: link_drive, // New link_drive
     };
 
     const team = await timkerjaService.createTimkerja(teamData);
@@ -342,24 +342,22 @@ router.post("/teams/:teamId/activities", async (req, res) => {
   const { teamId } = req.params;
   const { name, tanggal_pelaksanaan, deskripsi } = req.body;
   try {
-    const result = await prisma.timkerja.findMany(
-      {
-        where: {
-          id: parseInt(teamId), // Filter by teamId
-        },
-        select: {
-          link_drive: true, // Select only the link_drive column
-        },
-      }
-    )
-    
+    const result = await prisma.timkerja.findMany({
+      where: {
+        id: parseInt(teamId), // Filter by teamId
+      },
+      select: {
+        link_drive: true, // Select only the link_drive column
+      },
+    });
+
     const link_drive = await createFolder(req.body.name, extractFolderIdFromUrl(result[0].link_drive));
     const activity = await kegiatanService.createKegiatan({
       name,
       deskripsi,
       tanggal_pelaksanaan: tanggal_pelaksanaan ? new Date(tanggal_pelaksanaan) : new Date(), // Inline default date
       timkerja_id: parseInt(teamId),
-      link_drive
+      link_drive,
     });
     res.json(activity);
   } catch (error) {
@@ -487,16 +485,14 @@ router.post("/teams/:teamId/activities/:activityId/sub-activities", async (req, 
   const { activityId } = req.params;
   const { name, tanggal_pelaksanaan, deskripsi } = req.body; // Tambahkan tanggal_pelaksanaan
   try {
-    const result = await prisma.kegiatan.findMany(
-      {
-        where: {
-          id: parseInt(activityId), // Filter by teamId
-        },
-        select: {
-          link_drive: true, // Select only the link_drive column
-        },
-      }
-    )
+    const result = await prisma.kegiatan.findMany({
+      where: {
+        id: parseInt(activityId), // Filter by teamId
+      },
+      select: {
+        link_drive: true, // Select only the link_drive column
+      },
+    });
 
     const link_drive = await createFolder(req.body.name, extractFolderIdFromUrl(result[0].link_drive));
     const subActivity = await subkegiatanService.createSubkegiatan({
@@ -504,7 +500,7 @@ router.post("/teams/:teamId/activities/:activityId/sub-activities", async (req, 
       deskripsi,
       tanggal_pelaksanaan: tanggal_pelaksanaan ? new Date(tanggal_pelaksanaan) : new Date(), // Inline default date
       kegiatan_id: parseInt(activityId),
-      link_drive
+      link_drive,
     });
     res.json(subActivity);
   } catch (error) {
@@ -631,7 +627,7 @@ router.get("/teams/:teamId/activities/:activityId/sub-activities/:subActivityId/
 // Add a Task
 router.post("/teams/:teamId/activities/:activityId/sub-activities/:subActivityId/tasks", async (req, res) => {
   const { subActivityId } = req.params;
-  const { name, dueDate, dateCreated, link, deskripsi } = req.body;
+  const { name, dueDate, dateCreated, link, deskripsi, created_by } = req.body;
   try {
     const result = await prisma.subkegiatan.findMany(
       {
@@ -651,6 +647,7 @@ router.post("/teams/:teamId/activities/:activityId/sub-activities/:subActivityId
       link: link_drive,
       deskripsi,
       subkegiatan_id: parseInt(subActivityId),
+      created_by,
     });
     res.json(task);
   } catch (error) {

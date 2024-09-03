@@ -2,9 +2,9 @@ import React, { useState } from "react";
 import useAuth from "./hooks/use-auth.js";
 import { BrowserRouter as Router } from "react-router-dom";
 import { useTeams } from "./context/TeamsContext";
-import Header from "./components/common/Header";
-import Footer from "./components/common/Footer";
-import AppRouter from "./components/common/AppRoutes";
+import Header from "./components/common/navigation/Header";
+import Footer from "./components/common/navigation/Footer";
+import AppRouter from "./components/common/navigation/AppRoutes";
 import Box from "@mui/material/Box";
 import Container from "@mui/material/Container";
 
