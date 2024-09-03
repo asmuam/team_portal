@@ -119,6 +119,23 @@ async function createShortcut(targetFileURL, parentFolderId) {
     }
 }
 
+async function deleteFolder(folderId) {
+    const drive = await authenticate();
+
+    try {
+        // Delete the folder
+        await drive.files.delete({
+            fileId: folderId,
+        });
+
+        console.log(`Folder with ID ${folderId} deleted successfully.`);
+    } catch (error) {
+        console.error('Error deleting folder:', error);
+        throw error;
+    }
+}
+
+
 /**
  * Extracts the folder ID from a Google Drive folder link.
  * @param {string} url - The Google Drive folder URL.
@@ -131,4 +148,26 @@ function extractFolderIdFromUrl(url) {
     return match ? (match[1] || match[2]) : null;
 }
 
-export { createFolder, uploadFile, createShortcut, extractFolderIdFromUrl };
+async function renameFolder(folderId, newName) {
+    const drive = await authenticate();
+
+    const fileMetadata = {
+        name: newName,
+    };
+
+    try {
+        const response = await drive.files.update({
+            fileId: folderId,
+            resource: fileMetadata,
+            fields: 'id, name',
+        });
+
+        console.log(`Folder renamed successfully. New Name: ${response.data.name}`);
+        return response.data.name;
+    } catch (error) {
+        console.error('Error renaming folder:', error);
+        throw error;
+    }
+}
+
+export { createFolder, uploadFile, createShortcut, extractFolderIdFromUrl, deleteFolder, renameFolder };

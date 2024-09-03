@@ -4,9 +4,7 @@ import * as timkerjaService from "../services/timKerjaService.js";
 import * as kegiatanService from "../services/kegiatanService.js";
 import * as subkegiatanService from "../services/subkegiatanService.js";
 import * as tugasService from "../services/tugasService.js";
-import * as userService from "../services/userServices.js";
 import { createFolder, extractFolderIdFromUrl } from "../utils/googleDriveUtils.js";
-// import { createUser, getUserById, getAllUsers, updateUser, deleteUser } from "../services/userService.js";
 
 import dotenv from "dotenv";
 dotenv.config();
@@ -63,7 +61,6 @@ const getAllData = async () => {
   }));
 };
 
-// Create a new user
 // resp [
 //   {
 //       "id": 1,
