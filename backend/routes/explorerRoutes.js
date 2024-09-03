@@ -639,7 +639,8 @@ router.post("/teams/:teamId/activities/:activityId/sub-activities/:subActivityId
         },
       }
     )
-    const link_drive = await createFolder(req.body.name, extractFolderIdFromUrl(result[0].link_drive));
+    const folderName = `${created_by}_${name}`;
+    const link_drive = await createFolder(folderName, extractFolderIdFromUrl(result[0].link_drive));
     const task = await tugasService.createTugas({
       name,
       dateCreated: dateCreated ? new Date(dateCreated) : new Date(),
