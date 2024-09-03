@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Container, Typography, Button, Box, TextField, MenuItem } from "@mui/material";
 import UserList from "../components/userManagement/UserList";
 import UserForm from "../components/userManagement/UserForm";
-import axios from "axios";
+import useAxiosPrivate from "../hooks/use-axios-private.js";
 
 const URL = process.env.REACT_APP_API_URL;
 
@@ -12,6 +12,7 @@ const UserManagement = () => {
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [roleFilter, setRoleFilter] = useState("");
+  const apiPrivate = useAxiosPrivate();
 
   useEffect(() => {
     fetchUsers();
@@ -19,7 +20,7 @@ const UserManagement = () => {
 
   const fetchUsers = async () => {
     try {
-      const response = await axios.get(`${URL}/user`);
+      const response = await apiPrivate.get(`${URL}/user`);
       setUsers(response.data);
     } catch (error) {
       console.error("There was an error fetching the users:", error);

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Dialog, DialogActions, DialogContent, DialogTitle, TextField, Button, FormControl, InputLabel, Select, MenuItem } from "@mui/material";
-import axios from "axios";
+import useAxiosPrivate from "../../hooks/use-axios-private";
 
 const roles = ["admin", "pegawai"];
 
@@ -10,6 +10,7 @@ const UserForm = ({ user, onClose, refreshUsers }) => {
   const [password, setPassword] = useState("");
   const [role, setRole] = useState("");
   const URL = process.env.REACT_APP_API_URL;
+  const apiPrivate = useAxiosPrivate();
 
   useEffect(() => {
     if (user) {
@@ -33,9 +34,9 @@ const UserForm = ({ user, onClose, refreshUsers }) => {
 
     try {
       if (user) {
-        await axios.patch(`${URL}/user/${user.id}`, userData);
+        await apiPrivate.patch(`${URL}/user/${user.id}`, userData);
       } else {
-        await axios.post(`${URL}/user`, userData);
+        await apiPrivate.post(`${URL}/user`, userData);
       }
       await refreshUsers(); // Refresh the list after updating
       onClose();

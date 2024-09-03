@@ -3,13 +3,14 @@ import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import axios from "axios";
+import useAxiosPrivate from "../../hooks/use-axios-private";
 
 const UserList = ({ users = [], onEditUser, refreshUsers }) => {
   const [open, setOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
   const [page, setPage] = useState(1);
   const URL = process.env.REACT_APP_API_URL;
-
+  const apiPrivate = useAxiosPrivate();
   const usersPerPage = 5;
   const pageCount = Math.ceil(users.length / usersPerPage);
 
@@ -20,7 +21,7 @@ const UserList = ({ users = [], onEditUser, refreshUsers }) => {
 
   const handleConfirmDelete = async () => {
     try {
-      await axios.delete(`${URL}/user/${selectedUser.id}`);
+      await apiPrivate.delete(`${URL}/user/${selectedUser.id}`);
       setOpen(false);
       await refreshUsers(); // Refresh the list after deleting
     } catch (error) {
