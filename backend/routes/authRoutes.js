@@ -1,3 +1,5 @@
+// authRoutes.js
+
 import express from "express";
 import dotenv from "dotenv";
 import jwt from "jsonwebtoken";
@@ -50,8 +52,10 @@ router.post("/login", async (req, res) => {
     // Kirim refresh token dalam cookie
     res.cookie("refreshToken", refreshToken, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      maxAge: 7 * 24 * 60 * 60 * 1000,
+      secure: false,
+      // secure: process.env.NODE_ENV === "production",
+      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+      sameSite: 'Lax'
     });
 
     // Kirim access token dan data user dalam respons JSON
@@ -88,40 +92,38 @@ router.post("/login", async (req, res) => {
 // Refresh token route
 router.post("/refresh", async (req, res) => {
   try {
+    console.log("Cookies:", req.cookies); // Log all cookies
     const refreshToken = req.cookies.refreshToken;
     const { uid } = req.body;
-
-    // Validasi input
+    console.log("Refresh Token:", refreshToken);
+    
     if (!refreshToken) return res.status(401).json({ message: "Refresh token tidak ditemukan" });
 
-    // Temukan pengguna berdasarkan id
-    const user = await prismaClient.user.findUnique({
-      where: { id: +uid },
-    });
-
-    if (!user) return res.status(404).json({ message: "Akun tidak ditemukan" });
-
-    // Verifikasi refresh token
-    jwt.verify(refreshToken, REFRESH_TOKEN_SECRET, (err, user) => {
+    // Verifikasi dan validasi refresh token
+    jwt.verify(refreshToken, REFRESH_TOKEN_SECRET, async (err, decoded) => {
       if (err) return res.status(403).json({ message: "Refresh token tidak valid" });
 
-      // Buat ulang access token
+      const user = await prismaClient.user.findUnique({
+        where: { id: +uid },
+      });
+
+      if (!user || user.refresh_token !== refreshToken) {
+        return res.status(403).json({ message: "Refresh token tidak valid" });
+      }
+
       const accessToken = jwt.sign(
-        { userId: user.userId, username: user.username, role: user.role, name: user.name },
+        { userId: user.id, username: user.username, role: user.role, name: user.name },
         ACCESS_TOKEN_SECRET,
-        { expiresIn: "1h" } // Access token berlaku selama 1 jam
+        { expiresIn: "1h" }
       );
 
       res.status(200).json({ accessToken });
     });
   } catch (error) {
-    console.error(error.message);
-    res.status(500).json({
-      message: "Internal server error",
-      error: error.message,
-    });
+    res.status(500).json({ message: "Internal server error", error: error.message });
   }
 });
+
 
 // resp {
 //   "accessToken": "newAccessToken"
