@@ -4,7 +4,7 @@ import { TextField, Button, Container, Typography, Box, Alert, Paper, IconButton
 import { styled } from "@mui/system";
 import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
-
+import {api} from "../utils/axios"
 const Root = styled(Box)(({ theme }) => ({
   display: "flex",
   alignItems: "center",
@@ -57,25 +57,24 @@ const Login = ({ onLogin }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await fetch(`${process.env.REACT_APP_API_URL}/login`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ username, password }),
+      const response = await api.post('/login', {
+        username,
+        password,
       });
-
-      const result = await response.json();
-      if (response.ok) {
-        onLogin(result); // Mengirim data login ke fungsi onLogin
+  
+      if (response.status === 200) {
+        const result = response.data; // Axios automatically parses JSON response
+        onLogin(result); // Sending login data to the onLogin function
         navigate("/explorer");
       } else {
-        setError(result.message || "Login failed");
+        const errorData = response.data;
+        setError(errorData.message || "Login failed");
       }
     } catch (error) {
       setError("An error occurred during login");
     }
   };
+  
 
   return (
     <Root>
