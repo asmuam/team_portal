@@ -452,7 +452,7 @@ function Tugas() {
             </Button>
           )}
 
-          <AddButton onClick={() => openModal("add")} text="Tambah " />
+          {isMobile ? <AddButton onClick={() => openModal("add")} text="Tambah " /> : <AddButton onClick={() => openModal("add")} text="Tambah Tugas " />}
         </div>
 
         {/* Bagian Drive */}
@@ -611,9 +611,23 @@ function Tugas() {
               <CloseIcon />
             </IconButton>
           </Box>
-          <TextField label="Task Name" fullWidth value={taskName} onChange={(e) => setTaskName(e.target.value)} margin="normal" />
           <TextField
-            label="Due Date"
+            label={
+              <span>
+                Task Name<span style={{ color: "red" }}> *</span>
+              </span>
+            }
+            fullWidth
+            value={taskName}
+            onChange={(e) => setTaskName(e.target.value)}
+            margin="normal"
+          />
+          <TextField
+            label={
+              <span>
+                Due Date<span style={{ color: "red" }}> *</span>
+              </span>
+            }
             type="date"
             fullWidth
             value={dueDate}
@@ -623,7 +637,17 @@ function Tugas() {
               shrink: true,
             }}
           />
-          <TextField label="Deskripsi" fullWidth value={deskripsi} onChange={(e) => setDeskripsi(e.target.value)} margin="normal" />
+          <TextField
+            label={
+              <span>
+                Deskripsi<span style={{ color: "red" }}> *</span>
+              </span>
+            }
+            fullWidth
+            value={deskripsi}
+            onChange={(e) => setDeskripsi(e.target.value)}
+            margin="normal"
+          />
 
           <Typography variant="h6" marginTop="16px">
             Upload Type

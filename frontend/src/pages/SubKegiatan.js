@@ -270,7 +270,7 @@ function SubKegiatan() {
             </Button>
           )}
 
-          <AddButton onClick={() => openModal("add")} text="Tambah " />
+          {isMobile ? <AddButton onClick={() => openModal("add")} text="Tambah " /> : <AddButton onClick={() => openModal("add")} text="Tambah Sub Kegiatan " />}
         </div>
 
         {/* Bagian Drive */}

@@ -265,8 +265,7 @@ function Kegiatan() {
               Back
             </Button>
           )}
-
-          <AddButton onClick={() => openModal("add")} text="Tambah " />
+          {isMobile ? <AddButton onClick={() => openModal("add")} text="Tambah " /> : <AddButton onClick={() => openModal("add")} text="Tambah Kegiatan " />}
         </div>
 
         {/* Bagian Drive */}
@@ -276,34 +275,29 @@ function Kegiatan() {
       </div>
 
       <ActivityList
-          activities={currentActivities}
-          onActivityClick={handleActivityClick}
-          onEditClick={(id, name, tanggal, deskripsi) => openModal("edit", id, name, tanggal, deskripsi)}
-          onDeleteClick={openDeleteModal}
-          onArchiveClick={archiveActivity}
+        activities={currentActivities}
+        onActivityClick={handleActivityClick}
+        onEditClick={(id, name, tanggal, deskripsi) => openModal("edit", id, name, tanggal, deskripsi)}
+        onDeleteClick={openDeleteModal}
+        onArchiveClick={archiveActivity}
       />
 
       <TambahKegiatanModal
-          isModalOpen={isModalOpen}
-          closeModal={closeModal}
-          modalType={modalType}
-          newActivityName={newActivityName}
-          setNewActivityName={setNewActivityName}
-          tanggalPelaksanaan={tanggalPelaksanaan}
-          setTanggalPelaksanaan={setTanggalPelaksanaan}
-          newDeskripsi={newDeskripsi}
-          setNewDeskripsi={setNewDeskripsi}
-          handleAddActivity={handleAddActivity}
-          handleEditActivity={handleEditActivity}
-          loading={loading}
+        isModalOpen={isModalOpen}
+        closeModal={closeModal}
+        modalType={modalType}
+        newActivityName={newActivityName}
+        setNewActivityName={setNewActivityName}
+        tanggalPelaksanaan={tanggalPelaksanaan}
+        setTanggalPelaksanaan={setTanggalPelaksanaan}
+        newDeskripsi={newDeskripsi}
+        setNewDeskripsi={setNewDeskripsi}
+        handleAddActivity={handleAddActivity}
+        handleEditActivity={handleEditActivity}
+        loading={loading}
       />
 
-      <DeleteConfirmationModal
-        isDeleteModalOpen={isDeleteModalOpen}
-        closeDeleteModal={closeDeleteModal}
-        deleteActivity={deleteActivity}
-        deleteItemName="Kegiatan"
-        />
+      <DeleteConfirmationModal isDeleteModalOpen={isDeleteModalOpen} closeDeleteModal={closeDeleteModal} deleteActivity={deleteActivity} deleteItemName="Kegiatan" />
     </div>
   );
 }
