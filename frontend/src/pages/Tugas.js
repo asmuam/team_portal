@@ -23,6 +23,8 @@ import { useDriveLink } from "../context/DriveContext";
 import AddButton from "../components/common/button/AddButton";
 import DeleteConfirmationModal from "../components/common/alert/deleteModal";
 
+import useAxiosPrivate from "../hooks/use-axios-private.js";
+
 // Styled Components
 const ModalContent = styled(Box)(({ isMobile }) => ({
   position: "absolute",
@@ -165,7 +167,7 @@ function Tugas() {
   const [subActivityTasks, setSubActivityTasks] = useState({});
   const { linkDrive } = useDriveLink(); // Access the link_drive from context
 
-  const URL = process.env.REACT_APP_API_URL;
+  const apiPrivate = useAxiosPrivate()
 
   // Calculate progress
   const calculateProgress = (tasks) => {
@@ -188,7 +190,7 @@ function Tugas() {
   // Fetch team details
   const fetchTeamDetails = async () => {
     try {
-      const response = await axios.get(`${URL}/teams/${teamId}`);
+      const response = await apiPrivate.get(`/teams/${teamId}`);
       setTeamName(response.data.name);
     } catch (error) {
       console.error("Failed to fetch team details:", error);
@@ -198,7 +200,7 @@ function Tugas() {
   // Fetch activity details
   const fetchActivityDetails = async () => {
     try {
-      const response = await axios.get(`${URL}/activities/${activityId}`);
+      const response = await apiPrivate.get(`/activities/${activityId}`);
       setActivityName(response.data.name);
     } catch (error) {
       console.error("Failed to fetch activity details:", error);
@@ -208,7 +210,7 @@ function Tugas() {
   // Fetch sub-activity details
   const fetchSubActivityDetails = async () => {
     try {
-      const response = await axios.get(`${URL}/sub-activities/${subActivityId}`);
+      const response = await apiPrivate.get(`/sub-activities/${subActivityId}`);
       setSubActivityName(response.data.name);
     } catch (error) {
       console.error("Failed to fetch sub-activity details:", error);
@@ -223,7 +225,7 @@ function Tugas() {
     }
 
     try {
-      const response = await axios.get(`${URL}/teams/${teamId}/activities/${activityId}/sub-activities/${subActivityId}/tasks`);
+      const response = await apiPrivate.get(`/teams/${teamId}/activities/${activityId}/sub-activities/${subActivityId}/tasks`);
       setTasks(response.data);
     } catch (error) {
       console.error("Failed to fetch tasks:", error);
@@ -283,7 +285,7 @@ function Tugas() {
     };
 
     try {
-      await axios.post(`${URL}/teams/${teamId}/activities/${activityId}/sub-activities/${subActivityId}/tasks`, newTask);
+      await apiPrivate.post(`/teams/${teamId}/activities/${activityId}/sub-activities/${subActivityId}/tasks`, newTask);
       refetchTasks();
       closeModal();
     } catch (error) {
@@ -306,7 +308,7 @@ function Tugas() {
     };
 
     try {
-      const response = await axios.patch(`${URL}/teams/${teamId}/activities/${activityId}/sub-activities/${subActivityId}/tasks/${currentTaskId}`, updatedTask);
+      const response = await apiPrivate.patch(`/teams/${teamId}/activities/${activityId}/sub-activities/${subActivityId}/tasks/${currentTaskId}`, updatedTask);
       console.log("Updated Task Response:", response.data); // Check the server response
       refetchTasks();
       closeModal();
@@ -317,7 +319,7 @@ function Tugas() {
 
   const handleTaskCompletion = async (currentTaskId) => {
     try {
-      await axios.patch(`${URL}/teams/${teamId}/activities/${activityId}/sub-activities/${subActivityId}/tasks/${currentTaskId}/completion`, {});
+      await apiPrivate.patch(`/teams/${teamId}/activities/${activityId}/sub-activities/${subActivityId}/tasks/${currentTaskId}/completion`, {});
       refetchTasks();
     } catch (error) {
       console.error("Error toggling task completion:", error);
@@ -326,7 +328,7 @@ function Tugas() {
 
   const deleteTask = async () => {
     try {
-      await axios.delete(`${URL}/teams/${teamId}/activities/${activityId}/sub-activities/${subActivityId}/tasks/${currentTaskId}`);
+      await apiPrivate.delete(`/teams/${teamId}/activities/${activityId}/sub-activities/${subActivityId}/tasks/${currentTaskId}`);
       refetchTasks();
       closeDeleteModal();
     } catch (error) {

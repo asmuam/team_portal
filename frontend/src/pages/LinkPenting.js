@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Modal, Box, TextField, Button, Typography } from "@mui/material";
 import { useTeams } from "../context/TeamsContext";
 import axios from "axios";
+import useAxiosPrivate from "../hooks/use-axios-private.js";
 
 const API_URL = process.env.REACT_APP_API_URL;
 
@@ -14,6 +15,7 @@ const LinkPenting = () => {
   const [currentLinkId, setCurrentLinkId] = useState(null);
   const [linkUrl, setLinkUrl] = useState("");
   const [linkDescription, setLinkDescription] = useState("");
+  const apiPrivate = useAxiosPrivate()
 
   const handleToggleTeam = (teamId) => {
     setOpenTeam(openTeam === teamId ? null : teamId);
@@ -45,7 +47,7 @@ const LinkPenting = () => {
     const formattedUrl = formatUrl(linkUrl);
     const newLink = { url: formattedUrl, description: linkDescription };
     try {
-      const response = await axios.post(`${API_URL}/teams/${currentTeamId}/links`, newLink);
+      const response = await apiPrivate.post(`${API_URL}/teams/${currentTeamId}/links`, newLink);
       const { links } = response.data;
       setTeams((prevTeams) => prevTeams.map((team) => (team.id === currentTeamId ? { ...team, links } : team)));
       closeModal();
@@ -57,7 +59,7 @@ const LinkPenting = () => {
   const handleEditLink = async () => {
     const formattedUrl = formatUrl(linkUrl);
     try {
-      const response = await axios.patch(`${API_URL}/teams/${currentTeamId}/links/${currentLinkId}`, {
+      const response = await apiPrivate.patch(`${API_URL}/teams/${currentTeamId}/links/${currentLinkId}`, {
         url: formattedUrl,
         description: linkDescription,
       });
@@ -71,7 +73,7 @@ const LinkPenting = () => {
 
   const handleDeleteLink = async (teamId, linkId) => {
     try {
-      const response = await axios.delete(`${API_URL}/teams/${teamId}/links/${linkId}`);
+      const response = await apiPrivate.delete(`${API_URL}/teams/${teamId}/links/${linkId}`);
       const { links } = response.data;
       setTeams((prevTeams) => prevTeams.map((team) => (team.id === teamId ? { ...team, links } : team)));
     } catch (error) {

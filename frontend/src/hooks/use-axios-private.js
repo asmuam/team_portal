@@ -32,6 +32,14 @@ const useAxiosPrivate = () => {
       (response) => response,
       async (error) => {
         const prevRequest = error?.config;
+        // Handle 401 Unauthorized errors
+        if (error?.response?.status === 401) {
+          toast.fire({
+            icon: "info",
+            text: "Anda Tidak Mempunyai Akses.",
+          });
+          navigate("/");
+        }
         if (error?.response?.status === 403 && !prevRequest?.sent) {
           prevRequest.sent = true;
 

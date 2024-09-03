@@ -9,7 +9,6 @@ const UserForm = ({ user, onClose, refreshUsers }) => {
   const [name, setName] = useState("");
   const [password, setPassword] = useState("");
   const [role, setRole] = useState("");
-  const URL = process.env.REACT_APP_API_URL;
   const apiPrivate = useAxiosPrivate();
 
   useEffect(() => {
@@ -34,9 +33,9 @@ const UserForm = ({ user, onClose, refreshUsers }) => {
 
     try {
       if (user) {
-        await apiPrivate.patch(`${URL}/user/${user.id}`, userData);
+        await apiPrivate.patch(`/user/${user.id}`, userData);
       } else {
-        await apiPrivate.post(`${URL}/user`, userData);
+        await apiPrivate.post(`/user`, userData);
       }
       await refreshUsers(); // Refresh the list after updating
       onClose();

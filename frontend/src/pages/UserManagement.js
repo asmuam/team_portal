@@ -4,7 +4,6 @@ import UserList from "../components/userManagement/UserList";
 import UserForm from "../components/userManagement/UserForm";
 import useAxiosPrivate from "../hooks/use-axios-private.js";
 
-const URL = process.env.REACT_APP_API_URL;
 
 const UserManagement = () => {
   const [users, setUsers] = useState([]);
@@ -20,7 +19,7 @@ const UserManagement = () => {
 
   const fetchUsers = async () => {
     try {
-      const response = await apiPrivate.get(`${URL}/user`);
+      const response = await apiPrivate.get(`/user`);
       setUsers(response.data);
     } catch (error) {
       console.error("There was an error fetching the users:", error);

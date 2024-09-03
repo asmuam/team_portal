@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
-import axios from "axios";
 import { Box, Button, Typography, IconButton, Modal, TextField, CircularProgress } from "@mui/material";
 import { styled } from "@mui/system";
 import CloseIcon from "@mui/icons-material/Close";
@@ -17,6 +16,7 @@ import AddButton from "../components/common/button/AddButton";
 import DeleteConfirmationModal from "../components/common/alert/deleteModal";
 import TambahKegiatanModal from "../components/explorer/kegiatan/TambahKegiatanModal";
 import ActivityList from "../components/explorer/kegiatan/KegiatanList";
+import useAxiosPrivate from "../hooks/use-axios-private";
 
 // Styled Components
 const ModalContent = styled(Box)({
@@ -93,8 +93,8 @@ function Kegiatan() {
   const [currentPage, setCurrentPage] = useState(1);
   const tasksPerPage = 5;
   const navigate = useNavigate();
-  const URL = process.env.REACT_APP_API_URL;
   const { setLinkDrive, linkDrive } = useDriveLink(); // Access the link_drive from context
+  const apiPrivate = useAxiosPrivate()
 
   const openModal = (type, activityId = null, activityName = "", tanggal = "", deskripsi = "") => {
     setModalType(type);
@@ -125,12 +125,16 @@ function Kegiatan() {
 
   const refetchActivities = async () => {
     try {
-      const response = await fetch(`${URL}/teams/${teamId}/activities`);
-      if (!response.ok) {
-        throw new Error("Network response was not ok");
+      // Gunakan apiPrivate untuk melakukan permintaan
+      const response = await apiPrivate.get(`/teams/${teamId}/activities`);
+
+      // Periksa apakah status responnya 200 OK
+      if (response.status === 200) {
+        const data = response.data; // Data dari respons
+        setActivities(data);
+      } else {
+        throw new Error("Failed to fetch activities: " + response.status);
       }
-      const data = await response.json();
-      setActivities(data);
     } catch (error) {
       console.error("Failed to fetch activities:", error);
     }
@@ -152,7 +156,7 @@ function Kegiatan() {
       setLoading(true);
 
       try {
-        await axios.post(`${URL}/teams/${teamId}/activities/`, { name: newActivityName, tanggal_pelaksanaan: tanggalPelaksanaan, deskripsi: newDeskripsi });
+        await apiPrivate.post(`/teams/${teamId}/activities/`, { name: newActivityName, tanggal_pelaksanaan: tanggalPelaksanaan, deskripsi: newDeskripsi });
         setTimeout(() => {
           refetchActivities();
           closeModal();
@@ -167,7 +171,7 @@ function Kegiatan() {
   const handleEditActivity = async () => {
     if (newActivityName) {
       try {
-        await axios.patch(`${URL}/teams/${teamId}/activities/${currentActivityId}`, { name: newActivityName, tanggal_pelaksanaan: tanggalPelaksanaan, deskripsi: newDeskripsi });
+        await apiPrivate.patch(`/teams/${teamId}/activities/${currentActivityId}`, { name: newActivityName, tanggal_pelaksanaan: tanggalPelaksanaan, deskripsi: newDeskripsi });
         setTimeout(() => {
           setLoading(false);
         }, 2000);
@@ -187,7 +191,7 @@ function Kegiatan() {
   };
   const deleteActivity = async () => {
     try {
-      await axios.delete(`${URL}/teams/${teamId}/activities/${currentActivityId}`);
+      await apiPrivate.delete(`/teams/${teamId}/activities/${currentActivityId}`);
       refetchActivities();
       closeDeleteModal();
     } catch (error) {

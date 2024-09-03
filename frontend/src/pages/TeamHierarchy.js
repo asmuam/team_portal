@@ -15,6 +15,7 @@ import TambahTeamModal from "../components/explorer/team/TambahTeamModal";
 import { Archive, Delete, Edit } from "@mui/icons-material";
 import TeamList from "../components/explorer/team/TeamList";
 import DeleteConfirmationModal from "../components/common/alert/deleteModal";
+import useAxiosPrivate from "../hooks/use-axios-private.js";
 
 const ModalContent = styled(Box)({
   position: "absolute",
@@ -56,21 +57,23 @@ function TeamHierarchy({ teams, setTeams }) {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false); // State for delete confirmation modal
   const navigate = useNavigate();
   const { setLinkDrive } = useDriveLink(); // Access the context setter
+  const apiPrivate = useAxiosPrivate()
 
-  const URL = process.env.REACT_APP_API_URL;
 
   // Fetch users on component mount
   useEffect(() => {
     const fetchUsers = async () => {
       try {
-        const response = await axios.get(`${URL}/users/pegawai`);
+        const response = await apiPrivate.get(`/users/pegawai`);
         setUsers(response.data);
       } catch (error) {
         console.error("Failed to fetch users:", error);
       }
     };
     fetchUsers();
-  }, [URL]);
+    refetchTeams();
+    setLinkDrive(driveFolderUrl);
+  }, []);
 
   const openModal = (type, teamId = null, teamName = "", ketua = "", deskripsi = "") => {
     setModalType(type);
@@ -89,14 +92,19 @@ function TeamHierarchy({ teams, setTeams }) {
     setNewDeskripsi("");
   };
 
+
   const refetchTeams = async () => {
     try {
-      const response = await fetch(`${URL}/teams`);
-      if (!response.ok) {
-        throw new Error("Network response was not ok");
+      // Gunakan apiPrivate untuk melakukan permintaan
+      const response = await apiPrivate.get(`/teams`);
+
+      // Periksa apakah status responnya 200 OK
+      if (response.status === 200) {
+        const data = response.data; // Data dari respons
+        setTeams(data);
+      } else {
+        throw new Error("Failed to fetch teams: " + response.status);
       }
-      const data = await response.json();
-      setTeams(data);
     } catch (error) {
       console.error("Failed to fetch teams:", error);
     }
@@ -112,7 +120,7 @@ function TeamHierarchy({ teams, setTeams }) {
     if (newTeamName && selectedKetua && newDeskripsi) {
       setLoading(true);
       try {
-        await axios.post(`${URL}/teams`, {
+        await apiPrivate.post(`/teams`, {
           name: newTeamName,
           leader_id: selectedKetua, // Use selected ketua ID
           deskripsi: newDeskripsi,
@@ -135,7 +143,7 @@ function TeamHierarchy({ teams, setTeams }) {
     if (newTeamName && selectedKetua && newDeskripsi) {
       setLoading(true);
       try {
-        await axios.patch(`${URL}/teams/${id}`, {
+        await apiPrivate.patch(`/teams/${id}`, {
           name: newTeamName,
           leader_id: selectedKetua, // Use selected ketua ID
           deskripsi: newDeskripsi,
@@ -167,7 +175,7 @@ function TeamHierarchy({ teams, setTeams }) {
   const confirmDeleteTeam = async () => {
     setLoading(true);
     try {
-      await axios.delete(`${URL}/teams/${currentTeamId}`);
+      await apiPrivate.delete(`/teams/${currentTeamId}`);
       refetchTeams();
       closeDeleteModal();
     } catch (error) {
@@ -190,7 +198,6 @@ function TeamHierarchy({ teams, setTeams }) {
   };
 
   const driveFolderUrl = `https://drive.google.com/drive/folders/${process.env.REACT_APP_ROOT_DRIVE_FOLDER_ID}`;
-  setLinkDrive(driveFolderUrl);
 
   return (
       <div className="team-hierarchy">

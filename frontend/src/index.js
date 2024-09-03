@@ -11,15 +11,15 @@ import { BrowserRouter as Router } from "react-router-dom";
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
   <React.StrictMode>
-    <AuthProvider>
-      <TeamsProvider>
-        <DriveLinkProvider>
-          <Router>
+    <Router>
+      <AuthProvider>
+        <TeamsProvider>
+          <DriveLinkProvider>
             <App />
-          </Router>
-        </DriveLinkProvider>
-      </TeamsProvider>
-    </AuthProvider>
+          </DriveLinkProvider>
+        </TeamsProvider>
+      </AuthProvider>
+    </Router>
   </React.StrictMode>
 );
 

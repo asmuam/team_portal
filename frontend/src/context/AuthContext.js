@@ -5,7 +5,7 @@ import { createContext, useState, useEffect } from "react";
  * File untuk membuat state global
  * 
  * @property auth: Object => state yang berisi:
- *  - user: id user yang login
+ *  - uid: id user yang login
  *  - role: role user yang login
  *  - token: access token api
  * 

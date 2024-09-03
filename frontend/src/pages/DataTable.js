@@ -5,6 +5,8 @@ import DatePicker from "react-datepicker";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import "react-datepicker/dist/react-datepicker.css";
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Button } from "@mui/material";
+import useAxiosPrivate from "../hooks/use-axios-private.js";
+
 const formatDate = (dateString) => {
   const date = new Date(dateString);
   return new Intl.DateTimeFormat("en-GB", {
@@ -27,22 +29,28 @@ const DataTable = () => {
   const [currentPage, setCurrentPage] = useState(0);
   const rowsPerPage = 5;
 
+  const apiPrivate = useAxiosPrivate()
   useEffect(() => {
     const fetchAllData = async () => {
       try {
-        const response = await fetch(`${process.env.REACT_APP_API_URL}/allData`);
-        if (!response.ok) {
-          throw new Error("Network response was not ok");
+        // Gunakan apiPrivate untuk melakukan permintaan
+        const response = await apiPrivate.get(`/allData`);
+        
+        // Periksa apakah status responnya 200 OK
+        if (response.status === 200) {
+          const fetchedData = response.data; // Data dari respons
+          setData(fetchedData);
+        } else {
+          throw new Error("Failed to fetch data: " + response.status);
         }
-        const fetchedData = await response.json();
-        setData(fetchedData);
       } catch (error) {
         console.error("Failed to fetch data:", error);
       }
     };
 
     fetchAllData();
-  }, []);
+  }, [apiPrivate]); // Tambahkan apiPrivate sebagai dependensi jika perlu
+
 
   const [pelaksanaanDateRange, setPelaksanaanDateRange] = useState([null, null]);
   const [dueDateRange, setdueDateRange] = useState([null, null]);

@@ -3,7 +3,7 @@ import Breadcrumbs from '@mui/material/Breadcrumbs';
 import Link from '@mui/material/Link';
 import Typography from '@mui/material/Typography';
 import { useNavigate, useParams } from 'react-router-dom';
-import axios from 'axios';
+import useAxiosPrivate from "./../../../hooks/use-axios-private";
 
 const ExploreBreadcrumb = () => {
     const navigate = useNavigate();
@@ -13,6 +13,8 @@ const ExploreBreadcrumb = () => {
         activityName: '',
         subActivityName: ''
     });
+    const apiPrivate = useAxiosPrivate();
+
 
     useEffect(() => {
         console.log('Fetching data for breadcrumb...');
@@ -20,7 +22,7 @@ const ExploreBreadcrumb = () => {
             try {
                 // Fetch team by teamId
                 if (teamId) {
-                    const teamsResponse = await axios.get(`${process.env.REACT_APP_API_URL}/teams`);
+                    const teamsResponse = await apiPrivate.get(`/teams`);
                     const team = teamsResponse.data.find(team => team.id === parseInt(teamId));
                     if (team) {
                         setData(prev => ({ ...prev, teamName: team.name }));
@@ -28,14 +30,14 @@ const ExploreBreadcrumb = () => {
 
                     // Fetch activities if teamId is available
                     if (activityId) {
-                        const activitiesResponse = await axios.get(`${process.env.REACT_APP_API_URL}/teams/${teamId}/activities`);
+                        const activitiesResponse = await apiPrivate.get(`/teams/${teamId}/activities`);
                         const activity = activitiesResponse.data.find(activity => activity.id === parseInt(activityId));
                         if (activity) {
                             setData(prev => ({ ...prev, activityName: activity.name }));
 
                             // Fetch sub-activities if activityId is available
                             if (subActivityId) {
-                                const subActivitiesResponse = await axios.get(`${process.env.REACT_APP_API_URL}/teams/${teamId}/activities/${activityId}/sub-activities`);
+                                const subActivitiesResponse = await apiPrivate.get(`/teams/${teamId}/activities/${activityId}/sub-activities`);
                                 const subActivity = subActivitiesResponse.data.find(sub => sub.id === parseInt(subActivityId));
                                 if (subActivity) {
                                     setData(prev => ({ ...prev, subActivityName: subActivity.name }));

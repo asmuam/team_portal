@@ -15,6 +15,7 @@ import { useDriveLink } from "../context/DriveContext";
 import AddButton from "../components/common/button/AddButton";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import DeleteConfirmationModal from "../components/common/alert/deleteModal";
+import useAxiosPrivate from "../hooks/use-axios-private.js";
 
 // Styled Components
 const ModalContent = styled(Box)(({ isMobile }) => ({
@@ -84,8 +85,8 @@ function SubKegiatan() {
   const [currentPage, setCurrentPage] = useState(1);
   const [activitiesPerPage] = useState(4);
   const { setLinkDrive, linkDrive } = useDriveLink(); // Access the link_drive from context
+  const apiPrivate = useAxiosPrivate()
 
-  const URL = process.env.REACT_APP_API_URL;
   const navigate = useNavigate();
 
   const openModal = (type, subActivityId = null, name = "", tanggal = "", deskripsi = "") => {
@@ -126,12 +127,16 @@ function SubKegiatan() {
 
   const refetchSubActivities = async () => {
     try {
-      const response = await fetch(`${URL}/teams/${teamId}/activities/${activityId}/sub-activities`);
-      if (!response.ok) {
-        throw new Error("Network response was not ok");
+      // Gunakan apiPrivate untuk melakukan permintaan
+      const response = await apiPrivate.get(`/teams/${teamId}/activities/${activityId}/sub-activities`);
+
+      // Periksa apakah status responnya 200 OK
+      if (response.status === 200) {
+        const data = response.data; // Data dari respons
+        setSubActivities(data);
+      } else {
+        throw new Error("Failed to fetch sub-activities: " + response.status);
       }
-      const data = await response.json();
-      setSubActivities(data);
     } catch (error) {
       console.error("Failed to fetch sub-activities:", error);
     }
@@ -139,12 +144,16 @@ function SubKegiatan() {
 
   const refetchActivityDetails = async () => {
     try {
-      const response = await fetch(`${URL}/teams/${teamId}/activities/${activityId}/sub-activities`);
-      if (!response.ok) {
-        throw new Error("Network response was not ok");
+      // Gunakan apiPrivate untuk melakukan permintaan
+      const response = await apiPrivate.get(`/teams/${teamId}/activities/${activityId}/sub-activities`);
+
+      // Periksa apakah status responnya 200 OK
+      if (response.status === 200) {
+        const data = response.data; // Data dari respons
+        setActivityDetails(data);
+      } else {
+        throw new Error("Failed to fetch activity details: " + response.status);
       }
-      const data = await response.json();
-      setActivityDetails(data);
     } catch (error) {
       console.error("Failed to fetch activity details:", error);
     }
@@ -164,7 +173,7 @@ function SubKegiatan() {
   const handleAddSubActivity = async () => {
     if (subActivityName) {
       try {
-        await axios.post(`${URL}/teams/${teamId}/activities/${activityId}/sub-activities`, { name: subActivityName, tanggal_pelaksanaan: tanggalPelaksanaan, deskripsi: deskripsi });
+        await apiPrivate.post(`/teams/${teamId}/activities/${activityId}/sub-activities`, { name: subActivityName, tanggal_pelaksanaan: tanggalPelaksanaan, deskripsi: deskripsi });
         refetchSubActivities();
         closeModal();
       } catch (error) {
@@ -176,7 +185,7 @@ function SubKegiatan() {
   const handleEditSubActivity = async () => {
     if (subActivityName) {
       try {
-        await axios.patch(`${URL}/teams/${teamId}/activities/${activityId}/sub-activities/${currentSubActivityId}`, { name: subActivityName, tanggal_pelaksanaan: tanggalPelaksanaan, deskripsi: deskripsi });
+        await apiPrivate.patch(`/teams/${teamId}/activities/${activityId}/sub-activities/${currentSubActivityId}`, { name: subActivityName, tanggal_pelaksanaan: tanggalPelaksanaan, deskripsi: deskripsi });
         refetchSubActivities();
         closeModal();
       } catch (error) {
@@ -193,7 +202,7 @@ function SubKegiatan() {
 
   const deleteSubActivity = async () => {
     try {
-      await axios.delete(`${URL}/teams/${teamId}/activities/${activityId}/sub-activities/${currentSubActivityId}`);
+      await apiPrivate.delete(`/teams/${teamId}/activities/${activityId}/sub-activities/${currentSubActivityId}`);
       refetchSubActivities();
       closeDeleteModal();
     } catch (error) {
