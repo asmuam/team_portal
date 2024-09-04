@@ -1,13 +1,13 @@
 import React, { useState } from "react";
-import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, IconButton, Tooltip, Dialog, DialogActions, DialogContent, DialogTitle, Button, Pagination } from "@mui/material";
+import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, IconButton, Tooltip, Dialog, DialogActions, DialogContent, DialogTitle, Button, Pagination, CircularProgress } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
-import axios from "axios";
 import useAxiosPrivate from "../../hooks/use-axios-private";
 
 const UserList = ({ users = [], onEditUser, refreshUsers }) => {
   const [open, setOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
+  const [loading, setLoading] = useState(false); // State untuk loading
   const [page, setPage] = useState(1);
   const apiPrivate = useAxiosPrivate();
   const usersPerPage = 5;
@@ -19,13 +19,18 @@ const UserList = ({ users = [], onEditUser, refreshUsers }) => {
   };
 
   const handleConfirmDelete = async () => {
-    try {
-      await apiPrivate.delete(`/user/${selectedUser.id}`);
-      setOpen(false);
-      await refreshUsers(); // Refresh the list after deleting
-    } catch (error) {
-      console.error("There was an error deleting the user:", error);
-    }
+    setLoading(true); // Mulai loading
+    setTimeout(async () => {
+      try {
+        await apiPrivate.delete(`/user/${selectedUser.id}`);
+        await refreshUsers(); // Refresh the list after deleting
+        setOpen(false);
+      } catch (error) {
+        console.error("There was an error deleting the user:", error);
+      } finally {
+        setLoading(false); // Selesai loading
+      }
+    }, 2000); // Durasi loading 2 detik
   };
 
   const handleCloseModal = () => {
@@ -89,9 +94,11 @@ const UserList = ({ users = [], onEditUser, refreshUsers }) => {
         <DialogTitle>Confirm Delete</DialogTitle>
         <DialogContent>Are you sure you want to delete this user?</DialogContent>
         <DialogActions>
-          <Button onClick={handleCloseModal}>Cancel</Button>
-          <Button onClick={handleConfirmDelete} color="error">
-            Delete
+          <Button onClick={handleCloseModal} disabled={loading}>
+            Cancel
+          </Button>
+          <Button onClick={handleConfirmDelete} color="error" disabled={loading}>
+            {loading ? <CircularProgress size={24} /> : "Delete"}
           </Button>
         </DialogActions>
       </Dialog>

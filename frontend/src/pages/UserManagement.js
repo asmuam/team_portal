@@ -66,7 +66,7 @@ const UserManagement = () => {
         User Management
       </Typography>
       <Button variant="contained" color="primary" onClick={handleAddUser} sx={{ mb: 2 }}>
-        Tambah User
+        Tambah Pegawai
       </Button>
 
       {/* Search and Filter */}
