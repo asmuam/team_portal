@@ -61,7 +61,7 @@ const PaginationControls = styled(Box)(() => ({
   marginTop: "20px",
 }));
 
-const SubActivityList = ({ activities, onActivityClick, onEditClick, onDeleteClick, onArchiveClick, tasksPerPage = 4 }) => {
+const SubActivityList = ({ activities, onActivityClick, onEditClick, onDeleteClick, onArchiveClick, tasksPerPage = 8 }) => {
   const [currentPage, setCurrentPage] = useState(1);
   const totalPages = Math.ceil(activities.length / tasksPerPage);
 

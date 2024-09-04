@@ -8,6 +8,7 @@ import AppRouter from "./components/common/navigation/AppRoutes";
 import Box from "@mui/material/Box";
 import Container from "@mui/material/Container";
 import { api } from "./utils/axios.js";
+import LogoutModal from "./components/LogOutModal.js"; // Import the LogoutModal
 
 function App() {
   const { teams, setTeams } = useTeams();
@@ -16,6 +17,7 @@ function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
+  const [openLogoutModal, setOpenLogoutModal] = useState(false); // State to control modal visibility
 
   useEffect(() => {
     const validateAuth = async () => {
@@ -33,7 +35,7 @@ function App() {
               },
             }
           );
-  
+
           if (response.status === 200) {
             const { user } = response.data;
             setAuth({ ...user, token });
@@ -50,16 +52,17 @@ function App() {
       }
       setLoading(false);
     };
-  
+
     validateAuth();
   }, [setAuth]);
-  
 
   const clearAuth = () => {
     localStorage.removeItem("authToken");
     sessionStorage.clear();
     setAuth({});
     setIsAuthenticated(false);
+    setOpenLogoutModal(false);
+
     navigate("/login");
   };
 
@@ -67,82 +70,67 @@ function App() {
     localStorage.setItem("authToken", result.accessToken);
     sessionStorage.setItem("uid", result.uid);
     sessionStorage.setItem("role", result.role);
-    sessionStorage.setItem("username", result.username); // Simpan username ke sessionStorage
-    sessionStorage.setItem("name", result.name); // Simpan username ke sessionStorage
+    sessionStorage.setItem("username", result.username);
+    sessionStorage.setItem("name", result.name);
     setAuth({
       uid: result.uid,
       role: result.role,
       token: result.accessToken,
-      username: result.username, // Set username ke state auth
-      name: result.name, // Set username ke state auth
+      username: result.username,
+      name: result.name,
     });
     setIsAuthenticated(true);
   };
 
   const handleLogout = async () => {
-    if (window.confirm("Are you sure you want to log out?")) {
-      try {
-        await api.post(
-          `logout`,
-          {},
-          {
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${localStorage.getItem("authToken")}`,
-            },
-          }
-        );
+    try {
+      await api.post(
+        `logout`,
+        {},
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+          },
+        }
+      );
 
-        // Menghapus cookie dengan nama 'authToken'
-        document.cookie =
-          "authToken=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/";
+      document.cookie = "authToken=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/";
+      localStorage.removeItem("authToken");
+      sessionStorage.removeItem("uid");
+      sessionStorage.removeItem("role");
+      sessionStorage.removeItem("username");
+      sessionStorage.removeItem("name");
 
-        // Menghapus item dari localStorage dan sessionStorage
-        localStorage.removeItem("authToken");
-        sessionStorage.removeItem("uid");
-        sessionStorage.removeItem("role");
-        sessionStorage.removeItem("username"); // Hapus username dari sessionStorage
-        sessionStorage.removeItem("name"); // Hapus nama dari sessionStorage
-
-        // Mengupdate state auth
-        setAuth({});
-
-        // Mengupdate state isAuthenticated
-        setIsAuthenticated(false);
-
-        // Redirect ke halaman login
-        navigate("/login");
-      } catch (error) {
-        console.error("Logout error", error);
-        // Handle error jika diperlukan
-      }
+      setAuth({});
+      setIsAuthenticated(false);
+      setOpenLogoutModal();
+      navigate("/login");
+    } catch (error) {
+      console.error("Logout error", error);
     }
   };
 
   if (loading) {
-    return <div>Loading...</div>; // or any loading spinner/component
+    return <div>Loading...</div>;
   }
-  
+
   return (
     <Box display="flex" flexDirection="column" minHeight="100vh">
       <Header
         isAuthenticated={isAuthenticated}
-        handleLogout={handleLogout}
-        username={auth.username} // Kirim username ke Header sebagai prop
-        name={auth.name} // Kirim nama ke Header sebagai prop
-        role={auth.role} // Kirim role ke Header sebagai prop
+        handleLogout={() => setOpenLogoutModal(true)} // Trigger the modal
+        username={auth.username}
+        name={auth.name}
+        role={auth.role}
       />
       <Box component="main" sx={{ flex: 1, py: 4 }}>
         <Container maxWidth="xl">
-          <AppRouter
-            isAuthenticated={isAuthenticated}
-            teams={teams}
-            setTeams={setTeams}
-            handleLogin={handleLogin}
-          />
+          <AppRouter isAuthenticated={isAuthenticated} teams={teams} setTeams={setTeams} handleLogin={handleLogin} />
         </Container>
       </Box>
       <Footer />
+      <LogoutModal open={openLogoutModal} handleClose={() => setOpenLogoutModal(false)} handleLogout={handleLogout} />
     </Box>
   );
 }

@@ -4,7 +4,6 @@ import UserList from "../components/userManagement/UserList";
 import UserForm from "../components/userManagement/UserForm";
 import useAxiosPrivate from "../hooks/use-axios-private.js";
 
-
 const UserManagement = () => {
   const [users, setUsers] = useState([]);
   const [selectedUser, setSelectedUser] = useState(null);
@@ -74,7 +73,7 @@ const UserManagement = () => {
       <Box display="flex" gap={2} mb={3}>
         <TextField label="Search by Name" variant="outlined" value={searchTerm} onChange={handleSearchChange} sx={{ flex: 1 }} />
         <TextField select label="Filter by Role" variant="outlined" value={roleFilter} onChange={handleRoleChange} sx={{ flex: 1 }}>
-          <MenuItem value="">All</MenuItem>
+          <MenuItem value="">Semua </MenuItem>
           <MenuItem value="admin">Admin</MenuItem>
           <MenuItem value="pegawai">Pegawai</MenuItem>
         </TextField>
