@@ -29,13 +29,13 @@ const DataTable = () => {
   const [currentPage, setCurrentPage] = useState(0);
   const rowsPerPage = 5;
 
-  const apiPrivate = useAxiosPrivate()
+  const apiPrivate = useAxiosPrivate();
   useEffect(() => {
     const fetchAllData = async () => {
       try {
         // Gunakan apiPrivate untuk melakukan permintaan
         const response = await apiPrivate.get(`/allData`);
-        
+
         // Periksa apakah status responnya 200 OK
         if (response.status === 200) {
           const fetchedData = response.data; // Data dari respons
@@ -50,7 +50,6 @@ const DataTable = () => {
 
     fetchAllData();
   }, [apiPrivate]); // Tambahkan apiPrivate sebagai dependensi jika perlu
-
 
   const [pelaksanaanDateRange, setPelaksanaanDateRange] = useState([null, null]);
   const [dueDateRange, setdueDateRange] = useState([null, null]);
@@ -127,6 +126,11 @@ const DataTable = () => {
 
   const columns = useMemo(
     () => [
+      {
+        Header: "No",
+        accessor: (row, i) => i + 1 + currentPage * rowsPerPage,
+        Cell: ({ value }) => value,
+      },
       { Header: "Tim", accessor: "team" },
       { Header: "Kegiatan", accessor: "activity" },
       {

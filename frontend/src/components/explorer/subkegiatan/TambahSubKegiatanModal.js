@@ -1,4 +1,4 @@
-// src/components/TambahKegiatanModal.js
+// src/components/TambahSubKegiatanModal.js
 import React from "react";
 import { Box, Button, Typography, IconButton, Modal, TextField, CircularProgress } from "@mui/material";
 import { styled } from "@mui/system";
@@ -28,7 +28,7 @@ const InputField = styled(TextField)({
   marginBottom: "16px",
 });
 
-function TambahKegiatanModal({ isModalOpen, closeModal, modalType, newActivityName, setNewActivityName, tanggalPelaksanaan, setTanggalPelaksanaan, newDeskripsi, setNewDeskripsi, handleAddActivity, handleEditActivity, loading }) {
+function TambahSubKegiatanModal({ isModalOpen, closeModal, modalType, newActivityName, setNewActivityName, tanggalPelaksanaan, setTanggalPelaksanaan, newDeskripsi, setNewDeskripsi, handleAddActivity, handleEditActivity, loading }) {
   const handleKeyPress = (e) => {
     if (e.key === "Enter") {
       modalType === "add" ? handleAddActivity() : handleEditActivity();
@@ -39,7 +39,7 @@ function TambahKegiatanModal({ isModalOpen, closeModal, modalType, newActivityNa
     <Modal open={isModalOpen} onClose={closeModal} aria-labelledby="activity-modal-title" aria-describedby="activity-modal-description">
       <ModalContent>
         <Header id="activity-modal-title" variant="h6">
-          {modalType === "add" ? "Tambah Kegiatan Baru" : "Edit Kegiatan"}
+          {modalType === "add" ? "Tambah Sub Kegiatan Baru" : "Edit Sub Kegiatan"}
           <IconButton
             onClick={closeModal}
             sx={{
@@ -52,7 +52,7 @@ function TambahKegiatanModal({ isModalOpen, closeModal, modalType, newActivityNa
           </IconButton>
         </Header>
         <InputField
-          label="Nama Kegiatan"
+          label="Nama Sub Kegiatan"
           variant="outlined"
           value={newActivityName}
           onChange={(e) => setNewActivityName(e.target.value)}
@@ -81,11 +81,11 @@ function TambahKegiatanModal({ isModalOpen, closeModal, modalType, newActivityNa
           required
         />
         <Button disabled={loading} variant="contained" color="primary" onClick={modalType === "add" ? handleAddActivity : handleEditActivity} fullWidth startIcon={loading ? <CircularProgress size={24} color="inherit" /> : null}>
-          {!loading && (modalType === "add" ? "Tambah Kegiatan" : "Update Kegiatan")}
+          {!loading && (modalType === "add" ? "Tambah Sub Kegiatan" : "Update Sub Kegiatan")}
         </Button>
       </ModalContent>
     </Modal>
   );
 }
 
-export default TambahKegiatanModal;
+export default TambahSubKegiatanModal;

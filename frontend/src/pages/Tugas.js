@@ -158,6 +158,7 @@ function Tugas() {
   const [createdByFilter, setCreatedByFilter] = useState("");
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
+  const [loading, setLoading] = useState(false); // State for loading
 
   const { auth } = useContext(AuthContext);
 
@@ -167,7 +168,7 @@ function Tugas() {
   const [subActivityTasks, setSubActivityTasks] = useState({});
   const { linkDrive } = useDriveLink(); // Access the link_drive from context
 
-  const apiPrivate = useAxiosPrivate()
+  const apiPrivate = useAxiosPrivate();
 
   // Calculate progress
   const calculateProgress = (tasks) => {
@@ -283,14 +284,19 @@ function Tugas() {
       completed: false,
       created_by: auth.name, // Menggunakan nama pengguna yang sedang login
     };
+    setLoading(true);
 
     try {
       await apiPrivate.post(`/teams/${teamId}/activities/${activityId}/sub-activities/${subActivityId}/tasks`, newTask);
-      refetchTasks();
-      closeModal();
+      setTimeout(() => {
+        refetchTasks();
+        closeModal();
+        setLoading(false);
+      }, 2000);
     } catch (error) {
       console.error("Error adding task:", error.response || error.message);
       alert("Failed to add task. Please try again.");
+      setLoading(false);
     }
   };
 
@@ -306,14 +312,19 @@ function Tugas() {
       link: link,
       deskripsi: deskripsi,
     };
+    setLoading(true);
 
     try {
       const response = await apiPrivate.patch(`/teams/${teamId}/activities/${activityId}/sub-activities/${subActivityId}/tasks/${currentTaskId}`, updatedTask);
-      console.log("Updated Task Response:", response.data); // Check the server response
-      refetchTasks();
-      closeModal();
+      setTimeout(() => {
+        console.log("Updated Task Response:", response.data); // Check the server response
+        refetchTasks();
+        closeModal();
+        setLoading(false);
+      }, 2000);
     } catch (error) {
       console.error("Error updating task:", error);
+      setLoading(false);
     }
   };
 
@@ -528,9 +539,7 @@ function Tugas() {
                   <TableHeader isMobile={isMobile}>Deadline</TableHeader>
                   <TableHeader isMobile={isMobile}>Deskripsi</TableHeader>
                   <TableHeader isMobile={isMobile}>Link Drive</TableHeader>
-                  {auth.role === "admin" && (
-                    <TableHeader isMobile={isMobile}>Verified</TableHeader>
-                  )}
+                  {auth.role === "admin" && <TableHeader isMobile={isMobile}>Verified</TableHeader>}
                   <TableHeader isMobile={isMobile}>Actions</TableHeader>
                   <TableHeader isMobile={isMobile}>Dibuat Oleh</TableHeader>
                 </TableRow>
@@ -539,9 +548,11 @@ function Tugas() {
 
             <tbody>
               {currentTasks.length ? (
-                currentTasks.map((task) => (
+                currentTasks.map((task, index) => (
                   <TableRow key={task.id} isMobile={isMobile}>
-                    <TableCell>{task.id}</TableCell>
+                    <TableCell data-label="No" isMobile={isMobile}>
+                      {index + 1}
+                    </TableCell>
 
                     <TableCell data-label="Task" isMobile={isMobile}>
                       {task.name}
@@ -561,7 +572,7 @@ function Tugas() {
                       </ActionButton>
                     </TableCell>
                     {auth.role === "admin" && (
-                    <TableCell data-label="Verified" isMobile={isMobile}>
+                      <TableCell data-label="Verified" isMobile={isMobile}>
                         <ActionButton onClick={() => handleTaskCompletion(task.id)}>{task.completed ? <CheckCircleIcon color="success" /> : <CancelIcon color="error" />}</ActionButton>
                       </TableCell>
                     )}
@@ -688,12 +699,12 @@ function Tugas() {
 
           <Box display="flex" justifyContent="flex-end" marginTop="16px">
             {modalType === "add" ? (
-              <Button onClick={handleAddTask} variant="contained" color="primary">
-                Add Task
+              <Button onClick={handleAddTask} variant="contained" color="primary" disabled={loading}>
+                {loading ? <CircularProgress size={24} color="inherit" /> : modalType === "add" ? "Tambah" : "Simpan"}
               </Button>
             ) : (
               <Button onClick={handleEditTask} variant="contained" color="primary">
-                Update Task
+                {loading ? <CircularProgress size={24} color="inherit" /> : modalType === "edit" ? "update" : "Simpan"}
               </Button>
             )}
           </Box>

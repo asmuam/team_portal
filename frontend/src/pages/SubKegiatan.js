@@ -16,6 +16,8 @@ import AddButton from "../components/common/button/AddButton";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import DeleteConfirmationModal from "../components/common/alert/deleteModal";
 import useAxiosPrivate from "../hooks/use-axios-private.js";
+import TambahSubKegiatanModal from "../components/explorer/subkegiatan/TambahSubKegiatanModal.js";
+import SubActivityList from "../components/explorer/subkegiatan/SubKegiatanList.js";
 
 // Styled Components
 const ModalContent = styled(Box)(({ isMobile }) => ({
@@ -82,10 +84,11 @@ function SubKegiatan() {
   const [subActivityName, setSubActivityName] = useState("");
   const [deskripsi, setDeskripsi] = useState("");
   const [tanggalPelaksanaan, setTanggalPelaksanaan] = useState("");
+  const [loading, setLoading] = useState(false); // State for loading
   const [currentPage, setCurrentPage] = useState(1);
   const [activitiesPerPage] = useState(4);
   const { setLinkDrive, linkDrive } = useDriveLink(); // Access the link_drive from context
-  const apiPrivate = useAxiosPrivate()
+  const apiPrivate = useAxiosPrivate();
 
   const navigate = useNavigate();
 
@@ -172,10 +175,14 @@ function SubKegiatan() {
 
   const handleAddSubActivity = async () => {
     if (subActivityName) {
+      setLoading(true);
       try {
         await apiPrivate.post(`/teams/${teamId}/activities/${activityId}/sub-activities`, { name: subActivityName, tanggal_pelaksanaan: tanggalPelaksanaan, deskripsi: deskripsi });
-        refetchSubActivities();
-        closeModal();
+        setTimeout(() => {
+          refetchSubActivities();
+          closeModal();
+          setLoading(false);
+        }, 2000);
       } catch (error) {
         console.error("Error adding sub-activity:", error);
       }
@@ -184,10 +191,15 @@ function SubKegiatan() {
 
   const handleEditSubActivity = async () => {
     if (subActivityName) {
+      setLoading(true);
+
       try {
         await apiPrivate.patch(`/teams/${teamId}/activities/${activityId}/sub-activities/${currentSubActivityId}`, { name: subActivityName, tanggal_pelaksanaan: tanggalPelaksanaan, deskripsi: deskripsi });
-        refetchSubActivities();
-        closeModal();
+        setTimeout(() => {
+          refetchSubActivities();
+          closeModal();
+          setLoading(false);
+        }, 2000);
       } catch (error) {
         console.error("Error updating sub-activity:", error);
       }
@@ -287,96 +299,29 @@ function SubKegiatan() {
           <DriveButton driveFolderUrl={driveFolderUrl} />
         </div>
       </div>
-      <div className="sub-activity-list">
-        {currentActivities.map((subActivity) => (
-          <div key={subActivity.id} style={{ marginBottom: "20px;" }}>
-            <SubActivityBox onClick={() => handleSubActivityClick(subActivity.id, subActivity.link_drive)}>
-              <SubActivityName>{subActivity.name}</SubActivityName>
-              <Typography variant="body2" color="textSecondary">
-                Tanggal: {formatDate(subActivity.tanggal_pelaksanaan)}
-              </Typography>
-              <br />
-              <Typography variant="body2" color="textSecondary">
-                Deskripsi: {subActivity.deskripsi}
-              </Typography>
-              <SubActivityActions>
-                <IconButton
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    openModal("edit", subActivity.id, subActivity.name, subActivity.tanggal_pelaksanaan, subActivity.deskripsi);
-                  }}
-                >
-                  <EditIcon />
-                </IconButton>
-                <IconButton
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    openDeleteModal(subActivity.id);
-                  }}
-                >
-                  <DeleteIcon />
-                </IconButton>
-                <IconButton
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    archiveSubActivity(subActivity.id);
-                  }}
-                >
-                  <ArchiveIcon />
-                </IconButton>
-              </SubActivityActions>
-            </SubActivityBox>
-            {activeSubActivities.includes(subActivity.id) && <Tugas teamId={teamId} activityId={activityId} subActivityId={subActivity.id} />}
-          </div>
-        ))}
-      </div>
-      {subActivities.length > activitiesPerPage && (
-        <PaginationControls style={{ display: "flex", justifyContent: "flex-start" }}>
-          <Button onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))} disabled={currentPage === 1} style={{ fontSize: "25px" }}>
-            &lt;
-          </Button>
-          <Typography>
-            Page {currentPage} of {totalPages}
-          </Typography>
-          <Button onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))} disabled={currentPage === totalPages} style={{ fontSize: "25px" }}>
-            &gt;
-          </Button>
-        </PaginationControls>
-      )}
-      <Modal open={isModalOpen} onClose={closeModal}>
-        <ModalContent isMobile={isMobile}>
-          <Header>
-            {modalType === "add" ? "Tambah Sub-Kegiatan" : "Edit Sub-Kegiatan"}
-            <IconButton
-              onClick={closeModal}
-              sx={{
-                position: "absolute",
-                top: "4px",
-                right: "4px",
-              }}
-            >
-              <CloseIcon />
-            </IconButton>
-          </Header>
-          <InputField label="Nama Sub-Kegiatan" variant="outlined" value={subActivityName} onChange={(e) => setSubActivityName(e.target.value)} onKeyDown={handleKeyPress} required />
-          <InputField
-            label="Tanggal Pelaksanaan"
-            type="date"
-            variant="outlined"
-            value={tanggalPelaksanaan}
-            onChange={(e) => setTanggalPelaksanaan(e.target.value)}
-            onKeyDown={handleKeyPress}
-            required
-            InputLabelProps={{
-              shrink: true,
-            }}
-          />
-          <InputField label="Deskripsi" variant="outlined" value={deskripsi} onChange={(e) => setDeskripsi(e.target.value)} onKeyDown={handleKeyPress} required />
-          <Button variant="contained" color="primary" onClick={modalType === "add" ? handleAddSubActivity : handleEditSubActivity} fullWidth>
-            {modalType === "add" ? "Tambah Sub-Kegiatan" : "Update Sub-Kegiatan"}
-          </Button>
-        </ModalContent>
-      </Modal>
+
+      <SubActivityList
+        activities={currentActivities}
+        onActivityClick={handleSubActivityClick}
+        onEditClick={(id, name, tanggal, deskripsi) => openModal("edit", id, name, tanggal, deskripsi)}
+        onDeleteClick={openDeleteModal}
+        onArchiveClick={archiveSubActivity}
+      />
+
+      <TambahSubKegiatanModal
+        isModalOpen={isModalOpen}
+        closeModal={closeModal}
+        modalType={modalType}
+        newActivityName={subActivityName}
+        setNewActivityName={setSubActivityName}
+        tanggalPelaksanaan={tanggalPelaksanaan}
+        setTanggalPelaksanaan={setTanggalPelaksanaan}
+        newDeskripsi={deskripsi}
+        setNewDeskripsi={setDeskripsi}
+        handleAddActivity={handleAddSubActivity}
+        handleEditActivity={handleEditSubActivity}
+        loading={loading}
+      />
 
       <DeleteConfirmationModal isDeleteModalOpen={isDeleteModalOpen} closeDeleteModal={closeDeleteModal} deleteActivity={deleteSubActivity} deleteItemName="Sub-Kegiatan" />
     </div>

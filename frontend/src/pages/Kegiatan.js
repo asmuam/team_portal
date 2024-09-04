@@ -91,10 +91,10 @@ function Kegiatan() {
   const [loading, setLoading] = useState(false); // State for loading
 
   const [currentPage, setCurrentPage] = useState(1);
-  const tasksPerPage = 5;
+  const tasksPerPage = 9;
   const navigate = useNavigate();
   const { setLinkDrive, linkDrive } = useDriveLink(); // Access the link_drive from context
-  const apiPrivate = useAxiosPrivate()
+  const apiPrivate = useAxiosPrivate();
 
   const openModal = (type, activityId = null, activityName = "", tanggal = "", deskripsi = "") => {
     setModalType(type);
@@ -164,19 +164,22 @@ function Kegiatan() {
         }, 2000);
       } catch (error) {
         console.error("Error adding activity:", error);
+        setLoading(false);
       }
     }
   };
 
   const handleEditActivity = async () => {
     if (newActivityName) {
+      setLoading(true);
+
       try {
         await apiPrivate.patch(`/teams/${teamId}/activities/${currentActivityId}`, { name: newActivityName, tanggal_pelaksanaan: tanggalPelaksanaan, deskripsi: newDeskripsi });
         setTimeout(() => {
+          refetchActivities();
+          closeModal();
           setLoading(false);
         }, 2000);
-        refetchActivities();
-        closeModal();
       } catch (error) {
         console.error("Error updating activity:", error);
         setLoading(false);

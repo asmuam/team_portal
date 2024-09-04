@@ -45,6 +45,7 @@ const UserList = ({ users = [], onEditUser, refreshUsers }) => {
         <Table sx={{ minWidth: 650, border: "1px solid #ddd" }}>
           <TableHead>
             <TableRow>
+              <TableCell sx={{ borderBottom: "1px solid #ddd", padding: "10px", backgroundColor: "#f2f2f2", fontWeight: "bold" }}>No.</TableCell>
               <TableCell sx={{ borderBottom: "1px solid #ddd", padding: "10px", backgroundColor: "#f2f2f2", fontWeight: "bold" }}>Username</TableCell>
               <TableCell sx={{ borderBottom: "1px solid #ddd", padding: "10px", backgroundColor: "#f2f2f2", fontWeight: "bold" }}>Name</TableCell>
               <TableCell sx={{ borderBottom: "1px solid #ddd", padding: "10px", backgroundColor: "#f2f2f2", fontWeight: "bold" }}>Role</TableCell>
@@ -53,8 +54,9 @@ const UserList = ({ users = [], onEditUser, refreshUsers }) => {
           </TableHead>
           <TableBody>
             {paginatedUsers.length > 0 ? (
-              paginatedUsers.map((user) => (
+              paginatedUsers.map((user, index) => (
                 <TableRow key={user.id} hover sx={{ cursor: "pointer" }}>
+                  <TableCell sx={{ borderBottom: "1px solid #ddd", padding: "10px" }}>{(page - 1) * usersPerPage + index + 1}</TableCell>
                   <TableCell sx={{ borderBottom: "1px solid #ddd", padding: "10px" }}>{user.username}</TableCell>
                   <TableCell sx={{ borderBottom: "1px solid #ddd", padding: "10px" }}>{user.name}</TableCell>
                   <TableCell sx={{ borderBottom: "1px solid #ddd", padding: "10px" }}>{user.role}</TableCell>
@@ -74,7 +76,7 @@ const UserList = ({ users = [], onEditUser, refreshUsers }) => {
               ))
             ) : (
               <TableRow>
-                <TableCell colSpan={4} align="center">
+                <TableCell colSpan={5} align="center">
                   No users found.
                 </TableCell>
               </TableRow>
