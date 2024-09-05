@@ -110,51 +110,77 @@ const LinkPenting = () => {
             {openTeam === team.id ? "⮟" : "⮞"} {team.name}
           </Button>
           {openTeam === team.id && (
-            <Box
-              sx={{
-                display: "flex",
-                flexWrap: "wrap",
-                gap: 2,
-                marginTop: 2,
-                "@media (max-width: 600px)": {
-                  flexDirection: "column",
-                },
-              }}
-            >
-              {team.links.map((link) => (
-                <Box
-                  key={link.id}
+              <Box
                   sx={{
-                    flex: "1 1 calc(33.333% - 16px)", // 3 item per baris di layar besar
+                    display: "flex",
+                    flexWrap: "wrap",
+                    gap: 2,
+                    marginTop: 2,
                     "@media (max-width: 600px)": {
-                      flex: "1 1 100%", // 1 item per baris di layar kecil
+                      flexDirection: "column",
                     },
-                    padding: 2,
-                    border: "1px solid #ccc",
-                    borderRadius: 2,
-                    backgroundColor: "#f9f9f9",
                   }}
-                >
-                  <Typography variant="body1" component="a" href={link.url} target="_blank" rel="noopener noreferrer" sx={{ textDecoration: "none", color: "primary.main", display: "block", marginBottom: 1 }}>
-                    {link.url}
-                  </Typography>
-                  <Typography variant="body2" sx={{ marginBottom: 1 }}>
-                    {link.description}
-                  </Typography>
-                  <Box sx={{ display: "flex", justifyContent: "space-between" }}>
-                    <Button onClick={() => openModal("edit", team.id, link.id, link.url, link.description)} size="small">
-                      Edit
-                    </Button>
-                    <Button onClick={() => handleDeleteLink(team.id, link.id)} size="small" color="error">
-                      Delete
-                    </Button>
-                  </Box>
-                </Box>
-              ))}
-              <Button variant="outlined" onClick={() => openModal("add", team.id)}>
-                Add Another Link
-              </Button>
-            </Box>
+              >
+                {team.links.map((link) => (
+                    <Box
+                        key={link.id}
+                        sx={{
+                          flex: "1 1 calc(33.333% - 16px)", // 3 item per baris di layar besar
+                          "@media (max-width: 600px)": {
+                            flex: "1 1 100%", // 1 item per baris di layar kecil
+                          },
+                          padding: 2,
+                          border: "1px solid #ccc",
+                          borderRadius: 2,
+                          backgroundColor: "#f9f9f9",
+                          maxWidth: "90%", // Menentukan lebar maksimum
+                          overflow: "hidden", // Menyembunyikan konten yang melampaui batas
+                        }}
+                    >
+                      <Typography
+                          variant="body1"
+                          component="a"
+                          href={link.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          sx={{
+                            textDecoration: "none",
+                            color: "primary.main",
+                            display: "block",
+                            marginBottom: 1,
+                            whiteSpace: "nowrap", // Mencegah baris baru
+                            overflow: "hidden",
+                            textOverflow: "ellipsis", // Menambahkan ellipsis pada teks panjang
+                          }}
+                      >
+                        {link.url}
+                      </Typography>
+                      <Typography
+                          variant="body2"
+                          sx={{
+                            marginBottom: 1,
+                            whiteSpace: "nowrap", // Mencegah baris baru
+                            overflow: "hidden",
+                            textOverflow: "ellipsis", // Menambahkan ellipsis pada teks panjang
+                          }}
+                      >
+                        {link.description}
+                      </Typography>
+                      <Box sx={{ display: "flex", justifyContent: "space-between" }}>
+                        <Button onClick={() => openModal("edit", team.id, link.id, link.url, link.description)} size="small">
+                          Edit
+                        </Button>
+                        <Button onClick={() => handleDeleteLink(team.id, link.id)} size="small" color="error">
+                          Delete
+                        </Button>
+                      </Box>
+                    </Box>
+                ))}
+                <Button variant="outlined" onClick={() => openModal("add", team.id)}>
+                  Add Another Link
+                </Button>
+              </Box>
+
           )}
         </Box>
       ))}
