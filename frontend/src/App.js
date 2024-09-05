@@ -6,7 +6,6 @@ import Header from "./components/common/navigation/Header";
 import Footer from "./components/common/navigation/Footer";
 import AppRouter from "./components/common/navigation/AppRoutes";
 import CircularProgress from "@mui/material/CircularProgress";
-
 import Box from "@mui/material/Box";
 import Container from "@mui/material/Container";
 import { api } from "./utils/axios.js";
@@ -84,6 +83,14 @@ function App() {
     setIsAuthenticated(true);
   };
 
+  if (loading) {
+    return (
+      <Box display="flex" justifyContent="center" alignItems="center" height="100vh">
+        <CircularProgress />
+      </Box>
+    );
+  }
+
   const handleLogout = async () => {
     try {
       await api.post(
@@ -137,7 +144,7 @@ function App() {
       />
       <Box component="main" sx={{ flex: 1, py: 4 }}>
         <Container maxWidth="xl">
-          <AppRouter isAuthenticated={isAuthenticated} teams={teams} setTeams={setTeams} handleLogin={handleLogin} />
+          <AppRouter role={auth.role} isAuthenticated={isAuthenticated} teams={teams} setTeams={setTeams} handleLogin={handleLogin} />
         </Container>
       </Box>
       <Footer />

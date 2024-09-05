@@ -1,6 +1,5 @@
 import { node } from "prop-types";
 import { createContext, useState, useEffect } from "react";
-import CircularProgress from "@mui/material/CircularProgress";
 import Box from "@mui/material/Box";
 
 const AuthContext = createContext();
