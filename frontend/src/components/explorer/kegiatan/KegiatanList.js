@@ -7,7 +7,7 @@ import AuthContext from "../../../context/AuthContext.js";
 // Styled Component for Card
 const StyledCard = styled(Card)(() => ({
   width: "100%",
-  maxWidth: "340px",
+  maxWidth: "400px",
   marginTop: "20px",
   cursor: "pointer",
   border: "1px solid #e0e0e0",
@@ -16,11 +16,11 @@ const StyledCard = styled(Card)(() => ({
   position: "relative",
   overflow: "hidden",
   transition: "all 0.3s ease-in-out",
-  maxHeight: "150px", // Initial height to show truncated content
+  maxHeight: "150px",
   "&:hover": {
     boxShadow: "8",
     transform: "translateY(-5px)",
-    maxHeight: "500px", // Expanded height on hover to show full content
+    maxHeight: "500px",
   },
 }));
 
@@ -73,7 +73,7 @@ const ActivityList = ({ activities, onActivityClick, onEditClick, onDeleteClick,
 
   return (
     <>
-      <Grid container spacing={3} className="activity-list">
+      <Grid container spacing={{ xs: 0, sm: 1, md: 3 }} className="activity-list">
         {currentActivities.map((activity) => (
           <Grid item xs={12} sm={6} md={4} lg={3} key={activity.id}>
             <StyledCard onClick={() => onActivityClick(activity.id, activity.link_drive)}>

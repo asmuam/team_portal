@@ -218,10 +218,6 @@ function TeamHierarchy({ teams, setTeams }) {
       <ExploreBreadcrumb />
       <div
         className="header"
-        style={{
-          display: "flex",
-          justifyContent: auth.role === "admin" ? "space-between" : "flex-end",
-        }}
       >
         {auth.role === "admin" && <AddButton onClick={() => openModal("add")} text="Tambah Tim" />}
 
