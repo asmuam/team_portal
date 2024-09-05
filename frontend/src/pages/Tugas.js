@@ -425,7 +425,7 @@ function Tugas() {
         {/* Bagian Back dan Tambah */}
         <ExploreBreadcrumb />
 
-        <div style={{ display: "flex", alignItems: "center", marginTop: "10px" }}>
+        <div style={{ display: "flex", alignItems: "center" }}>
           {isMobile ? (
             <IconButton onClick={() => navigate(`/explorer/team/${teamId}/kegiatan/${activityId}/subkegiatan`)} style={{ backgroundColor: "#007bff", color: "#ffffff", marginRight: "10px" }}>
               <ArrowBackIcon />

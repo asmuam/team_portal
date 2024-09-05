@@ -52,8 +52,8 @@ const Header = ({ isAuthenticated, handleLogout, name, role }) => {
           to="/explorer"
           onClick={() => setActiveMenu("explorer")}
           sx={{
-            backgroundColor: activeMenu === "explorer" ? "primary.main" : "inherit",
-            "&:hover": { backgroundColor: "primary.light" },
+            backgroundColor: activeMenu === "explorer" ? "#50575d" : "inherit",
+            "&:hover": { backgroundColor: "#6a737d" },
           }}
         >
           <ListItemIcon>
@@ -68,8 +68,8 @@ const Header = ({ isAuthenticated, handleLogout, name, role }) => {
           to="/table"
           onClick={() => setActiveMenu("table")}
           sx={{
-            backgroundColor: activeMenu === "table" ? "primary.main" : "inherit",
-            "&:hover": { backgroundColor: "primary.light" },
+            backgroundColor: activeMenu === "table" ? "#50575d" : "inherit",
+            "&:hover": { backgroundColor: "#6a737d" },
           }}
         >
           <ListItemIcon>
@@ -83,8 +83,8 @@ const Header = ({ isAuthenticated, handleLogout, name, role }) => {
           to="/links"
           onClick={() => setActiveMenu("links")}
           sx={{
-            backgroundColor: activeMenu === "links" ? "primary.main" : "inherit",
-            "&:hover": { backgroundColor: "primary.light" },
+            backgroundColor: activeMenu === "links" ? "#50575d" : "inherit",
+            "&:hover": { backgroundColor: "#6a737d" },
           }}
         >
           <ListItemIcon>
@@ -100,8 +100,8 @@ const Header = ({ isAuthenticated, handleLogout, name, role }) => {
             to="/user-management"
             onClick={() => setActiveMenu("user-management")}
             sx={{
-              backgroundColor: activeMenu === "user-management" ? "primary.main" : "inherit",
-              "&:hover": { backgroundColor: "primary.light" },
+              backgroundColor: activeMenu === "user-management" ? "#50575d" : "inherit",
+              "&:hover": { backgroundColor: "#6a737d" },
             }}
           >
             <ListItemIcon>
@@ -114,8 +114,8 @@ const Header = ({ isAuthenticated, handleLogout, name, role }) => {
           button
           onClick={handleMenuOpen}
           sx={{
-            backgroundColor: anchorEl ? "primary.main" : "inherit",
-            "&:hover": { backgroundColor: "primary.light" },
+            backgroundColor: anchorEl ? "#50575d" : "inherit",
+            "&:hover": { backgroundColor: "#6a737d" },
           }}
         >
           <ListItemIcon>
@@ -143,8 +143,8 @@ const Header = ({ isAuthenticated, handleLogout, name, role }) => {
                   component={Link}
                   to="/explorer"
                   sx={{
-                    backgroundColor: location.pathname === "/explorer" ? "primary.main" : "inherit",
-                    "&:hover": { backgroundColor: "primary.light" },
+                    backgroundColor: location.pathname === "/explorer" ? "#50575d" : "inherit",
+                    "&:hover": { backgroundColor: "#6a737d" },
                   }}
                 >
                   Explorer
@@ -156,8 +156,8 @@ const Header = ({ isAuthenticated, handleLogout, name, role }) => {
                   component={Link}
                   to="/table"
                   sx={{
-                    backgroundColor: location.pathname === "/table" ? "primary.main" : "inherit",
-                    "&:hover": { backgroundColor: "primary.light" },
+                    backgroundColor: location.pathname === "/table" ? "#50575d" : "inherit",
+                    "&:hover": { backgroundColor: "#6a737d" },
                   }}
                 >
                   Tabel
@@ -168,8 +168,8 @@ const Header = ({ isAuthenticated, handleLogout, name, role }) => {
                   component={Link}
                   to="/links"
                   sx={{
-                    backgroundColor: location.pathname === "/links" ? "primary.main" : "inherit",
-                    "&:hover": { backgroundColor: "primary.light" },
+                    backgroundColor: location.pathname === "/links" ? "#50575d" : "inherit",
+                    "&:hover": { backgroundColor: "#6a737d" },
                   }}
                 >
                   Link Penting
@@ -181,8 +181,8 @@ const Header = ({ isAuthenticated, handleLogout, name, role }) => {
                     component={Link}
                     to="/user-management"
                     sx={{
-                      backgroundColor: location.pathname === "/user-management" ? "primary.main" : "inherit",
-                      "&:hover": { backgroundColor: "primary.light" },
+                      backgroundColor: location.pathname === "/user-management" ? "#50575d" : "inherit",
+                      "&:hover": { backgroundColor: "#6a737d" },
                     }}
                   >
                     User Management
@@ -192,8 +192,8 @@ const Header = ({ isAuthenticated, handleLogout, name, role }) => {
                   color="inherit"
                   onClick={handleMenuOpen}
                   sx={{
-                    backgroundColor: anchorEl ? "primary.main" : "inherit",
-                    "&:hover": { backgroundColor: "primary.light" },
+                    backgroundColor: anchorEl ? "#50575d" : "inherit",
+                    "&:hover": { backgroundColor: "#6a737d" },
                   }}
                 >
                   <AccountCircleIcon />
