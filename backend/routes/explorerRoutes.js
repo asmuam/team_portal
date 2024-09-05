@@ -5,6 +5,7 @@ import * as kegiatanService from "../services/kegiatanService.js";
 import * as subkegiatanService from "../services/subkegiatanService.js";
 import * as tugasService from "../services/tugasService.js";
 import { createFolder, extractFolderIdFromUrl, deleteFolder, renameFolder } from "../utils/googleDriveUtils.js";
+import { authorizeRole } from "../middleware/authMiddleware.js"; // Sesuaikan dengan path authMiddleware.js
 
 const router = express.Router();
 
@@ -231,7 +232,7 @@ router.get("/teams/:id", async (req, res) => {
 // ]
 
 // add team
-router.post("/teams", async (req, res) => {
+router.post("/teams", authorizeRole(["admin"]), async (req, res) => {
   try {
     const team = await timkerjaService.createTimkerja(req.body);
     res.status(201).json(team);
@@ -252,7 +253,7 @@ router.post("/teams", async (req, res) => {
 //   "leader_id": null
 // }
 
-router.patch("/teams/:id", async (req, res) => {
+router.patch("/teams/:id", authorizeRole(["admin"]), async (req, res) => {
   try {
     // Fetch the current team data
     const team = await timkerjaService.getTimkerjaById(req.params.id);
@@ -295,7 +296,7 @@ router.patch("/teams/:id", async (req, res) => {
 //   "leader_id": null
 // }
 
-router.delete("/teams/:id", async (req, res) => {
+router.delete("/teams/:id", authorizeRole(["admin"]), async (req, res) => {
   try {
     const team = await timkerjaService.deleteTimkerja(req.params.id);
     await deleteFolder(extractFolderIdFromUrl(team.link_drive))
@@ -808,7 +809,7 @@ router.delete("/teams/:teamId/activities/:activityId/sub-activities/:subActivity
 // }
 
 // Toggle Task Completion
-router.patch("/teams/:teamId/activities/:activityId/sub-activities/:subActivityId/tasks/:taskId/completion", async (req, res) => {
+router.patch("/teams/:teamId/activities/:activityId/sub-activities/:subActivityId/tasks/:taskId/completion", authorizeRole(["admin"]), async (req, res) => {
   const { taskId } = req.params;
   try {
     const task = await tugasService.toggleTugasCompletion(taskId);
@@ -833,7 +834,7 @@ router.patch("/teams/:teamId/activities/:activityId/sub-activities/:subActivityI
 // archive tugas soon
 
 // Get all pegawai incl admins
-router.get("/users/pegawai", async (req, res) => {
+router.get("/users/pegawai", authorizeRole(["admin"]), async (req, res) => {
   try {
     const pegawai = await prisma.user.findMany({
       where: {
