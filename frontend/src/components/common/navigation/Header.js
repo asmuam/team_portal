@@ -232,6 +232,7 @@ const Header = ({ isAuthenticated, handleLogout, name, role }) => {
             color="primary"
             onClick={() => {
               handleLogout();
+              handleMenuClose();
               handleAccountDrawerClose();
             }}
             fullWidth
@@ -261,7 +262,11 @@ const Header = ({ isAuthenticated, handleLogout, name, role }) => {
         <MenuItem>
           <ListItemText primary={`Role: ${role}`} />
         </MenuItem>
-        <MenuItem onClick={handleLogout}>
+        <MenuItem  onClick={() => {
+              handleLogout();
+              handleMenuClose();
+              handleAccountDrawerClose();
+            }}>
           <ListItemText primary="Logout" />
         </MenuItem>
       </Menu>
