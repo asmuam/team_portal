@@ -571,24 +571,35 @@ function Tugas() {
                         <ContentCopyIcon />
                       </ActionButton>
                     </TableCell>
+
+                    {/* Tampilkan kolom Verified hanya jika admin, atau user pembuat tugas */}
                     {auth.role === "admin" && (
                       <TableCell data-label="Verified" isMobile={isMobile}>
                         <ActionButton onClick={() => handleTaskCompletion(task.id)}>{task.completed ? <CheckCircleIcon color="success" /> : <CancelIcon color="error" />}</ActionButton>
                       </TableCell>
                     )}
+
+                    {/* Tampilkan tombol edit dan delete hanya jika admin, atau user pembuat tugas */}
                     <TableCell data-label="Actions" isMobile={isMobile}>
-                      <ActionButton onClick={() => openModal("edit", task.id, task.name, task.dueDate, task.link, task.deskripsi)}>
-                        <EditIcon />
-                      </ActionButton>
-                      <ActionButton
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          openDeleteModal(task.id);
-                        }}
-                      >
-                        <DeleteIcon color="error" />
-                      </ActionButton>
+                      {auth.role === "admin" || task.created_by === auth.name ? (
+                        <>
+                          <ActionButton onClick={() => openModal("edit", task.id, task.name, task.dueDate, task.link, task.deskripsi)}>
+                            <EditIcon />
+                          </ActionButton>
+                          <ActionButton
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              openDeleteModal(task.id);
+                            }}
+                          >
+                            <DeleteIcon color="error" />
+                          </ActionButton>
+                        </>
+                      ) : (
+                        <Typography color="textSecondary">Restricted</Typography>
+                      )}
                     </TableCell>
+
                     <TableCell data-label="Dibuat Oleh" isMobile={isMobile}>
                       {task.created_by}
                     </TableCell>
