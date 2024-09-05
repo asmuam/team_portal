@@ -16,8 +16,8 @@ import AddButton from "../components/common/button/AddButton";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import DeleteConfirmationModal from "../components/common/alert/deleteModal";
 import useAxiosPrivate from "../hooks/use-axios-private.js";
-import TambahSubKegiatanModal from "../components/explorer/subkegiatan/TambahSubKegiatanModal.js";
-import SubActivityList from "../components/explorer/subkegiatan/SubKegiatanList.js";
+import TambahSubKegiatanModal from "../components/explorer/subKegiatan/TambahSubKegiatanModal.js";
+import SubActivityList from "../components/explorer/subKegiatan/SubKegiatanList.js";
 
 // Styled Components
 const ModalContent = styled(Box)(({ isMobile }) => ({
