@@ -9,7 +9,7 @@ const Header = ({ isAuthenticated, handleLogout, name, role }) => {
   const [anchorEl, setAnchorEl] = useState(null);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [accountDrawerOpen, setAccountDrawerOpen] = useState(false);
-  const [activeMenu, setActiveMenu] = useState(""); // State for active menu
+  const [activeMenu, setActiveMenu] = useState("");
   const { auth } = useContext(AuthContext);
 
   const isMobile = useMediaQuery("(max-width:600px)");
@@ -61,54 +61,54 @@ const Header = ({ isAuthenticated, handleLogout, name, role }) => {
           </ListItemIcon>
           <ListItemText primary="Explorer" />
         </ListItem>
+        {/* Tampilkan menu ini untuk semua user kecuali user management */}
+        <ListItem
+          button
+          component={Link}
+          to="/table"
+          onClick={() => setActiveMenu("table")}
+          sx={{
+            backgroundColor: activeMenu === "table" ? "primary.main" : "inherit",
+            "&:hover": { backgroundColor: "primary.light" },
+          }}
+        >
+          <ListItemIcon>
+            <TableChartIcon />
+          </ListItemIcon>
+          <ListItemText primary="Tabel" />
+        </ListItem>
+        <ListItem
+          button
+          component={Link}
+          to="/links"
+          onClick={() => setActiveMenu("links")}
+          sx={{
+            backgroundColor: activeMenu === "links" ? "primary.main" : "inherit",
+            "&:hover": { backgroundColor: "primary.light" },
+          }}
+        >
+          <ListItemIcon>
+            <LinkIcon />
+          </ListItemIcon>
+          <ListItemText primary="Link Penting" />
+        </ListItem>
+        {/* Menu User Management hanya muncul untuk Admin */}
         {auth.role === "admin" && (
-          <>
-            <ListItem
-              button
-              component={Link}
-              to="/table"
-              onClick={() => setActiveMenu("table")}
-              sx={{
-                backgroundColor: activeMenu === "table" ? "primary.main" : "inherit",
-                "&:hover": { backgroundColor: "primary.light" },
-              }}
-            >
-              <ListItemIcon>
-                <TableChartIcon />
-              </ListItemIcon>
-              <ListItemText primary="Tabel" />
-            </ListItem>
-            <ListItem
-              button
-              component={Link}
-              to="/links"
-              onClick={() => setActiveMenu("links")}
-              sx={{
-                backgroundColor: activeMenu === "links" ? "primary.main" : "inherit",
-                "&:hover": { backgroundColor: "primary.light" },
-              }}
-            >
-              <ListItemIcon>
-                <LinkIcon />
-              </ListItemIcon>
-              <ListItemText primary="Link Penting" />
-            </ListItem>
-            <ListItem
-              button
-              component={Link}
-              to="/user-management"
-              onClick={() => setActiveMenu("user-management")}
-              sx={{
-                backgroundColor: activeMenu === "user-management" ? "primary.main" : "inherit",
-                "&:hover": { backgroundColor: "primary.light" },
-              }}
-            >
-              <ListItemIcon>
-                <PeopleIcon />
-              </ListItemIcon>
-              <ListItemText primary="User Management" />
-            </ListItem>
-          </>
+          <ListItem
+            button
+            component={Link}
+            to="/user-management"
+            onClick={() => setActiveMenu("user-management")}
+            sx={{
+              backgroundColor: activeMenu === "user-management" ? "primary.main" : "inherit",
+              "&:hover": { backgroundColor: "primary.light" },
+            }}
+          >
+            <ListItemIcon>
+              <PeopleIcon />
+            </ListItemIcon>
+            <ListItemText primary="User Management" />
+          </ListItem>
         )}
         <ListItem
           button
@@ -149,45 +149,44 @@ const Header = ({ isAuthenticated, handleLogout, name, role }) => {
                 >
                   Explorer
                 </Button>
+                {/* Menu tanpa User Management untuk selain Admin */}
+                <Button
+                  color="inherit"
+                  startIcon={<TableChartIcon />}
+                  component={Link}
+                  to="/table"
+                  sx={{
+                    backgroundColor: location.pathname === "/table" ? "primary.main" : "inherit",
+                    "&:hover": { backgroundColor: "primary.light" },
+                  }}
+                >
+                  Tabel
+                </Button>
+                <Button
+                  color="inherit"
+                  startIcon={<LinkIcon />}
+                  component={Link}
+                  to="/links"
+                  sx={{
+                    backgroundColor: location.pathname === "/links" ? "primary.main" : "inherit",
+                    "&:hover": { backgroundColor: "primary.light" },
+                  }}
+                >
+                  Link Penting
+                </Button>
                 {auth.role === "admin" && (
-                  <>
-                    <Button
-                      color="inherit"
-                      startIcon={<TableChartIcon />}
-                      component={Link}
-                      to="/table"
-                      sx={{
-                        backgroundColor: location.pathname === "/table" ? "primary.main" : "inherit",
-                        "&:hover": { backgroundColor: "primary.light" },
-                      }}
-                    >
-                      Tabel
-                    </Button>
-                    <Button
-                      color="inherit"
-                      startIcon={<LinkIcon />}
-                      component={Link}
-                      to="/links"
-                      sx={{
-                        backgroundColor: location.pathname === "/links" ? "primary.main" : "inherit",
-                        "&:hover": { backgroundColor: "primary.light" },
-                      }}
-                    >
-                      Link Penting
-                    </Button>
-                    <Button
-                      color="inherit"
-                      startIcon={<PeopleIcon />}
-                      component={Link}
-                      to="/user-management"
-                      sx={{
-                        backgroundColor: location.pathname === "/user-management" ? "primary.main" : "inherit",
-                        "&:hover": { backgroundColor: "primary.light" },
-                      }}
-                    >
-                      User Management
-                    </Button>
-                  </>
+                  <Button
+                    color="inherit"
+                    startIcon={<PeopleIcon />}
+                    component={Link}
+                    to="/user-management"
+                    sx={{
+                      backgroundColor: location.pathname === "/user-management" ? "primary.main" : "inherit",
+                      "&:hover": { backgroundColor: "primary.light" },
+                    }}
+                  >
+                    User Management
+                  </Button>
                 )}
                 <IconButton
                   color="inherit"
