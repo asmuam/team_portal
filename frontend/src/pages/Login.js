@@ -44,7 +44,7 @@ const Login = ({ onLogin }) => {
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
-  const [isLoading, setIsLoading] = useState(false); // Tambahkan state untuk melacak loading
+  const [isLoading, setIsLoading] = useState(false); // State untuk melacak loading
   const navigate = useNavigate();
 
   const handleClickShowPassword = () => {
@@ -58,25 +58,26 @@ const Login = ({ onLogin }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true); // Set loading ke true ketika tombol diklik
+    setError(""); // Reset error sebelum melakukan permintaan
 
     try {
-      setTimeout(async () => {
-        const response = await api.post("/login", { username, password });
+      const response = await api.post("/login", { username, password });
 
-        if (response.status === 200) {
-          const result = response.data;
-          onLogin(result);
-          navigate("/explorer");
-        } else {
-          const errorData = response.data;
-          setError(errorData.message || "Login failed");
-        }
-
-        setIsLoading(false); // Kembali ke false setelah 2 detik
-      }, 2000);
+      if (response.status === 200) {
+        const result = response.data;
+        onLogin(result);
+        navigate("/explorer");
+      } else {
+        setError(response.data.message || "Login failed"); // Set error jika status bukan 200
+      }
     } catch (error) {
-      setError("An error occurred during login");
-      setIsLoading(false); // Hentikan loading jika terjadi error
+      if (error.response && error.response.status === 401) {
+        setError("Invalid username or password"); // Pesan kesalahan khusus untuk status 401
+      } else {
+        setError("An error occurred during login"); // Pesan kesalahan umum
+      }
+    } finally {
+      setIsLoading(false); // Set loading ke false setelah operasi selesai
     }
   };
 
@@ -90,7 +91,19 @@ const Login = ({ onLogin }) => {
           Silahkan Login Dengan Akun Anda
         </Typography>
         <Form onSubmit={handleSubmit} noValidate>
-          <TextField variant="outlined" margin="normal" required fullWidth id="username" label="Username" name="username" autoComplete="username" autoFocus value={username} onChange={(e) => setUsername(e.target.value)} />
+          <TextField
+            variant="outlined"
+            margin="normal"
+            required
+            fullWidth
+            id="username"
+            label="Username"
+            name="username"
+            autoComplete="username"
+            autoFocus
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
+          />
           <TextField
             variant="outlined"
             margin="normal"
@@ -106,7 +119,11 @@ const Login = ({ onLogin }) => {
             InputProps={{
               endAdornment: (
                 <InputAdornment position="end">
-                  <IconButton onClick={handleClickShowPassword} onMouseDown={handleMouseDownPassword} edge="end">
+                  <IconButton
+                    onClick={handleClickShowPassword}
+                    onMouseDown={handleMouseDownPassword}
+                    edge="end"
+                  >
                     {showPassword ? <VisibilityOff /> : <Visibility />}
                   </IconButton>
                 </InputAdornment>
