@@ -1,6 +1,5 @@
 import { node } from "prop-types";
 import { createContext, useState, useEffect } from "react";
-import CircularProgress from "@mui/material/CircularProgress";
 import Box from "@mui/material/Box";
 
 const AuthContext = createContext();
@@ -25,14 +24,6 @@ export const AuthProvider = ({ children }) => {
     setAuth({ uid, role, token, name, username });
     setLoading(false);
   }, []);
-
-  if (loading) {
-    return (
-      <Box display="flex" justifyContent="center" alignItems="center" height="100vh">
-        <CircularProgress />
-      </Box>
-    );
-  }
 
   return <AuthContext.Provider value={{ auth, setAuth }}>{children}</AuthContext.Provider>;
 };

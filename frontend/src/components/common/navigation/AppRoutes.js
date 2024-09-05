@@ -11,19 +11,44 @@ import UserManagement from "../../../pages/UserManagement";
 import ForbiddenPage from "../../../pages/error/403";
 import ServerErrorPage from "../../../pages/error/500";
 import NotFoundPage from "../../../pages/error/404";
+import ProtectedRoute from '../../ProtectedRoute'; // Import the ProtectedRoute component
 
-function AppRouter({ isAuthenticated, teams, setTeams, handleLogin }) {
+function AppRouter({ role, isAuthenticated, teams, setTeams, handleLogin }) {
   return (
     <Routes>
       <Route path="/" element={<Navigate to={isAuthenticated ? "/explorer" : "/login"} />} />
-      <Route path="/login" element={!isAuthenticated ? <Login onLogin={handleLogin} /> : <Navigate to="/explorer" />} />
-      <Route path="/explorer" element={isAuthenticated ? <TeamHierarchy teams={teams} setTeams={setTeams} /> : <Navigate to="/login" />} />
-      <Route path="/table" element={isAuthenticated ? <DataTable /> : <Navigate to="/login" />} />
-      <Route path="/links" element={isAuthenticated ? <LinkPenting /> : <Navigate to="/login" />} />
-      <Route path="/explorer/team/:teamId/kegiatan" element={isAuthenticated ? <Kegiatan /> : <Navigate to="/login" />} />
-      <Route path="/explorer/team/:teamId/kegiatan/:activityId/subkegiatan" element={isAuthenticated ? <SubKegiatan /> : <Navigate to="/login" />} />
-      <Route path="/explorer/team/:teamId/kegiatan/:activityId/subkegiatan/:subActivityId/tugas" element={isAuthenticated ? <Tugas /> : <Navigate to="/login" />} />
-      <Route path="/user-management" element={isAuthenticated ? <UserManagement /> : <Navigate to="/login" />} /> {/* Tambahkan route User Management */}
+      <Route
+        path="/login"
+        element={!isAuthenticated ? <Login onLogin={handleLogin} /> : <Navigate to="/explorer" />}
+      />
+      <Route
+        path="/explorer"
+        element={<ProtectedRoute element={<TeamHierarchy teams={teams} setTeams={setTeams} />} isAuthenticated={isAuthenticated} role={role} allowedRoles={['admin', 'pegawai']} />}
+      />
+      <Route
+        path="/table"
+        element={<ProtectedRoute element={<DataTable />} isAuthenticated={isAuthenticated} role={role} allowedRoles={['admin', 'pegawai']} />}
+      />
+      <Route
+        path="/links"
+        element={<ProtectedRoute element={<LinkPenting />} isAuthenticated={isAuthenticated} role={role} allowedRoles={['admin', 'pegawai']} />}
+      />
+      <Route
+        path="/explorer/team/:teamId/kegiatan"
+        element={<ProtectedRoute element={<Kegiatan />} isAuthenticated={isAuthenticated} role={role} allowedRoles={['admin', 'pegawai']} />}
+      />
+      <Route
+        path="/explorer/team/:teamId/kegiatan/:activityId/subkegiatan"
+        element={<ProtectedRoute element={<SubKegiatan />} isAuthenticated={isAuthenticated} role={role} allowedRoles={['admin', 'pegawai']} />}
+      />
+      <Route
+        path="/explorer/team/:teamId/kegiatan/:activityId/subkegiatan/:subActivityId/tugas"
+        element={<ProtectedRoute element={<Tugas />} isAuthenticated={isAuthenticated} role={role} allowedRoles={['admin', 'pegawai']} />}
+      />
+      <Route
+        path="/user-management"
+        element={<ProtectedRoute element={<UserManagement />} isAuthenticated={isAuthenticated} role={role} allowedRoles={['admin']} />}
+      />
       <Route path="/403" element={<ForbiddenPage />} />
       <Route path="/500" element={<ServerErrorPage />} />
       <Route path="*" element={<NotFoundPage />} />

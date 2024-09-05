@@ -202,10 +202,14 @@ function TeamHierarchy({ teams, setTeams }) {
   return (
     <div className="team-hierarchy">
       <ExploreBreadcrumb />
-      <div className="header" style={{ display: "flex", justifyContent: "space-between" }}>
-        {auth.role === "admin" && ( // O
-          <AddButton onClick={() => openModal("add")} text="Tambah Tim" />
-        )}
+      <div
+        className="header"
+        style={{
+          display: "flex",
+          justifyContent: auth.role === "admin" ? "space-between" : "flex-end",
+        }}
+      >
+        {auth.role === "admin" && <AddButton onClick={() => openModal("add")} text="Tambah Tim" />}
 
         <DriveButton driveFolderUrl={driveFolderUrl} />
       </div>

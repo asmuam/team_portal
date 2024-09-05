@@ -1,16 +1,16 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { TextField, Button, Container, Typography, Box, Alert, Paper, IconButton, InputAdornment } from "@mui/material";
+import { TextField, Button, Container, Typography, Box, Alert, Paper, IconButton, InputAdornment, CircularProgress } from "@mui/material";
 import { styled } from "@mui/system";
 import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
-import {api} from "../utils/axios"
+import { api } from "../utils/axios";
+
 const Root = styled(Box)(({ theme }) => ({
   display: "flex",
   alignItems: "center",
   justifyContent: "center",
   height: "70vh",
-  //   backgroundColor: "#f0f2f5",
 }));
 
 const StyledPaper = styled(Paper)(({ theme }) => ({
@@ -44,6 +44,7 @@ const Login = ({ onLogin }) => {
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
+  const [isLoading, setIsLoading] = useState(false); // Tambahkan state untuk melacak loading
   const navigate = useNavigate();
 
   const handleClickShowPassword = () => {
@@ -56,25 +57,28 @@ const Login = ({ onLogin }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setIsLoading(true); // Set loading ke true ketika tombol diklik
+
     try {
-      const response = await api.post('/login', {
-        username,
-        password,
-      });
-  
-      if (response.status === 200) {
-        const result = response.data; // Axios automatically parses JSON response
-        onLogin(result); // Sending login data to the onLogin function
-        navigate("/explorer");
-      } else {
-        const errorData = response.data;
-        setError(errorData.message || "Login failed");
-      }
+      setTimeout(async () => {
+        const response = await api.post("/login", { username, password });
+
+        if (response.status === 200) {
+          const result = response.data;
+          onLogin(result);
+          navigate("/explorer");
+        } else {
+          const errorData = response.data;
+          setError(errorData.message || "Login failed");
+        }
+
+        setIsLoading(false); // Kembali ke false setelah 2 detik
+      }, 2000);
     } catch (error) {
       setError("An error occurred during login");
+      setIsLoading(false); // Hentikan loading jika terjadi error
     }
   };
-  
 
   return (
     <Root>
@@ -110,8 +114,8 @@ const Login = ({ onLogin }) => {
             }}
           />
           {error && <Alert severity="error">{error}</Alert>}
-          <SubmitButton type="submit" fullWidth variant="contained">
-            Login
+          <SubmitButton type="submit" fullWidth variant="contained" disabled={isLoading}>
+            {isLoading ? <CircularProgress size={24} color="inherit" /> : "Login"}
           </SubmitButton>
         </Form>
       </StyledPaper>
