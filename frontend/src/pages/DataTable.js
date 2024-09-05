@@ -182,7 +182,7 @@ const DataTable = () => {
   const endRow = startRow + rowsPerPage;
   const paginatedRows = rows.slice(startRow, endRow);
 
-  const pageCount = Math.ceil(rows.length / rowsPerPage);
+  const pageCount = Math.max(1, Math.ceil(rows.length / rowsPerPage));
 
   const handlePageChange = (newPage) => {
     if (newPage >= 0 && newPage < pageCount) {
