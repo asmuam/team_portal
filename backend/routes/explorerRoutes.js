@@ -6,10 +6,6 @@ import * as subkegiatanService from "../services/subkegiatanService.js";
 import * as tugasService from "../services/tugasService.js";
 import { createFolder, extractFolderIdFromUrl, deleteFolder, renameFolder } from "../utils/googleDriveUtils.js";
 
-import dotenv from "dotenv";
-dotenv.config();
-
-const ROOT_DRIVE_FOLDER_ID = process.env.ROOT_DRIVE_FOLDER_ID;
 const router = express.Router();
 
 // full direct
@@ -237,17 +233,7 @@ router.get("/teams/:id", async (req, res) => {
 // add team
 router.post("/teams", async (req, res) => {
   try {
-    const link_drive = await createFolder(req.body.name, ROOT_DRIVE_FOLDER_ID);
-    // Add the link_drive to the request body before calling createTimkerja
-    const teamData = {
-      name: req.body.name,
-      leader_id: req.body.leader_id,
-      deskripsi: req.body.deskripsi,
-      links: req.body.links, // Existing links or an empty array
-      link_drive: link_drive, // New link_drive
-    };
-
-    const team = await timkerjaService.createTimkerja(teamData);
+    const team = await timkerjaService.createTimkerja(req.body);
     res.status(201).json(team);
   } catch (error) {
     console.error(error); // Log the full error
@@ -273,6 +259,15 @@ router.patch("/teams/:id", async (req, res) => {
 
     // Check if name is provided and link_drive exists
     if (req.body.name && team.link_drive) {
+      const existingTeam = await prisma.timkerja.findUnique({
+        where: {
+          leader_id: req.body.leader_id,
+        },
+      });
+    
+      if (existingTeam) {
+        throw new Error('A team with this leader_id already exists.');
+      }
       // Rename the folder
       await renameFolder(extractFolderIdFromUrl(team.link_drive), req.body.name);
     }
