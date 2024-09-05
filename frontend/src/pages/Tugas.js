@@ -563,14 +563,39 @@ function Tugas() {
                     <TableCell data-label="Deskripsi" isMobile={isMobile}>
                       {task.deskripsi}
                     </TableCell>
-                    <TableCell data-label="Link Drive" isMobile={isMobile} sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                      <a href={formatLink(task.link)} target="_blank" rel="noopener noreferrer" style={{ textDecoration: "none", color: "blue", cursor: "pointer" }}>
-                        {task.link}
-                      </a>
+                    <TableCell
+                        data-label="Link Drive"
+                        isMobile={isMobile}
+                        sx={{ display: "flex", alignItems: "center", gap: 1, maxWidth: {
+                            xs: "55%", // Lebar maksimum pada perangkat mobile (xs)
+                            sm: "60%",  // Lebar maksimum pada perangkat kecil (sm) dan seterusnya
+                            md: "80%",  // Lebar maksimum pada perangkat menengah (md) dan seterusnya
+                            lg: "100%", // Lebar maksimum pada perangkat besar (lg) dan seterusnya
+                          }, overflow: "hidden", textOverflow: "ellipsis" }} // Menambahkan gaya batas panjang
+                    >
+                      <Typography
+                          variant="body2"
+                          sx={{
+                            flex: 1,
+                            whiteSpace: "nowrap", // Mencegah baris baru
+                            overflow: "hidden",
+                            textOverflow: "ellipsis", // Menambahkan ellipsis pada teks panjang
+                          }}
+                      >
+                        <a
+                            href={formatLink(task.link)}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            style={{ textDecoration: "none", color: "blue", cursor: "pointer" }}
+                        >
+                          {task.link}
+                        </a>
+                      </Typography>
                       <ActionButton onClick={() => copyToClipboard(task.link)}>
                         <ContentCopyIcon />
                       </ActionButton>
                     </TableCell>
+
 
                     {/* Tampilkan kolom Verified hanya jika admin, atau user pembuat tugas */}
                     {auth.role === "admin" && (
