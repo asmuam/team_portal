@@ -6,12 +6,10 @@ import Header from "./components/common/navigation/Header";
 import Footer from "./components/common/navigation/Footer";
 import AppRouter from "./components/common/navigation/AppRoutes";
 import CircularProgress from "@mui/material/CircularProgress";
-
 import Box from "@mui/material/Box";
 import Container from "@mui/material/Container";
 import { api } from "./utils/axios.js";
 import LogoutModal from "./components/LogOutModal.js"; // Import the LogoutModal
-import CircularProgress from "@mui/material/CircularProgress";
 
 function App() {
   const { teams, setTeams } = useTeams();
