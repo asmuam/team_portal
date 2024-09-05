@@ -9,6 +9,7 @@ import Box from "@mui/material/Box";
 import Container from "@mui/material/Container";
 import { api } from "./utils/axios.js";
 import LogoutModal from "./components/LogOutModal.js"; // Import the LogoutModal
+import CircularProgress from "@mui/material/CircularProgress";
 
 function App() {
   const { teams, setTeams } = useTeams();
@@ -82,6 +83,14 @@ function App() {
     setIsAuthenticated(true);
   };
 
+  if (loading) {
+    return (
+      <Box display="flex" justifyContent="center" alignItems="center" height="100vh">
+        <CircularProgress />
+      </Box>
+    );
+  }
+
   const handleLogout = async () => {
     try {
       await api.post(
@@ -122,7 +131,7 @@ function App() {
       />
       <Box component="main" sx={{ flex: 1, py: 4 }}>
         <Container maxWidth="xl">
-          <AppRouter isAuthenticated={isAuthenticated} teams={teams} setTeams={setTeams} handleLogin={handleLogin} />
+          <AppRouter role={auth.role} isAuthenticated={isAuthenticated} teams={teams} setTeams={setTeams} handleLogin={handleLogin} />
         </Container>
       </Box>
       <Footer />
