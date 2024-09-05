@@ -1,16 +1,7 @@
 import { node } from "prop-types";
 import { createContext, useState, useEffect } from "react";
-
-/**
- * File untuk membuat state global
- * 
- * @property auth: Object => state yang berisi:
- *  - uid: id user yang login
- *  - role: role user yang login
- *  - token: access token api
- * 
- * Token disimpan di localstorage, sementara lainnya di session storage
- */
+import CircularProgress from "@mui/material/CircularProgress";
+import Box from "@mui/material/Box";
 
 const AuthContext = createContext();
 
@@ -24,27 +15,26 @@ export const AuthProvider = ({ children }) => {
   });
   const [loading, setLoading] = useState(true);
 
-
   useEffect(() => {
     const uid = sessionStorage.getItem("uid");
     const role = sessionStorage.getItem("role");
     const name = sessionStorage.getItem("name");
     const username = sessionStorage.getItem("username");
     const token = localStorage.getItem("authToken");
-    
+
     setAuth({ uid, role, token, name, username });
     setLoading(false);
   }, []);
 
   if (loading) {
-    return <div>Loading...</div>; // or any loading spinner/component
+    return (
+      <Box display="flex" justifyContent="center" alignItems="center" height="100vh">
+        <CircularProgress />
+      </Box>
+    );
   }
 
-  return (
-    <AuthContext.Provider value={{ auth, setAuth }}>
-      {children}
-    </AuthContext.Provider>
-  );
+  return <AuthContext.Provider value={{ auth, setAuth }}>{children}</AuthContext.Provider>;
 };
 
 AuthProvider.propTypes = {

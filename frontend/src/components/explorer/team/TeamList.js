@@ -1,8 +1,11 @@
-import React from "react";
+import React, { useContext } from "react";
 import { Grid, Card, CardContent, Typography, IconButton, Box, Tooltip } from "@mui/material";
 import { Edit, Delete, Archive } from "@mui/icons-material";
+import AuthContext from "../../../context/AuthContext.js";
 
 const TeamList = ({ teams, handleTeamClick, deleteTeam, archiveTeam, openModal }) => {
+  const { auth } = useContext(AuthContext);
+
   return (
     <Grid container spacing={3} className="team-list">
       {teams.map((team) => (
@@ -34,72 +37,74 @@ const TeamList = ({ teams, handleTeamClick, deleteTeam, archiveTeam, openModal }
                 Deskripsi: {team.deskripsi}
               </Typography>
             </CardContent>
-            <Box
-              sx={{
-                position: "absolute",
-                bottom: 0,
-                right: 0,
-                p: 1,
-                display: "flex",
-                gap: 1,
-                backgroundColor: "background.paper", // Card background color
-                borderTopLeftRadius: 2, // Rounded top-left corner
-                borderBottomRightRadius: 3, // Rounded bottom-right corner
-                overflow: "hidden", // Ensure contents do not overflow card
-              }}
-            >
-              <Tooltip title="Edit">
-                <IconButton
-                  aria-label="edit"
-                  onClick={(e) => {
-                    e.stopPropagation(); // Prevent unwanted navigation
-                    openModal("edit", team.id, team.name, team.leader.id, team.deskripsi);
-                  }}
-                  sx={{
-                    color: "primary.main",
-                    "&:hover": {
-                      color: "primary.dark",
-                    },
-                  }}
-                >
-                  <Edit />
-                </IconButton>
-              </Tooltip>
-              <Tooltip title="Delete">
-                <IconButton
-                  aria-label="delete"
-                  onClick={(e) => {
-                    e.stopPropagation(); // Prevent unwanted navigation
-                    deleteTeam(team.id);
-                  }}
-                  sx={{
-                    color: "error.main",
-                    "&:hover": {
-                      color: "error.dark",
-                    },
-                  }}
-                >
-                  <Delete />
-                </IconButton>
-              </Tooltip>
-              <Tooltip title="Archive">
-                <IconButton
-                  aria-label="archive"
-                  onClick={(e) => {
-                    e.stopPropagation(); // Prevent unwanted navigation
-                    archiveTeam(e, team.id);
-                  }}
-                  sx={{
-                    color: "warning.main",
-                    "&:hover": {
-                      color: "warning.dark",
-                    },
-                  }}
-                >
-                  <Archive />
-                </IconButton>
-              </Tooltip>
-            </Box>
+            {auth.role === "admin" && ( // Only show icons if the user is an admin
+              <Box
+                sx={{
+                  position: "absolute",
+                  bottom: 0,
+                  right: 0,
+                  p: 1,
+                  display: "flex",
+                  gap: 1,
+                  backgroundColor: "background.paper", // Card background color
+                  borderTopLeftRadius: 2, // Rounded top-left corner
+                  borderBottomRightRadius: 3, // Rounded bottom-right corner
+                  overflow: "hidden", // Ensure contents do not overflow card
+                }}
+              >
+                <Tooltip title="Edit">
+                  <IconButton
+                    aria-label="edit"
+                    onClick={(e) => {
+                      e.stopPropagation(); // Prevent unwanted navigation
+                      openModal("edit", team.id, team.name, team.leader.id, team.deskripsi);
+                    }}
+                    sx={{
+                      color: "primary.main",
+                      "&:hover": {
+                        color: "primary.dark",
+                      },
+                    }}
+                  >
+                    <Edit />
+                  </IconButton>
+                </Tooltip>
+                <Tooltip title="Delete">
+                  <IconButton
+                    aria-label="delete"
+                    onClick={(e) => {
+                      e.stopPropagation(); // Prevent unwanted navigation
+                      deleteTeam(team.id);
+                    }}
+                    sx={{
+                      color: "error.main",
+                      "&:hover": {
+                        color: "error.dark",
+                      },
+                    }}
+                  >
+                    <Delete />
+                  </IconButton>
+                </Tooltip>
+                <Tooltip title="Archive">
+                  <IconButton
+                    aria-label="archive"
+                    onClick={(e) => {
+                      e.stopPropagation(); // Prevent unwanted navigation
+                      archiveTeam(e, team.id);
+                    }}
+                    sx={{
+                      color: "warning.main",
+                      "&:hover": {
+                        color: "warning.dark",
+                      },
+                    }}
+                  >
+                    <Archive />
+                  </IconButton>
+                </Tooltip>
+              </Box>
+            )}
           </Card>
         </Grid>
       ))}

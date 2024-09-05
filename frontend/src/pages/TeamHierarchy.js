@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { Modal, Box, Button, TextField, Typography, IconButton, Select, MenuItem, InputLabel, FormControl, CircularProgress } from "@mui/material";
@@ -11,6 +11,7 @@ import DriveButton from "../components/common/button/DriveButton";
 import { useDriveLink } from "../context/DriveContext";
 import AddButton from "../components/common/button/AddButton";
 import TambahTeamModal from "../components/explorer/team/TambahTeamModal";
+import AuthContext from "../context/AuthContext.js";
 
 import { Archive, Delete, Edit } from "@mui/icons-material";
 import TeamList from "../components/explorer/team/TeamList";
@@ -57,8 +58,8 @@ function TeamHierarchy({ teams, setTeams }) {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false); // State for delete confirmation modal
   const navigate = useNavigate();
   const { setLinkDrive } = useDriveLink(); // Access the context setter
-  const apiPrivate = useAxiosPrivate()
-
+  const apiPrivate = useAxiosPrivate();
+  const { auth } = useContext(AuthContext);
 
   // Fetch users on component mount
   useEffect(() => {
@@ -91,7 +92,6 @@ function TeamHierarchy({ teams, setTeams }) {
     setSelectedKetua(""); // Clear selected ketua
     setNewDeskripsi("");
   };
-
 
   const refetchTeams = async () => {
     try {
@@ -200,40 +200,38 @@ function TeamHierarchy({ teams, setTeams }) {
   const driveFolderUrl = `https://drive.google.com/drive/folders/${process.env.REACT_APP_ROOT_DRIVE_FOLDER_ID}`;
 
   return (
-      <div className="team-hierarchy">
-        <div className="header">
-          <ExploreBreadcrumb />
+    <div className="team-hierarchy">
+      <ExploreBreadcrumb />
+      <div className="header" style={{ display: "flex", justifyContent: "space-between" }}>
+        {auth.role === "admin" && ( // O
           <AddButton onClick={() => openModal("add")} text="Tambah Tim" />
-          <DriveButton driveFolderUrl={driveFolderUrl} />
-        </div>
+        )}
 
-        <TeamList teams={teams} handleTeamClick={handleTeamClick} deleteTeam={openDeleteModal} archiveTeam={archiveTeam} openModal={openModal} />
-
-        <TambahTeamModal
-            open={isModalOpen}
-            onClose={closeModal}
-            modalType={modalType}
-            newTeamName={newTeamName}
-            setNewTeamName={setNewTeamName}
-            selectedKetua={selectedKetua}
-            setSelectedKetua={setSelectedKetua}
-            newDeskripsi={newDeskripsi}
-            setNewDeskripsi={setNewDeskripsi}
-            users={users}
-            handleKeyPress={handleKeyPress}
-            handleAddTeam={handleAddTeam}
-            handleEditTeam={handleEditTeam}
-            currentTeamId={currentTeamId}
-            loading={loading}
-        />
-
-        <DeleteConfirmationModal
-            isDeleteModalOpen={isDeleteModalOpen}
-            closeDeleteModal={closeDeleteModal}
-            deleteActivity={confirmDeleteTeam}
-            deleteItemName="Tim"
-        />
+        <DriveButton driveFolderUrl={driveFolderUrl} />
       </div>
+
+      <TeamList teams={teams} handleTeamClick={handleTeamClick} deleteTeam={openDeleteModal} archiveTeam={archiveTeam} openModal={openModal} />
+
+      <TambahTeamModal
+        open={isModalOpen}
+        onClose={closeModal}
+        modalType={modalType}
+        newTeamName={newTeamName}
+        setNewTeamName={setNewTeamName}
+        selectedKetua={selectedKetua}
+        setSelectedKetua={setSelectedKetua}
+        newDeskripsi={newDeskripsi}
+        setNewDeskripsi={setNewDeskripsi}
+        users={users}
+        handleKeyPress={handleKeyPress}
+        handleAddTeam={handleAddTeam}
+        handleEditTeam={handleEditTeam}
+        currentTeamId={currentTeamId}
+        loading={loading}
+      />
+
+      <DeleteConfirmationModal isDeleteModalOpen={isDeleteModalOpen} closeDeleteModal={closeDeleteModal} deleteActivity={confirmDeleteTeam} deleteItemName="Tim" />
+    </div>
   );
 }
 

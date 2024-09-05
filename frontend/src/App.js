@@ -111,10 +111,6 @@ function App() {
     }
   };
 
-  if (loading) {
-    return <div>Loading...</div>;
-  }
-
   return (
     <Box display="flex" flexDirection="column" minHeight="100vh">
       <Header
