@@ -50,6 +50,7 @@ function TeamHierarchy({ teams, setTeams }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalType, setModalType] = useState(""); // Type of the modal ("add" or "edit")
   const [currentTeamId, setCurrentTeamId] = useState(null);
+  const [notification, setNotification] = useState("");
   const [newTeamName, setNewTeamName] = useState("");
   const [newDeskripsi, setNewDeskripsi] = useState(""); // State for deskripsi
   const [users, setUsers] = useState([]); // State for users
@@ -83,6 +84,7 @@ function TeamHierarchy({ teams, setTeams }) {
     setSelectedKetua(ketua); // Set selected ketua
     setNewDeskripsi(deskripsi);
     setIsModalOpen(true);
+    setNotification(""); // Reset notification when opening modal
   };
 
   const closeModal = () => {
@@ -91,6 +93,7 @@ function TeamHierarchy({ teams, setTeams }) {
     setNewTeamName("");
     setSelectedKetua(""); // Clear selected ketua
     setNewDeskripsi("");
+    setNotification(""); // Reset notification when closing modal
   };
 
   const refetchTeams = async () => {
@@ -118,43 +121,54 @@ function TeamHierarchy({ teams, setTeams }) {
 
   const handleAddTeam = async () => {
     if (newTeamName && selectedKetua && newDeskripsi) {
+      const isKetuaAlreadyAssigned = teams.some((team) => team.leader_id === selectedKetua);
+
+      if (isKetuaAlreadyAssigned) {
+        setNotification("Ketua yang dipilih sudah memimpin tim lain. Silakan pilih ketua yang lain.");
+        return;
+      }
+
       setLoading(true);
       try {
         await apiPrivate.post(`/teams`, {
           name: newTeamName,
-          leader_id: selectedKetua, // Use selected ketua ID
+          leader_id: selectedKetua,
           deskripsi: newDeskripsi,
         });
 
-        // Simulate loading duration (e.g., 2 seconds)
         setTimeout(() => {
           refetchTeams();
           closeModal();
           setLoading(false);
-        }, 2000); // 2000ms = 2 seconds
+        }, 2000);
       } catch (error) {
         console.error("Error adding team:", error);
         setLoading(false);
       }
     }
   };
-
   const handleEditTeam = async (id) => {
     if (newTeamName && selectedKetua && newDeskripsi) {
+      const isKetuaAlreadyAssigned = teams.some((team) => team.leader_id === selectedKetua && team.id !== id);
+
+      if (isKetuaAlreadyAssigned) {
+        setNotification("Ketua yang dipilih sudah memimpin tim lain. Silakan pilih ketua yang lain.");
+        return;
+      }
+
       setLoading(true);
       try {
         await apiPrivate.patch(`/teams/${id}`, {
           name: newTeamName,
-          leader_id: selectedKetua, // Use selected ketua ID
+          leader_id: selectedKetua,
           deskripsi: newDeskripsi,
         });
 
-        // Simulate loading duration (e.g., 2 seconds)
         setTimeout(() => {
           refetchTeams();
           closeModal();
           setLoading(false);
-        }, 2000); // 2000ms = 2 seconds
+        }, 2000);
       } catch (error) {
         console.error("Error editing team:", error);
         setLoading(false);
@@ -232,6 +246,9 @@ function TeamHierarchy({ teams, setTeams }) {
         handleEditTeam={handleEditTeam}
         currentTeamId={currentTeamId}
         loading={loading}
+        setLoading={setLoading} // <-- Ensure this line is present
+        notification={notification} // pass notification state
+        setNotification={setNotification} // pass notification setter
       />
 
       <DeleteConfirmationModal isDeleteModalOpen={isDeleteModalOpen} closeDeleteModal={closeDeleteModal} deleteActivity={confirmDeleteTeam} deleteItemName="Tim" />
