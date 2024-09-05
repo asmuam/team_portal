@@ -26,14 +26,6 @@ export const AuthProvider = ({ children }) => {
     setLoading(false);
   }, []);
 
-  if (loading) {
-    return (
-      <Box display="flex" justifyContent="center" alignItems="center" height="100vh">
-        <CircularProgress />
-      </Box>
-    );
-  }
-
   return <AuthContext.Provider value={{ auth, setAuth }}>{children}</AuthContext.Provider>;
 };
 

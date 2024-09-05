@@ -5,6 +5,8 @@ import { useTeams } from "./context/TeamsContext";
 import Header from "./components/common/navigation/Header";
 import Footer from "./components/common/navigation/Footer";
 import AppRouter from "./components/common/navigation/AppRoutes";
+import CircularProgress from "@mui/material/CircularProgress";
+
 import Box from "@mui/material/Box";
 import Container from "@mui/material/Container";
 import { api } from "./utils/axios.js";
@@ -95,6 +97,7 @@ function App() {
         }
       );
 
+      // Hapus auth token dan session
       document.cookie = "authToken=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/";
       localStorage.removeItem("authToken");
       sessionStorage.removeItem("uid");
@@ -102,14 +105,26 @@ function App() {
       sessionStorage.removeItem("username");
       sessionStorage.removeItem("name");
 
+      // Set auth state ke default
       setAuth({});
       setIsAuthenticated(false);
-      setOpenLogoutModal();
-      navigate("/login");
+      setOpenLogoutModal(false); // Tutup modal
+
+      // Refresh halaman sebelum pindah ke login
+      window.location.reload(); // Refresh halaman
+      navigate("/login"); // Pindah ke halaman login setelah refresh
     } catch (error) {
       console.error("Logout error", error);
     }
   };
+
+  if (loading) {
+    return (
+      <Box display="flex" justifyContent="center" alignItems="center" height="100vh">
+        <CircularProgress />
+      </Box>
+    );
+  }
 
   return (
     <Box display="flex" flexDirection="column" minHeight="100vh">
