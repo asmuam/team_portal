@@ -185,26 +185,39 @@ const LinkPenting = () => {
         </Box>
       ))}
 
-      <Modal open={isModalOpen} onClose={closeModal}>
+      <Modal open={isModalOpen} onClose={closeModal} sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
         <Box
-          sx={{
-            position: "absolute",
-            top: "50%",
-            left: "50%",
-            transform: "translate(-50%, -50%)",
-            width: 400,
-            bgcolor: "background.paper",
-            border: "2px solid #000",
-            boxShadow: 24,
-            p: 4,
-            borderRadius: 2,
-          }}
+            sx={{
+              width: { xs: '80%', sm: '90%', md: 400 }, // Responsif berdasarkan ukuran layar
+              bgcolor: 'background.paper',
+              borderRadius: 2,
+              boxShadow: 24,
+              p: 4,
+              border: '1px solid #ddd',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: 2
+            }}
         >
-          <Typography variant="h6" marginBottom={2}>
+          <Typography variant="h6" component="h2" gutterBottom>
             {modalType === "add" ? "Add New Link" : "Edit Link"}
           </Typography>
-          <TextField label="Link URL" fullWidth value={linkUrl} onChange={(e) => setLinkUrl(e.target.value)} margin="normal" />
-          <TextField label="Description" fullWidth value={linkDescription} onChange={(e) => setLinkDescription(e.target.value)} margin="normal" />
+          <TextField
+              label="Link URL"
+              fullWidth
+              value={linkUrl}
+              onChange={(e) => setLinkUrl(e.target.value)}
+              margin="normal"
+              variant="outlined"
+          />
+          <TextField
+              label="Description"
+              fullWidth
+              value={linkDescription}
+              onChange={(e) => setLinkDescription(e.target.value)}
+              margin="normal"
+              variant="outlined"
+          />
           <Box display="flex" justifyContent="flex-end" marginTop={2}>
             <Button onClick={modalType === "add" ? handleAddLink : handleEditLink} variant="contained" color="primary">
               {modalType === "add" ? "Add Link" : "Save Changes"}
