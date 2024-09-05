@@ -15,30 +15,28 @@ const ExploreBreadcrumb = () => {
     });
     const apiPrivate = useAxiosPrivate();
 
-
     useEffect(() => {
-        console.log('Fetching data for breadcrumb...');
         const fetchData = async () => {
             try {
                 // Fetch team by teamId
                 if (teamId) {
-                    const teamsResponse = await apiPrivate.get(`/teams`);
-                    const team = teamsResponse.data.find(team => team.id === parseInt(teamId));
+                    const teamResponse = await apiPrivate.get(`/teams/${teamId}`);
+                    const team = teamResponse.data;
                     if (team) {
                         setData(prev => ({ ...prev, teamName: team.name }));
                     }
 
-                    // Fetch activities if teamId is available
+                    // Fetch activity by activityId if available
                     if (activityId) {
-                        const activitiesResponse = await apiPrivate.get(`/teams/${teamId}/activities`);
-                        const activity = activitiesResponse.data.find(activity => activity.id === parseInt(activityId));
+                        const activityResponse = await apiPrivate.get(`/teams/${teamId}/activities/${activityId}`);
+                        const activity = activityResponse.data;
                         if (activity) {
                             setData(prev => ({ ...prev, activityName: activity.name }));
 
-                            // Fetch sub-activities if activityId is available
+                            // Fetch sub-activity by subActivityId if available
                             if (subActivityId) {
-                                const subActivitiesResponse = await apiPrivate.get(`/teams/${teamId}/activities/${activityId}/sub-activities`);
-                                const subActivity = subActivitiesResponse.data.find(sub => sub.id === parseInt(subActivityId));
+                                const subActivityResponse = await apiPrivate.get(`/teams/${teamId}/activities/${activityId}/sub-activities/${subActivityId}`);
+                                const subActivity = subActivityResponse.data;
                                 if (subActivity) {
                                     setData(prev => ({ ...prev, subActivityName: subActivity.name }));
                                 }
@@ -52,7 +50,7 @@ const ExploreBreadcrumb = () => {
         };
 
         fetchData();
-    }, [teamId, activityId, subActivityId]);
+    }, [teamId, activityId, subActivityId, apiPrivate]);
 
     return (
         <Breadcrumbs aria-label="breadcrumb">

@@ -33,8 +33,7 @@ const DriveButton = ({ driveFolderUrl }) => {
         "&:focus": {
           outline: "none",
           boxShadow: "0 0 0 3px rgba(38, 143, 255, 0.5)",
-        },
-        marginLeft: "10px", // Add margin to the right for spacing
+        }, // Add margin to the right for spacing
       }}
     >
       {isMobile ? "" : "Buka Drive"}
