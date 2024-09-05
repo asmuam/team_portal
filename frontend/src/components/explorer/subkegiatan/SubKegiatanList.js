@@ -1,7 +1,8 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import { Grid, Card, CardContent, Typography, IconButton, Box, Tooltip, Button } from "@mui/material";
 import { Edit, Delete, Archive } from "@mui/icons-material";
 import { styled } from "@mui/system";
+import AuthContext from "../../../context/AuthContext.js";
 
 // Styled Component for Card
 const StyledCard = styled(Card)(() => ({
@@ -64,6 +65,7 @@ const PaginationControls = styled(Box)(() => ({
 const SubActivityList = ({ activities, onActivityClick, onEditClick, onDeleteClick, onArchiveClick, tasksPerPage = 8 }) => {
   const [currentPage, setCurrentPage] = useState(1);
   const totalPages = Math.ceil(activities.length / tasksPerPage);
+  const { auth } = useContext(AuthContext);
 
   // Calculate the activities to display for the current page
   const startIndex = (currentPage - 1) * tasksPerPage;
@@ -104,41 +106,43 @@ const SubActivityList = ({ activities, onActivityClick, onEditClick, onDeleteCli
                   {activity.deskripsi}
                 </DescriptionBox>
               </CardContent>
-              <IconContainer>
-                <Tooltip title="Edit">
-                  <IconButton
-                    aria-label="edit"
-                    onClick={(e) => {
-                      e.stopPropagation(); // Prevent unwanted navigation
-                      onEditClick(activity.id, activity.name, activity.tanggal_pelaksanaan, activity.deskripsi);
-                    }}
-                  >
-                    <Edit />
-                  </IconButton>
-                </Tooltip>
-                <Tooltip title="Delete">
-                  <IconButton
-                    aria-label="delete"
-                    onClick={(e) => {
-                      e.stopPropagation(); // Prevent unwanted navigation
-                      onDeleteClick(activity.id);
-                    }}
-                  >
-                    <Delete />
-                  </IconButton>
-                </Tooltip>
-                <Tooltip title="Archive">
-                  <IconButton
-                    aria-label="archive"
-                    onClick={(e) => {
-                      e.stopPropagation(); // Prevent unwanted navigation
-                      onArchiveClick(activity.id);
-                    }}
-                  >
-                    <Archive />
-                  </IconButton>
-                </Tooltip>
-              </IconContainer>
+              {auth.role === "admin" && ( // Only show icons if the user is an admin
+                <IconContainer>
+                  <Tooltip title="Edit">
+                    <IconButton
+                      aria-label="edit"
+                      onClick={(e) => {
+                        e.stopPropagation(); // Prevent unwanted navigation
+                        onEditClick(activity.id, activity.name, activity.tanggal_pelaksanaan, activity.deskripsi);
+                      }}
+                    >
+                      <Edit />
+                    </IconButton>
+                  </Tooltip>
+                  <Tooltip title="Delete">
+                    <IconButton
+                      aria-label="delete"
+                      onClick={(e) => {
+                        e.stopPropagation(); // Prevent unwanted navigation
+                        onDeleteClick(activity.id);
+                      }}
+                    >
+                      <Delete />
+                    </IconButton>
+                  </Tooltip>
+                  <Tooltip title="Archive">
+                    <IconButton
+                      aria-label="archive"
+                      onClick={(e) => {
+                        e.stopPropagation(); // Prevent unwanted navigation
+                        onArchiveClick(activity.id);
+                      }}
+                    >
+                      <Archive />
+                    </IconButton>
+                  </Tooltip>
+                </IconContainer>
+              )}
             </StyledCard>
           </Grid>
         ))}
