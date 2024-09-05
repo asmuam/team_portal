@@ -34,7 +34,6 @@ const TambahTeamModal = ({
   setNotification, // Tambahkan setNotification sebagai props
 }) => {
   const isMobile = useMediaQuery("(max-width:600px)");
-
   // Fungsi untuk memeriksa apakah ketua sudah dipilih di tim lain
   const checkIfKetuaExistsInOtherTeams = () => {
     if (!teams || !Array.isArray(teams)) {
