@@ -12,13 +12,20 @@ const useRefreshToken = () => {
 
   const refresh = async () => {
     try {
-      const response = await api.post("/refresh", { uid: auth.uid });
-      const { accessToken } = response.data;
+      // Ambil uid dari sessionStorage
+      const uid = sessionStorage.getItem("uid");
       
+      if (!uid) {
+        throw new Error("UID tidak ditemukan di sessionStorage");
+      }
+
+      const response = await api.post("/refresh", { uid });
+      const { accessToken } = response.data;
+
       // Menyimpan access token baru di local storage dan global state
       localStorage.setItem("authToken", accessToken);
       setAuth((prev) => ({ ...prev, token: accessToken }));
-      
+
       return accessToken; // Mengembalikan access token baru
     } catch (error) {
       console.error("Failed to refresh token:", error);

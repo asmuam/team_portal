@@ -103,6 +103,7 @@ router.post("/refresh", async (req, res) => {
     // Verifikasi dan validasi refresh token
     jwt.verify(refreshToken, REFRESH_TOKEN_SECRET, async (err, decoded) => {
       if (err) return res.status(403).json({ message: "Refresh token tidak valid" });
+      if (!uid) return res.status(403).json({ message: "Sesi Telah Berakhir" });
 
       const user = await prismaClient.user.findUnique({
         where: { id: parseInt(uid) },
