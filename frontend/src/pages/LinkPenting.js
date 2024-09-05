@@ -1,7 +1,6 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Modal, Box, TextField, Button, Typography } from "@mui/material";
 import { useTeams } from "../context/TeamsContext";
-import axios from "axios";
 import useAxiosPrivate from "../hooks/use-axios-private.js";
 
 const API_URL = process.env.REACT_APP_API_URL;
@@ -17,8 +16,30 @@ const LinkPenting = () => {
   const [linkDescription, setLinkDescription] = useState("");
   const apiPrivate = useAxiosPrivate()
 
+    // Fetch users on component mount
+    useEffect(() => {
+      refetchTeams();
+        }, []);
+
   const handleToggleTeam = (teamId) => {
     setOpenTeam(openTeam === teamId ? null : teamId);
+  };
+
+  const refetchTeams = async () => {
+    try {
+      // Gunakan apiPrivate untuk melakukan permintaan
+      const response = await apiPrivate.get(`/teams`);
+
+      // Periksa apakah status responnya 200 OK
+      if (response.status === 200) {
+        const data = response.data; // Data dari respons
+        setTeams(data);
+      } else {
+        throw new Error("Failed to fetch teams: " + response.status);
+      }
+    } catch (error) {
+      console.error("Failed to fetch teams:", error);
+    }
   };
 
   const formatUrl = (url) => {
