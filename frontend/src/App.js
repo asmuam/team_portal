@@ -118,7 +118,6 @@ function App() {
       setOpenLogoutModal(false); // Tutup modal
 
       // Refresh halaman sebelum pindah ke login
-      window.location.reload(); // Refresh halaman
       navigate("/login"); // Pindah ke halaman login setelah refresh
     } catch (error) {
       console.error("Logout error", error);
