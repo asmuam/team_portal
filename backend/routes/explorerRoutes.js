@@ -834,7 +834,7 @@ router.patch("/teams/:teamId/activities/:activityId/sub-activities/:subActivityI
 // archive tugas soon
 
 // Get all pegawai incl admins
-router.get("/users/pegawai", authorizeRole(["admin"]), async (req, res) => {
+router.get("/users/pegawai", async (req, res) => {
   try {
     const pegawai = await prisma.user.findMany({
       where: {
