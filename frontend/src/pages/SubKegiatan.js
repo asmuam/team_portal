@@ -86,12 +86,33 @@ function SubKegiatan() {
   const [tanggalPelaksanaan, setTanggalPelaksanaan] = useState("");
   const [loading, setLoading] = useState(false); // State for loading
   const [currentPage, setCurrentPage] = useState(1);
-  const [activitiesPerPage] = useState(4);
   const { setLinkDrive, linkDrive } = useDriveLink(); // Access the link_drive from context
   const apiPrivate = useAxiosPrivate();
-
   const navigate = useNavigate();
+  const driveFolderUrl = linkDrive;
+  useEffect(() => {
+    if (activityId && teamId) {
+      refetchSubActivities();
+      refetchActivityDetails();
+      refetchLink();
+    }
+  }, [activityId, teamId]);
+  const refetchLink = async () => {
+    try {
+      // Gunakan apiPrivate untuk melakukan permintaan
+      const response = await apiPrivate.get(`/teams/${teamId}/activities/${activityId}`);
 
+      // Periksa apakah status responnya 200 OK
+      if (response.status === 200) {
+        const data = response.data; // Data dari respons
+        setLinkDrive(data.link_drive);
+      } else {
+        throw new Error("Failed to fetch activities: " + response.status);
+      }
+    } catch (error) {
+      console.error("Failed to fetch activities:", error);
+    }
+  };
   const openModal = (type, subActivityId = null, name = "", tanggal = "", deskripsi = "") => {
     setModalType(type);
     setCurrentSubActivityId(subActivityId);
@@ -100,7 +121,6 @@ function SubKegiatan() {
     setTanggalPelaksanaan(tanggal ? new Date(tanggal).toISOString().substr(0, 10) : "");
     setIsModalOpen(true);
   };
-
   const closeModal = () => {
     setIsModalOpen(false);
     setCurrentSubActivityId(null);
@@ -108,26 +128,21 @@ function SubKegiatan() {
     setTanggalPelaksanaan("");
     setDeskripsi("");
   };
-
   const openDeleteModal = (subActivityId) => {
     setCurrentSubActivityId(subActivityId);
     setIsDeleteModalOpen(true);
   };
-
   const isMobile = useMediaQuery("(max-width:600px)");
-
   const closeDeleteModal = () => {
     setIsDeleteModalOpen(false);
     setCurrentSubActivityId(null);
   };
-
   const PaginationControls = styled(Box)({
     display: "flex",
     justifyContent: "center",
     alignItems: "center",
     marginTop: "20px",
   });
-
   const refetchSubActivities = async () => {
     try {
       // Gunakan apiPrivate untuk melakukan permintaan
@@ -144,7 +159,6 @@ function SubKegiatan() {
       console.error("Failed to fetch sub-activities:", error);
     }
   };
-
   const refetchActivityDetails = async () => {
     try {
       // Gunakan apiPrivate untuk melakukan permintaan
@@ -161,18 +175,9 @@ function SubKegiatan() {
       console.error("Failed to fetch activity details:", error);
     }
   };
-
-  useEffect(() => {
-    if (activityId && teamId) {
-      refetchSubActivities();
-      refetchActivityDetails();
-    }
-  }, [activityId, teamId]);
-
   const toggleSubActivityTasks = (subActivityId) => {
     setActiveSubActivities((prevState) => (prevState.includes(subActivityId) ? prevState.filter((id) => id !== subActivityId) : [...prevState, subActivityId]));
   };
-
   const handleAddSubActivity = async () => {
     if (subActivityName) {
       setLoading(true);
@@ -188,7 +193,6 @@ function SubKegiatan() {
       }
     }
   };
-
   const handleEditSubActivity = async () => {
     if (subActivityName) {
       setLoading(true);
@@ -205,13 +209,11 @@ function SubKegiatan() {
       }
     }
   };
-
   const handleKeyPress = (e) => {
     if (e.key === "Enter") {
       modalType === "add" ? handleAddSubActivity() : handleEditSubActivity();
     }
   };
-
   const deleteSubActivity = async () => {
     try {
       await apiPrivate.delete(`/teams/${teamId}/activities/${activityId}/sub-activities/${currentSubActivityId}`);
@@ -221,29 +223,18 @@ function SubKegiatan() {
       console.error("Error deleting sub-activity:", error);
     }
   };
-
   const archiveSubActivity = async (subActivityId) => {
     alert("Fitur arsip belum tersedia");
     refetchSubActivities();
   };
-
   const handleSubActivityClick = (subActivityId, link_drive) => {
     setLinkDrive(link_drive);
     navigate(`/explorer/team/${teamId}/kegiatan/${activityId}/subkegiatan/${subActivityId}/tugas`);
   };
-
   const formatDate = (dateString) => {
     const options = { day: "numeric", month: "long", year: "numeric" };
     return new Date(dateString).toLocaleDateString("id-ID", options);
   };
-
-  const indexOfLastActivity = currentPage * activitiesPerPage;
-  const indexOfFirstActivity = indexOfLastActivity - activitiesPerPage;
-  const currentActivities = subActivities.slice(indexOfFirstActivity, indexOfLastActivity);
-
-  const totalPages = Math.ceil(subActivities.length / activitiesPerPage);
-  const driveFolderUrl = linkDrive;
-  setLinkDrive(driveFolderUrl);
 
   return (
     <div className="sub-activity-container">
@@ -301,8 +292,8 @@ function SubKegiatan() {
       </div>
 
       <SubActivityList
-        activities={currentActivities}
-        onActivityClick={handleSubActivityClick}
+        subActivities={subActivities}
+        onSubActivityClick={handleSubActivityClick}
         onEditClick={(id, name, tanggal, deskripsi) => openModal("edit", id, name, tanggal, deskripsi)}
         onDeleteClick={openDeleteModal}
         onArchiveClick={archiveSubActivity}

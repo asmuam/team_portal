@@ -166,7 +166,7 @@ function Tugas() {
   const [activityName, setActivityName] = useState("");
   const [subActivityName, setSubActivityName] = useState("");
   const [subActivityTasks, setSubActivityTasks] = useState({});
-  const { linkDrive } = useDriveLink(); // Access the link_drive from context
+  const {setLinkDrive, linkDrive } = useDriveLink(); // Access the link_drive from context
 
   const apiPrivate = useAxiosPrivate();
 
@@ -238,8 +238,25 @@ function Tugas() {
     fetchActivityDetails();
     fetchSubActivityDetails();
     refetchTasks();
+    refetchLink();
   }, [teamId, activityId, subActivityId]);
 
+  const refetchLink = async () => {
+    try {
+      // Gunakan apiPrivate untuk melakukan permintaan
+      const response = await apiPrivate.get(`/teams/${teamId}/activities/${activityId}/sub-activities/${subActivityId}`);
+
+      // Periksa apakah status responnya 200 OK
+      if (response.status === 200) {
+        const data = response.data; // Data dari respons
+        setLinkDrive(data.link_drive);
+      } else {
+        throw new Error("Failed to fetch activities: " + response.status);
+      }
+    } catch (error) {
+      console.error("Failed to fetch activities:", error);
+    }
+  };
   const openModal = (type, taskId = null, name = "", date = "", link = "", deskripsi = "") => {
     setModalType(type);
     setCurrentTaskId(taskId);

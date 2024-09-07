@@ -1,6 +1,14 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
-import { Box, Button, Typography, IconButton, Modal, TextField, CircularProgress } from "@mui/material";
+import {
+  Box,
+  Button,
+  Typography,
+  IconButton,
+  Modal,
+  TextField,
+  CircularProgress,
+} from "@mui/material";
 import { styled } from "@mui/system";
 import CloseIcon from "@mui/icons-material/Close";
 import AddIcon from "@mui/icons-material/Add";
@@ -89,22 +97,32 @@ function Kegiatan() {
   const [newDeskripsi, setNewDeskripsi] = useState("");
   const [tanggalPelaksanaan, setTanggalPelaksanaan] = useState("");
   const [loading, setLoading] = useState(false); // State for loading
-
-  const [currentPage, setCurrentPage] = useState(1);
-  const tasksPerPage = 9;
   const navigate = useNavigate();
   const { setLinkDrive, linkDrive } = useDriveLink(); // Access the link_drive from context
   const apiPrivate = useAxiosPrivate();
-
-  const openModal = (type, activityId = null, activityName = "", tanggal = "", deskripsi = "") => {
+  const driveFolderUrl = linkDrive;
+  useEffect(() => {
+    if (teamId) {
+      refetchActivities();
+      refetchLink();
+    }
+  }, [teamId]);
+  const openModal = (
+    type,
+    activityId = null,
+    activityName = "",
+    tanggal = "",
+    deskripsi = ""
+  ) => {
     setModalType(type);
     setCurrentActivityId(activityId);
     setNewActivityName(activityName);
     setNewDeskripsi(deskripsi);
-    setTanggalPelaksanaan(tanggal ? new Date(tanggal).toISOString().substr(0, 10) : ""); // Format to YYYY-MM-DD
+    setTanggalPelaksanaan(
+      tanggal ? new Date(tanggal).toISOString().substr(0, 10) : ""
+    ); // Format to YYYY-MM-DD
     setIsModalOpen(true);
   };
-
   const closeModal = () => {
     setIsModalOpen(false);
     setCurrentActivityId(null);
@@ -112,17 +130,14 @@ function Kegiatan() {
     setTanggalPelaksanaan("");
     setNewDeskripsi("");
   };
-
   const openDeleteModal = (activityId) => {
     setCurrentActivityId(activityId);
     setIsDeleteModalOpen(true);
   };
-
   const closeDeleteModal = () => {
     setIsDeleteModalOpen(false);
     setCurrentActivityId(null);
   };
-
   const refetchActivities = async () => {
     try {
       // Gunakan apiPrivate untuk melakukan permintaan
@@ -139,24 +154,36 @@ function Kegiatan() {
       console.error("Failed to fetch activities:", error);
     }
   };
+  const refetchLink = async () => {
+    try {
+      // Gunakan apiPrivate untuk melakukan permintaan
+      const response = await apiPrivate.get(`/teams/${teamId}`);
 
-  useEffect(() => {
-    if (teamId) {
-      refetchActivities();
+      // Periksa apakah status responnya 200 OK
+      if (response.status === 200) {
+        const data = response.data; // Data dari respons
+        setLinkDrive(data.link_drive);
+      } else {
+        throw new Error("Failed to fetch activities: " + response.status);
+      }
+    } catch (error) {
+      console.error("Failed to fetch activities:", error);
     }
-  }, [teamId]);
-
+  };
   const handleActivityClick = (activityId, link_drive) => {
     setLinkDrive(link_drive); // Set the link_drive in context
     navigate(`/explorer/team/${teamId}/kegiatan/${activityId}/subkegiatan`);
   };
-
   const handleAddActivity = async () => {
     if (newActivityName) {
       setLoading(true);
 
       try {
-        await apiPrivate.post(`/teams/${teamId}/activities/`, { name: newActivityName, tanggal_pelaksanaan: tanggalPelaksanaan, deskripsi: newDeskripsi });
+        await apiPrivate.post(`/teams/${teamId}/activities/`, {
+          name: newActivityName,
+          tanggal_pelaksanaan: tanggalPelaksanaan,
+          deskripsi: newDeskripsi,
+        });
         setTimeout(() => {
           refetchActivities();
           closeModal();
@@ -168,13 +195,19 @@ function Kegiatan() {
       }
     }
   };
-
   const handleEditActivity = async () => {
     if (newActivityName) {
       setLoading(true);
 
       try {
-        await apiPrivate.patch(`/teams/${teamId}/activities/${currentActivityId}`, { name: newActivityName, tanggal_pelaksanaan: tanggalPelaksanaan, deskripsi: newDeskripsi });
+        await apiPrivate.patch(
+          `/teams/${teamId}/activities/${currentActivityId}`,
+          {
+            name: newActivityName,
+            tanggal_pelaksanaan: tanggalPelaksanaan,
+            deskripsi: newDeskripsi,
+          }
+        );
         setTimeout(() => {
           refetchActivities();
           closeModal();
@@ -186,7 +219,6 @@ function Kegiatan() {
       }
     }
   };
-
   const handleKeyPress = (e) => {
     if (e.key === "Enter") {
       modalType === "add" ? handleAddActivity() : handleEditActivity();
@@ -194,7 +226,9 @@ function Kegiatan() {
   };
   const deleteActivity = async () => {
     try {
-      await apiPrivate.delete(`/teams/${teamId}/activities/${currentActivityId}`);
+      await apiPrivate.delete(
+        `/teams/${teamId}/activities/${currentActivityId}`
+      );
       refetchActivities();
       closeDeleteModal();
     } catch (error) {
@@ -206,36 +240,31 @@ function Kegiatan() {
     // Implement actual archiving logic here if needed
     refetchActivities();
   };
-
   const formatDate = (dateString) => {
     const options = { day: "numeric", month: "long", year: "numeric" };
     return new Date(dateString).toLocaleDateString("id-ID", options);
   };
   const isMobile = useMediaQuery("(max-width:600px)");
 
-  // const indexOfLastActivity = currentPage * activitiesPerPage;
-  // const indexOfFirstActivity = indexOfLastActivity - activitiesPerPage;
-  // const currentActivities = activities.slice(indexOfFirstActivity, indexOfLastActivity);
-
-  // const totalPages = Math.ceil(activities.length / activitiesPerPage);
-
-  const indexOfLastTask = currentPage * tasksPerPage;
-  const indexOfFirstTask = indexOfLastTask - tasksPerPage;
-  const currentActivities = activities.slice(indexOfFirstTask, indexOfLastTask);
-
-  const totalPages = Math.ceil(activities.length / tasksPerPage);
-  const driveFolderUrl = linkDrive;
-  setLinkDrive(driveFolderUrl);
-
   return (
     <div className="kegiatan">
-      <div className="header" style={{ marginBottom: "10px", position: "relative" }}>
+      <div
+        className="header"
+        style={{ marginBottom: "10px", position: "relative" }}
+      >
         {/* Bagian Back dan Tambah */}
         <ExploreBreadcrumb />
 
         <div style={{ display: "flex", alignItems: "center" }}>
           {isMobile ? (
-            <IconButton onClick={() => navigate("/explorer")} style={{ backgroundColor: "#007bff", color: "#ffffff", marginRight: "10px" }}>
+            <IconButton
+              onClick={() => navigate("/explorer")}
+              style={{
+                backgroundColor: "#007bff",
+                color: "#ffffff",
+                marginRight: "10px",
+              }}
+            >
               <ArrowBackIcon />
             </IconButton>
           ) : (
@@ -272,7 +301,14 @@ function Kegiatan() {
               Back
             </Button>
           )}
-          {isMobile ? <AddButton onClick={() => openModal("add")} text="Tambah " /> : <AddButton onClick={() => openModal("add")} text="Tambah Kegiatan " />}
+          {isMobile ? (
+            <AddButton onClick={() => openModal("add")} text="Tambah " />
+          ) : (
+            <AddButton
+              onClick={() => openModal("add")}
+              text="Tambah Kegiatan "
+            />
+          )}
         </div>
 
         {/* Bagian Drive */}
@@ -282,9 +318,11 @@ function Kegiatan() {
       </div>
 
       <ActivityList
-        activities={currentActivities}
+        activities={activities}
         onActivityClick={handleActivityClick}
-        onEditClick={(id, name, tanggal, deskripsi) => openModal("edit", id, name, tanggal, deskripsi)}
+        onEditClick={(id, name, tanggal, deskripsi) =>
+          openModal("edit", id, name, tanggal, deskripsi)
+        }
         onDeleteClick={openDeleteModal}
         onArchiveClick={archiveActivity}
       />
@@ -304,7 +342,12 @@ function Kegiatan() {
         loading={loading}
       />
 
-      <DeleteConfirmationModal isDeleteModalOpen={isDeleteModalOpen} closeDeleteModal={closeDeleteModal} deleteActivity={deleteActivity} deleteItemName="Kegiatan" />
+      <DeleteConfirmationModal
+        isDeleteModalOpen={isDeleteModalOpen}
+        closeDeleteModal={closeDeleteModal}
+        deleteActivity={deleteActivity}
+        deleteItemName="Kegiatan"
+      />
     </div>
   );
 }
