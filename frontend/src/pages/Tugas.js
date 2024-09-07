@@ -39,7 +39,7 @@ const ModalContent = styled(Box)(({ isMobile }) => ({
 }));
 const TableContainer = styled(Box)({
   width: "100%",
-  overflowX: "auto", // Menambahkan overflow horizontal
+  overflowX: "auto", // Ensures horizontal scrolling for large tables
 });
 
 const TaskTable = styled("table")(({ isMobile }) => ({
@@ -53,6 +53,20 @@ const TaskTable = styled("table")(({ isMobile }) => ({
 const TableRow = styled("tr")(({ isMobile }) => ({
   display: isMobile ? "block" : "table-row",
   marginBottom: isMobile ? "10px" : "0",
+  position: isMobile ? "relative" : "static",
+  padding: isMobile ? "8px 0" : "0", // Add padding for mobile view
+  "&:not(:last-child)::after": isMobile
+    ? {
+        content: '""',
+        display: "block",
+        width: "100%",
+        height: "1px",
+        backgroundColor: "#ddd",
+        position: "absolute",
+        left: "0",
+        bottom: "0",
+      }
+    : {},
 }));
 
 const TableHeader = styled("th")(({ isMobile }) => ({
@@ -77,11 +91,13 @@ const TableCell = styled("td")(({ isMobile }) => ({
       }
     : {},
 }));
+
 const Header = styled(Typography)({
   marginBottom: "16px",
   position: "relative",
   paddingRight: "32px",
 });
+
 
 const ActionButton = styled(IconButton)({
   backgroundColor: "#ddd",
@@ -142,12 +158,11 @@ const FileName = styled("span")({
 
 function Tugas() {
   const { teamId, activityId, subActivityId } = useParams();
-
   const [tasks, setTasks] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalType, setModalType] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const tasksPerPage = 5;
+  const tasksPerPage = 4;
   const [currentTaskId, setCurrentTaskId] = useState(null);
   const [taskName, setTaskName] = useState("");
   const [dueDate, setDueDate] = useState("");
@@ -159,15 +174,12 @@ function Tugas() {
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
   const [loading, setLoading] = useState(false); // State for loading
-
   const { auth } = useContext(AuthContext);
-
   const [teamName, setTeamName] = useState("");
   const [activityName, setActivityName] = useState("");
   const [subActivityName, setSubActivityName] = useState("");
   const [subActivityTasks, setSubActivityTasks] = useState({});
   const {setLinkDrive, linkDrive } = useDriveLink(); // Access the link_drive from context
-
   const apiPrivate = useAxiosPrivate();
 
   // Calculate progress
@@ -568,7 +580,7 @@ function Tugas() {
                 currentTasks.map((task, index) => (
                   <TableRow key={task.id} isMobile={isMobile}>
                     <TableCell data-label="No" isMobile={isMobile}>
-                      {index + 1}
+                      {tasksPerPage * (currentPage-1) + index + 1}
                     </TableCell>
 
                     <TableCell data-label="Task" isMobile={isMobile}>
@@ -583,7 +595,7 @@ function Tugas() {
                     <TableCell
                         data-label="Link Drive"
                         isMobile={isMobile}
-                        sx={{ display: "flex", alignItems: "center", gap: 1, maxWidth: {
+                        sx={{alignItems: "center", gap: 1, maxWidth: {
                             xs: "55%", // Lebar maksimum pada perangkat mobile (xs)
                             sm: "60%",  // Lebar maksimum pada perangkat kecil (sm) dan seterusnya
                             md: "80%",  // Lebar maksimum pada perangkat menengah (md) dan seterusnya
