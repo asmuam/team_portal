@@ -74,7 +74,13 @@ Response:
     "id": 1,
     "name": "Team Name",
     "links": [],
-    "leader_id": null
+    "deskripsi": "desc",
+    "leader_id": null,
+    "link_drive": "gdrive link",
+        "leader": {
+            "id": 1,
+            "name": "leader name"
+        }
   }
 ]
 ```
@@ -603,4 +609,46 @@ All endpoints return appropriate HTTP status codes and error messages. Common er
 
 ## Authentication
 
-Some endpoints might require authentication. Make sure to include an authorization token in the request headers.
+#### Login
+
+- **Endpoint:** `POST /login`
+- **Description:** Login.
+
+Request Body:
+
+```json
+{
+  "username": "username",
+  "password": "password"
+}
+```
+
+Response:
+
+```json
+{
+    "success": true,
+    "uid": 4,
+    "name": "Setya Hadi Nugroho",
+    "username": "hadi",
+    "role": "admin",
+    "accessToken": "accessToken"
+}
+```
+
+#### Refresh
+
+- **Endpoint:** `POST /refresh`
+- **Description:** Refresh token. (use cookie)
+
+Response:
+
+```json
+{
+    "accessToken": "accessToken"
+}
+```
+
+Some endpoints might require authentication and cookie. Make sure to include an authorization token and cookie in the request headers.
+
+- get by id belum didokumentasikan dan beberapa route tambahan lainnya
