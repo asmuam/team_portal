@@ -654,34 +654,49 @@ router.get("/teams/:teamId/activities/:activityId/sub-activities/:subActivityId/
 // Add a Task
 router.post("/teams/:teamId/activities/:activityId/sub-activities/:subActivityId/tasks", async (req, res) => {
   const { subActivityId } = req.params;
-  const { name, dueDate, dateCreated, link, deskripsi, created_by } = req.body;
+  const { name, dueDate, dateCreated, deskripsi, created_by } = req.body;
+  
   try {
-    const result = await prisma.subkegiatan.findMany(
-      {
-        where: {
-          id: parseInt(subActivityId), // Filter by teamId
-        },
-        select: {
-          link_drive: true, // Select only the link_drive column
-        },
-      }
-    )
-    const folderName = `${created_by}_${name}`;
-    const link_drive = await createFolder(folderName, extractFolderIdFromUrl(result[0].link_drive));
+    // Step 1: Create the task without the link_drive
     const task = await tugasService.createTugas({
       name,
       dateCreated: dateCreated ? new Date(dateCreated) : new Date(),
       dueDate: new Date(dueDate),
-      link: link_drive,
+      link: null, // Initially set link to null
       deskripsi,
       subkegiatan_id: parseInt(subActivityId),
       created_by,
     });
-    res.json(task);
+
+    // Step 2: Retrieve the link_drive and update the task
+    const result = await prisma.subkegiatan.findUnique({
+      where: {
+        id: parseInt(subActivityId),
+      },
+      select: {
+        link_drive: true,
+      },
+    });
+
+    if (result && result.link_drive) {
+      const folderName = `${created_by}_${name}`;
+      const link_drive = await createFolder(folderName, extractFolderIdFromUrl(result.link_drive));
+      
+      // Update the task with the link_drive
+      
+      // Return the updated task
+      const updatedTask = await tugasService.updateTugas(task.id, { link: link_drive });
+
+      return res.json(updatedTask);
+    } else {
+      // If no link_drive is found, return the task without link
+      return res.json(task);
+    }
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 });
+
 
 // req {
 //   "name": "task numero uno",

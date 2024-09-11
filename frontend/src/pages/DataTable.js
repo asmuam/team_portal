@@ -27,7 +27,7 @@ const DataTable = () => {
   });
 
   const [currentPage, setCurrentPage] = useState(0);
-  const rowsPerPage = 5;
+  const rowsPerPage = 4;
 
   const apiPrivate = useAxiosPrivate();
   useEffect(() => {

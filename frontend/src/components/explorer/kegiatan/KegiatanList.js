@@ -62,14 +62,15 @@ const PaginationControls = styled(Box)(() => ({
   marginTop: "20px",
 }));
 
-const ActivityList = ({ activities, onActivityClick, onEditClick, onDeleteClick, onArchiveClick, tasksPerPage = 8 }) => {
+const ActivityList = ({ activities, onActivityClick, onEditClick, onDeleteClick, onArchiveClick}) => {
+  const activityPerPage = 4;
   const [currentPage, setCurrentPage] = useState(1);
-  const totalPages = Math.ceil(activities.length / tasksPerPage);
+  const totalPages = Math.ceil(activities.length / activityPerPage);
   const { auth } = useContext(AuthContext);
 
   // Calculate the activities to display for the current page
-  const startIndex = (currentPage - 1) * tasksPerPage;
-  const currentActivities = activities.slice(startIndex, startIndex + tasksPerPage);
+  const startIndex = (currentPage - 1) * activityPerPage;
+  const currentActivities = activities.slice(startIndex, startIndex + activityPerPage);
 
   return (
     <>
@@ -149,7 +150,7 @@ const ActivityList = ({ activities, onActivityClick, onEditClick, onDeleteClick,
         ))}
       </Grid>
 
-      {activities.length > tasksPerPage && (
+      {activities.length > activityPerPage && (
         <PaginationControls>
           <Button onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))} disabled={currentPage === 1} style={{ fontSize: "25px" }}>
             &lt;

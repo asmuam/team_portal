@@ -10,7 +10,7 @@ const UserList = ({ users = [], onEditUser, refreshUsers }) => {
   const [loading, setLoading] = useState(false); // State untuk loading
   const [page, setPage] = useState(1);
   const apiPrivate = useAxiosPrivate();
-  const usersPerPage = 5;
+  const usersPerPage = 4;
   const pageCount = Math.ceil(users.length / usersPerPage);
 
   const handleDeleteUser = (user) => {

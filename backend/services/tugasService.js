@@ -21,12 +21,7 @@ export const createTugas = async (data) => {
 export const updateTugas = async (id, data) => {
   return prisma.tugas.update({
     where: { id: parseInt(id) },
-    data: {
-      ...data,
-      dueDate: data.dueDate ? new Date(data.dueDate) : null,
-      link: data.link, // Menggunakan data.link yang benar
-      deskripsi: data.deskripsi,
-    },
+    data
   });
 };
 

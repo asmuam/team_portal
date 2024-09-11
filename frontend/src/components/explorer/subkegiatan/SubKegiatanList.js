@@ -61,20 +61,20 @@ const PaginationControls = styled(Box)(() => ({
   marginTop: "20px",
 }));
 
-const SubActivityList = ({ activities, onActivityClick, onEditClick, onDeleteClick, onArchiveClick, tasksPerPage = 8 }) => {
+const SubActivityList = ({ subActivities, onSubActivityClick, onEditClick, onDeleteClick, onArchiveClick}) => {
+  const subActivitiyPerPage = 4;
   const [currentPage, setCurrentPage] = useState(1);
-  const totalPages = Math.ceil(activities.length / tasksPerPage);
+  const totalPages = Math.ceil(subActivities.length / subActivitiyPerPage);
   const { auth } = useContext(AuthContext);
-
-  // Calculate the activities to display for the current page
-  const startIndex = (currentPage - 1) * tasksPerPage;
-  const currentActivities = activities.slice(startIndex, startIndex + tasksPerPage);
+  // Calculate the subActivities to display for the current page
+  const startIndex = (currentPage - 1) * subActivitiyPerPage;
+  const currentsubActivities = subActivities.slice(startIndex, startIndex + subActivitiyPerPage);
   return (
     <>
-      <Grid container spacing={{ xs: 0, sm: 1, md: 3 }} className="activity-list">
-        {currentActivities.map((activity) => (
-          <Grid item xs={12} sm={6} md={4} lg={3} key={activity.id}>
-            <StyledCard onClick={() => onActivityClick(activity.id, activity.link_drive)}>
+      <Grid container spacing={{ xs: 0, sm: 1, md: 3 }} className="sub-activity-list">
+        {currentsubActivities.map((subActivity) => (
+          <Grid item xs={12} sm={6} md={4} lg={3} key={subActivity.id}>
+            <StyledCard onClick={() => onSubActivityClick(subActivity.id, subActivity.link_drive)}>
               <CardContent>
                 <Typography
                   variant="h6"
@@ -85,7 +85,7 @@ const SubActivityList = ({ activities, onActivityClick, onEditClick, onDeleteCli
                     color: "#212121",
                   }}
                 >
-                  {activity.name}
+                  {subActivity.name}
                 </Typography>
                 <Typography
                   variant="body2"
@@ -94,7 +94,7 @@ const SubActivityList = ({ activities, onActivityClick, onEditClick, onDeleteCli
                     marginBottom: "8px",
                   }}
                 >
-                  {new Date(activity.tanggal_pelaksanaan).toLocaleDateString("id-ID", { day: "numeric", month: "long", year: "numeric" })}
+                  {new Date(subActivity.tanggal_pelaksanaan).toLocaleDateString("id-ID", { day: "numeric", month: "long", year: "numeric" })}
                 </Typography>
                 <DescriptionBox
                   variant="body2"
@@ -102,7 +102,7 @@ const SubActivityList = ({ activities, onActivityClick, onEditClick, onDeleteCli
                     color: "#757575",
                   }}
                 >
-                  {activity.deskripsi}
+                  {subActivity.deskripsi}
                 </DescriptionBox>
               </CardContent>
               {auth.role === "admin" && ( // Only show icons if the user is an admin
@@ -112,7 +112,7 @@ const SubActivityList = ({ activities, onActivityClick, onEditClick, onDeleteCli
                       aria-label="edit"
                       onClick={(e) => {
                         e.stopPropagation(); // Prevent unwanted navigation
-                        onEditClick(activity.id, activity.name, activity.tanggal_pelaksanaan, activity.deskripsi);
+                        onEditClick(subActivity.id, subActivity.name, subActivity.tanggal_pelaksanaan, subActivity.deskripsi);
                       }}
                     >
                       <Edit />
@@ -123,7 +123,7 @@ const SubActivityList = ({ activities, onActivityClick, onEditClick, onDeleteCli
                       aria-label="delete"
                       onClick={(e) => {
                         e.stopPropagation(); // Prevent unwanted navigation
-                        onDeleteClick(activity.id);
+                        onDeleteClick(subActivity.id);
                       }}
                     >
                       <Delete />
@@ -134,7 +134,7 @@ const SubActivityList = ({ activities, onActivityClick, onEditClick, onDeleteCli
                       aria-label="archive"
                       onClick={(e) => {
                         e.stopPropagation(); // Prevent unwanted navigation
-                        onArchiveClick(activity.id);
+                        onArchiveClick(subActivity.id);
                       }}
                     >
                       <Archive />
@@ -147,7 +147,7 @@ const SubActivityList = ({ activities, onActivityClick, onEditClick, onDeleteCli
         ))}
       </Grid>
 
-      {activities.length > tasksPerPage && (
+      {subActivities.length > subActivitiyPerPage && (
         <PaginationControls>
           <Button onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))} disabled={currentPage === 1} style={{ fontSize: "25px" }}>
             &lt;
