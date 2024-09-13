@@ -1,12 +1,24 @@
-npm i
-npx prisma generate
-npx prisma migrate dev --name init
+
+# Memulai
+```bash
+npm i # instal dependensi
+npx prisma generate # buat prisma client (ORM) dari schema
+npx prisma migrate dev --name init # menjalankan migrasi untuk database 
+```
+
+# Google Drive API
+Backend ini terintegrasi dengan [`google drive API`](/backend/utils/googleDriveUtils.js)
+
+edit [`service_account.json`](/backend/utils/service_account.json)
+
+## Tutorial mengisi service_account.json
+---isi mas him
 
 # API Documentation
 
-## Overview
+## Ringkasan
 
-This API provides endpoints to manage teams, activities, sub-activities, and tasks. It allows you to perform CRUD (Create, Read, Update, Delete) operations and other actions on these entities.
+API ini menyediakan endpoint untuk mengelola tim, aktivitas, sub-aktivitas, dan tugas. Ini memungkinkan Anda untuk melakukan operasi CRUD (Buat, Baca, Perbarui, Hapus) dan tindakan lain.
 
 ## Base URL
 
@@ -649,6 +661,6 @@ Response:
 }
 ```
 
-Some endpoints might require authentication and cookie. Make sure to include an authorization token and cookie in the request headers.
+Beberapa endpoint mungkin memerlukan autentikasi dan cookie. Pastikan untuk menyertakan token otorisasi dan cookie dalam header permintaan pada frontend.
 
 - get by id belum didokumentasikan dan beberapa route tambahan lainnya
